@@ -3,465 +3,1847 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Integral de Gestión Docente · MEP</title>
+    <title>Sistema Integral Gestión Docente · MEP</title>
     <style>
+        /* ===== SISTEMA DE DISEÑO INSTITUCIONAL MEP ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
         }
+
         :root {
-            --primario: #0b3b2f;
-            --secundario: #a7c1b0;
-            --fondo: #f4f7f5;
-            --texto: #1e2b28;
-            --gris-claro: #e0e7e3;
-            --borde: #c0cfc5;
-            --sombra: rgba(0, 40, 30, 0.08);
+            /* Paleta institucional MEP */
+            --mep-verde-profundo: #0B3B2F;
+            --mep-verde-claro: #A7C1B0;
+            --mep-gris-fondo: #F4F7F5;
+            --mep-texto-oscuro: #1E2B28;
+            --mep-borde: #C0CFC5;
+            --mep-sombra: rgba(11, 59, 47, 0.12);
+            --mep-alerta: #D32F2F;
+            --mep-exito: #2E7D32;
+            --mep-advertencia: #ED6C02;
+            
+            /* Modo claro (default) */
+            --bg-primary: var(--mep-gris-fondo);
+            --bg-sidebar: var(--mep-verde-profundo);
+            --text-primary: var(--mep-texto-oscuro);
+            --text-sidebar: #FFFFFF;
+            --card-bg: #FFFFFF;
+            --border-color: var(--mep-borde);
+            --button-primary: var(--mep-verde-profundo);
+            --button-secondary: var(--mep-verde-claro);
+            --hover-overlay: rgba(255, 255, 255, 0.1);
         }
+
         @media (prefers-color-scheme: dark) {
             :root {
-                --primario: #1f5e4f;
-                --secundario: #3d5e51;
-                --fondo: #1b2a25;
-                --texto: #e0ede7;
-                --gris-claro: #2e4039;
-                --borde: #3f5b50;
-                --sombra: rgba(0,0,0,0.4);
+                --bg-primary: #1A2A24;
+                --bg-sidebar: #0F2A20;
+                --text-primary: #E0EDE7;
+                --text-sidebar: #FFFFFF;
+                --card-bg: #26362F;
+                --border-color: #3D5E51;
+                --button-primary: #1F5E4F;
+                --button-secondary: #3D5E51;
+                --hover-overlay: rgba(255, 255, 255, 0.15);
             }
         }
+
         body {
             display: flex;
             min-height: 100vh;
-            background: var(--fondo);
-            color: var(--texto);
-            transition: background 0.2s;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s, color 0.3s;
         }
-        /* barra lateral fija */
-        nav {
-            width: 260px;
-            background: var(--primario);
-            padding: 2rem 0.5rem;
+
+        /* ===== BARRA LATERAL FIJA ===== */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-sidebar);
+            color: var(--text-sidebar);
+            padding: 2rem 1rem;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 4px 0 20px var(--mep-sombra);
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding-bottom: 2rem;
+            border-bottom: 2px solid var(--mep-verde-claro);
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.4rem;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .sidebar-header small {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            display: block;
+            margin-top: 0.5rem;
+        }
+
+        .nav-btn {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text-sidebar);
+            padding: 1rem 1.2rem;
+            text-align: left;
+            font-size: 1rem;
+            border-radius: 12px 0 0 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-btn:hover {
+            background: var(--hover-overlay);
+        }
+
+        .nav-btn.active {
+            background: var(--bg-primary);
+            color: var(--mep-verde-profundo);
+            border-left: 4px solid var(--mep-verde-claro);
+            font-weight: 600;
+            box-shadow: -4px 0 10px rgba(0,0,0,0.05);
+        }
+
+        .dark .nav-btn.active {
+            color: var(--text-sidebar);
+        }
+
+        /* ===== CONTENIDO PRINCIPAL ===== */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        /* ===== PESTAÑAS ===== */
+        .pestana {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .pestana.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0.5; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== COMPONENTES UI ===== */
+        .card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 8px 24px var(--mep-sombra);
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--mep-verde-claro);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--mep-verde-profundo);
+        }
+
+        .grid-2, .grid-3, .grid-4 {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+        .form-group {
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
-            box-shadow: 4px 0 12px var(--sombra);
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            overflow-y: auto;
         }
-        nav button {
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: white;
-            padding: 1rem 0.8rem;
-            text-align: left;
-            font-size: 1rem;
+
+        .form-group label {
             font-weight: 500;
-            border-radius: 10px 0 0 10px;
-            cursor: pointer;
-            transition: 0.2s;
-            border-left: 4px solid transparent;
+            font-size: 0.9rem;
+            opacity: 0.9;
         }
-        nav button.activo {
-            background: var(--fondo);
-            color: var(--primario);
-            border-left: 4px solid var(--secundario);
-            font-weight: 700;
-            box-shadow: -4px 0 8px rgba(0,0,0,0.05);
-        }
-        nav button:hover {
-            background: rgba(255,255,240,0.25);
-        }
-        main {
-            flex: 1;
-            padding: 2rem;
-            overflow-y: auto;
-            max-width: calc(100% - 260px);
-        }
-        .pestana {
-            display: none;
-            animation: fade 0.2s;
-        }
-        .pestana.activa {
-            display: block;
-        }
-        @keyframes fade { from { opacity:0.3; } to { opacity:1; } }
-        h2 { margin-bottom: 1.8rem; font-weight: 400; border-bottom: 2px solid var(--secundario); padding-bottom: 0.4rem; }
-        .card {
-            background: color-mix(in srgb, var(--fondo) 95%, black);
-            border-radius: 24px;
-            padding: 1.5rem;
-            box-shadow: 0 6px 16px var(--sombra);
-            border: 1px solid var(--borde);
-            margin-bottom: 1.5rem;
-        }
-        .fila {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1.5rem;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-        .campo {
-            display: flex;
-            flex-direction: column;
-            min-width: 180px;
-        }
-        label { font-size: 0.9rem; opacity: 0.9; }
-        input, select, textarea, button:not(.nav-btn) {
-            background: var(--fondo);
-            border: 1px solid var(--borde);
-            border-radius: 16px;
-            padding: 0.6rem 1rem;
-            color: var(--texto);
+
+        input, select, textarea {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 0.8rem 1.2rem;
+            color: var(--text-primary);
             font-size: 0.95rem;
+            transition: border-color 0.2s;
         }
-        button:not(.nav-btn) {
-            background: var(--primario);
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--mep-verde-profundo);
+            box-shadow: 0 0 0 3px rgba(11, 59, 47, 0.1);
+        }
+
+        .btn {
+            background: var(--button-primary);
             color: white;
-            font-weight: 600;
             border: none;
-            padding: 0.7rem 1.8rem;
             border-radius: 40px;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 2px 6px var(--sombra);
-            transition: 0.2s;
-            min-width: 140px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+            border: 1px solid transparent;
         }
-        button:not(.nav-btn):hover { filter: brightness(1.1); transform: scale(1.02); }
-        .boton-sec { background: var(--secundario); color: #1e2b28; }
-        .tabla {
+
+        .btn:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        }
+
+        .btn-secondary {
+            background: var(--button-secondary);
+            color: var(--mep-texto-oscuro);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-small {
+            padding: 0.5rem 1.2rem;
+            font-size: 0.85rem;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin: 1.5rem 0;
+        }
+
+        /* ===== TABLAS ===== */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        table {
             width: 100%;
             border-collapse: collapse;
-            margin: 1rem 0;
+            background: var(--card-bg);
         }
-        .tabla th { background: var(--secundario); color: #1e2b28; padding: 0.75rem; }
-        .tabla td { border-bottom: 1px solid var(--borde); padding: 0.7rem; }
-        .toolbar { display: flex; gap: 0.8rem; flex-wrap: wrap; margin: 1.5rem 0; }
-        .badge { background: var(--primario); color: white; border-radius: 40px; padding: 0.2rem 1rem; }
-        .porcentaje-box { display: flex; gap: 1rem; align-items: center; }
-        .aviso { background: #ffd966; color: #2c1e0a; border-radius: 30px; padding: 0.5rem 1.5rem; }
-        @media (max-width: 720px) {
-            body { flex-direction: column; }
-            nav { width: 100%; height: auto; flex-direction: row; overflow-x: auto; padding: 0.5rem; }
-            nav button { border-radius: 30px; border-left: none; }
-            main { max-width: 100%; }
+
+        th {
+            background: var(--mep-verde-claro);
+            color: var(--mep-texto-oscuro);
+            font-weight: 600;
+            padding: 1rem;
+            text-align: left;
         }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* ===== BADGES Y ALERTAS ===== */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 1rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: var(--mep-exito);
+            color: white;
+        }
+
+        .badge-warning {
+            background: var(--mep-advertencia);
+            color: white;
+        }
+
+        .badge-error {
+            background: var(--mep-alerta);
+            color: white;
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+            border-left: 6px solid;
+        }
+
+        .alert-warning {
+            background: rgba(237, 108, 2, 0.1);
+            border-left-color: var(--mep-advertencia);
+        }
+
+        .alert-success {
+            background: rgba(46, 125, 80, 0.1);
+            border-left-color: var(--mep-exito);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .grid-4 { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding: 1rem;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 1.5rem;
+            }
+            
+            .grid-2, .grid-3, .grid-4 {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-btn {
+                border-radius: 12px;
+            }
+            
+            .nav-btn.active {
+                border-left: 4px solid var(--mep-verde-claro);
+            }
+        }
+
+        /* ===== UTILIDADES ===== */
+        .text-center { text-align: center; }
+        .mt-4 { margin-top: 2rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .w-100 { width: 100%; }
+        .d-flex { display: flex; }
+        .gap-2 { gap: 1rem; }
+        .justify-between { justify-content: space-between; }
+        .align-center { align-items: center; }
     </style>
 </head>
 <body>
-<nav id="barra-lateral">
-    <button class="nav-btn activo" data-pestana="config">1️⃣ CONFIGURACIÓN</button>
-    <button class="nav-btn" data-pestana="grupos">2️⃣ GRUPOS Y EST.</button>
-    <button class="nav-btn" data-pestana="componentes">3️⃣ COMPONENTES</button>
-    <button class="nav-btn" data-pestana="instrumentos">4️⃣ INSTRUMENTOS</button>
-    <button class="nav-btn" data-pestana="asistencia">5️⃣ ASISTENCIA</button>
-    <button class="nav-btn" data-pestana="bitacora">6️⃣ BITÁCORA</button>
-    <button class="nav-btn" data-pestana="reportes">7️⃣ REPORTES</button>
-    <button class="nav-btn" data-pestana="acta">8️⃣ ACTA FINAL</button>
-    <button class="nav-btn" data-pestana="respaldo">9️⃣ RESPALDO</button>
-</nav>
-<main id="contenido-principal">
-    <!-- 1 CONFIGURACIÓN GENERAL -->
-    <div id="pestana-config" class="pestana activa">
-        <h2>⚙️ Configuración general MEP</h2>
-        <div class="card">
-            <div class="fila"><div class="campo"><label>Centro educativo</label><input id="centroInput" placeholder="Liceo, escuela..."></div>
-            <div class="campo"><label>Modalidad</label><select id="modalidadSelect"><option>Primaria</option><option>Secundaria</option><option>Preescolar</option></select></div>
-            <div class="campo"><label>Periodo</label><select id="periodoSelect"><option>I</option><option>II</option><option>III</option></select></div></div>
-            <div class="porcentaje-box">
-                <div class="campo"><label>🧮 Trabajo cotidiano %</label><input type="number" id="porcTC" value="30" min="0" max="100"></div>
-                <div class="campo"><label>📐 Proyecto %</label><input type="number" id="porcProy" value="20" min="0" max="100"></div>
-                <div class="campo"><label>📝 Prueba %</label><input type="number" id="porcPrueba" value="30" min="0" max="100"></div>
-                <div class="campo"><label>📚 Tareas %</label><input type="number" id="porcTareas" value="20" min="0" max="100"></div>
-            </div>
-            <div id="sumaPorcentajes" class="badge">Suma: 100% ✅</div>
-            <div class="toolbar">
-                <button id="guardarConfig">💾 Guardar configuración</button>
-                <button id="cargarConfig" class="boton-sec">📂 Cargar configuración</button>
-                <button id="resetSistema" class="boton-sec">⚠️ Restablecer sistema</button>
-            </div>
+    <!-- BARRA LATERAL FIJA -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1>Sistema Integral<br>Gestión Docente</h1>
+            <small>Ministerio de Educación Pública · Costa Rica</small>
         </div>
-        <div class="card"><h3>Centros guardados</h3><div id="listaCentros"></div></div>
-    </div>
-    <!-- 2 GRUPOS Y ESTUDIANTES -->
-    <div id="pestana-grupos" class="pestana">
-        <h2>👥 Grupos y estudiantes</h2>
-        <div class="fila"><input id="nuevoGrupo" placeholder="Ej: 7-1, 2B"><button id="agregarGrupo">+ Grupo</button></div>
-        <select id="selectorGrupo"></select>
-        <div class="toolbar"><button id="importarCSVEst">⬆️ Importar CSV</button><button id="exportarCSVEst">⬇️ Exportar CSV</button></div>
-        <table class="tabla" id="tablaEstudiantes"><thead><tr><th>#</th><th>Nombre</th><th>Teléfono</th><th>Correo</th><th>ACS</th><th>Adec. no significativa</th><th>Observaciones</th></tr></thead><tbody></tbody></table>
-        <button id="agregarEstudiante">➕ Añadir estudiante manual</button>
-    </div>
-    <!-- 3 REGISTRO DE COMPONENTES -->
-    <div id="pestana-componentes" class="pestana">
-        <h2>📊 Registro de componentes y promedio</h2>
-        <div class="fila"><select id="grupoComp"></select><select id="estudianteComp"></select></div>
-        <div class="card"><div class="fila"><div class="campo"><label>Trabajo cotidiano</label><input id="notaTC" type="number" step="0.1"></div><div class="campo"><label>Proyecto</label><input id="notaProy" type="number" step="0.1"></div><div class="campo"><label>Prueba</label><input id="notaPrueba" type="number" step="0.1"></div><div class="campo"><label>Tareas</label><input id="notaTareas" type="number" step="0.1"></div></div>
-        <div><label><input type="checkbox" id="acsCheckbox"> Estudiante con ACS (fórmula alternativa editable)</label></div>
-        <div class="campo"><label>Fórmula alternativa ACS (ej: tc*0.2+proy*0.2+prueba*0.4+tareas*0.2)</label><input id="formulaACS" value="tc*0.2+proy*0.2+prueba*0.4+tareas*0.2"></div>
-        <button id="calcularPromedio">📐 Calcular promedio</button> <span id="promedioResultado">___</span>
-        <button id="guardarNotasPeriodo">💾 Guardar notas periodo</button>
-        </div>
-    </div>
-    <!-- 4 INSTRUMENTOS (simplificado) -->
-    <div id="pestana-instrumentos" class="pestana">
-        <h2>📋 Instrumentos (rúbrica / lista de cotejo)</h2>
-        <div class="fila"><select id="tipoInstrumento"><option>Lista de cotejo</option><option>Rúbrica analítica</option><option>Escala de desempeño</option><option>Prueba estructurada</option></select><input placeholder="Nombre instrumento" id="nombreInstrumento"><button id="crearInstrumento">+ Crear plantilla</button></div>
-        <div id="instrumentosGuardados"></div>
-    </div>
-    <!-- 5 ASISTENCIA -->
-    <div id="pestana-asistencia" class="pestana">
-        <h2>📆 Asistencia diaria</h2>
-        <select id="grupoAsistencia"></select>
-        <div class="toolbar"><button id="marcarPresente">P</button><button id="marcarAusente">A</button><button id="marcarJustificada">J</button><button id="marcarTardia">T</button></div>
-        <table class="tabla" id="tablaAsistencia"></table>
-        <button id="reporteAusentismo">📄 Generar reporte ausentismo PDF</button>
-    </div>
-    <!-- 6 BITÁCORA DOCENTE -->
-    <div id="pestana-bitacora" class="pestana">
-        <h2>📓 Bitácora docente (DUA)</h2>
-        <div class="fila"><input type="date" id="fechaBit"><input placeholder="Tema" id="temaBit"><input placeholder="Actividad" id="actividadBit"><input placeholder="Observaciones" id="obsBit"><input placeholder="Ajustes DUA" id="duaBit"><button id="agregarBitacora">➕ Agregar</button></div>
-        <div id="bitacoraTabla"></div>
-        <button id="exportBitacoraWord">📥 Word</button><button id="exportBitacoraPDF">📥 PDF</button>
-    </div>
-    <!-- 7 REPORTES POR PERIODO -->
-    <div id="pestana-reportes" class="pestana">
-        <h2>📈 Reportes por periodo</h2>
-        <select id="periodoReporte"></select><button id="generarReporte">Generar</button>
-        <div id="reporteResultado"></div>
-        <div class="toolbar"><button id="exportReportePDF">PDF</button><button id="exportReporteWord">Word</button><button id="exportReporteCSV">CSV</button></div>
-    </div>
-    <!-- 8 ACTA FINAL -->
-    <div id="pestana-acta" class="pestana">
-        <h2>📜 Acta final · consolidado anual</h2>
-        <select id="grupoActa"></select><button id="consolidarActa">Consolidar</button>
-        <div id="actaResultado"></div>
-        <button id="exportActaPDF">PDF</button><button id="exportActaWord">Word</button>
-    </div>
-    <!-- 9 RESPALDO -->
-    <div id="pestana-respaldo" class="pestana">
-        <h2>💾 Respaldos / exportación global</h2>
-        <button id="exportarTodoJSON">⬇️ Exportar todo JSON</button>
-        <input type="file" id="importarJSON" accept="application/json"><button id="cargarBackup">Restaurar respaldo</button>
-        <button id="exportMasivoCSV">📤 Exportación masiva CSV</button>
-        <button id="generarCopia">📀 Generar copia seguridad</button>
-    </div>
-</main>
+        <nav>
+            <button class="nav-btn active" data-pestana="config">
+                <span>⚙️</span> 1. CONFIGURACIÓN
+            </button>
+            <button class="nav-btn" data-pestana="grupos">
+                <span>👥</span> 2. GRUPOS Y ESTUDIANTES
+            </button>
+            <button class="nav-btn" data-pestana="componentes">
+                <span>📊</span> 3. COMPONENTES
+            </button>
+            <button class="nav-btn" data-pestana="instrumentos">
+                <span>📋</span> 4. INSTRUMENTOS
+            </button>
+            <button class="nav-btn" data-pestana="asistencia">
+                <span>📆</span> 5. ASISTENCIA
+            </button>
+            <button class="nav-btn" data-pestana="bitacora">
+                <span>📓</span> 6. BITÁCORA
+            </button>
+            <button class="nav-btn" data-pestana="reportes">
+                <span>📈</span> 7. REPORTES
+            </button>
+            <button class="nav-btn" data-pestana="acta">
+                <span>📜</span> 8. ACTA FINAL
+            </button>
+            <button class="nav-btn" data-pestana="respaldo">
+                <span>💾</span> 9. RESPALDO
+            </button>
+        </nav>
+    </aside>
 
-<script>
-    (function() {
-        // **********************************************
-        // SIMULACIÓN DE ALMACENAMIENTO Y ESTADO GLOBAL
-        // **********************************************
-        let centros = JSON.parse(localStorage.getItem('mep_centros')) || [{ nombre: 'Liceo San José', modalidad: 'Secundaria' }];
-        let configuraciones = JSON.parse(localStorage.getItem('mep_config')) || { porcTC:30, porcProy:20, porcPrueba:30, porcTareas:20, periodo:'I' };
-        let estudiantes = JSON.parse(localStorage.getItem('mep_estudiantes')) || [];
-        let grupos = JSON.parse(localStorage.getItem('mep_grupos')) || ['7-1'];
-        let notasPeriodo = JSON.parse(localStorage.getItem('mep_notas')) || [];
-        let asistencia = JSON.parse(localStorage.getItem('mep_asistencia')) || [];
-        let bitacora = JSON.parse(localStorage.getItem('mep_bitacora')) || [];
-        let instrumentos = JSON.parse(localStorage.getItem('mep_instrumentos')) || [];
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-content">
+        <!-- PESTAÑA 1: CONFIGURACIÓN GENERAL -->
+        <section id="pestana-config" class="pestana active">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">⚙️ Configuración General MEP</h2>
+                </div>
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Centro Educativo</label>
+                        <input type="text" id="centro-nombre" placeholder="Ej: Liceo de Costa Rica">
+                    </div>
+                    <div class="form-group">
+                        <label>Modalidad</label>
+                        <select id="centro-modalidad">
+                            <option value="Primaria">Primaria</option>
+                            <option value="Secundaria" selected>Secundaria</option>
+                            <option value="Preescolar">Preescolar</option>
+                        </select>
+                    </div>
+                </div>
 
-        // ---------- Helper render ----------
-        function guardarTodo() {
-            localStorage.setItem('mep_centros', JSON.stringify(centros));
-            localStorage.setItem('mep_config', JSON.stringify(configuraciones));
-            localStorage.setItem('mep_estudiantes', JSON.stringify(estudiantes));
-            localStorage.setItem('mep_grupos', JSON.stringify(grupos));
-            localStorage.setItem('mep_notas', JSON.stringify(notasPeriodo));
-            localStorage.setItem('mep_asistencia', JSON.stringify(asistencia));
-            localStorage.setItem('mep_bitacora', JSON.stringify(bitacora));
-            localStorage.setItem('mep_instrumentos', JSON.stringify(instrumentos));
-        }
+                <div class="grid-3 mt-4">
+                    <div class="form-group">
+                        <label>Periodo activo</label>
+                        <select id="periodo-activo">
+                            <option value="I">I Periodo</option>
+                            <option value="II">II Periodo</option>
+                            <option value="III">III Periodo</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Año lectivo</label>
+                        <input type="number" id="anio-lectivo" value="2025" min="2020" max="2030">
+                    </div>
+                </div>
 
-        // navegacion pestañas
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.addEventListener('click', e => {
-                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('activo'));
-                btn.classList.add('activo');
-                document.querySelectorAll('.pestana').forEach(p => p.classList.remove('activa'));
-                document.getElementById('pestana-'+btn.dataset.pestana).classList.add('activa');
-            });
-        });
+                <h3 class="mt-4 mb-2">📊 Porcentajes de evaluación</h3>
+                <div class="grid-4">
+                    <div class="form-group">
+                        <label>Trabajo cotidiano (%)</label>
+                        <input type="number" id="porc-tc" value="30" min="0" max="100" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Proyecto (%)</label>
+                        <input type="number" id="porc-proy" value="20" min="0" max="100" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Prueba (%)</label>
+                        <input type="number" id="porc-prueba" value="30" min="0" max="100" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Tareas (%)</label>
+                        <input type="number" id="porc-tareas" value="20" min="0" max="100" step="1">
+                    </div>
+                </div>
 
-        // 1️⃣ CONFIGURACIÓN
-        function actualizarSuma() {
-            let tc = +document.getElementById('porcTC').value || 0;
-            let py = +document.getElementById('porcProy').value || 0;
-            let pb = +document.getElementById('porcPrueba').value || 0;
-            let ta = +document.getElementById('porcTareas').value || 0;
-            let suma = tc+py+pb+ta;
-            document.getElementById('sumaPorcentajes').innerText = suma===100? 'Suma: 100% ✅' : `Suma: ${suma}% ❌ debe ser 100`;
-            return suma===100;
-        }
-        document.querySelectorAll('#porcTC,#porcProy,#porcPrueba,#porcTareas').forEach(i => i.addEventListener('input', actualizarSuma));
-        document.getElementById('guardarConfig').addEventListener('click', ()=>{
-            if(!actualizarSuma()) return alert('Los porcentajes deben sumar 100');
-            configuraciones = {
-                centro: document.getElementById('centroInput').value,
-                modalidad: document.getElementById('modalidadSelect').value,
-                periodo: document.getElementById('periodoSelect').value,
-                porcTC: +document.getElementById('porcTC').value,
-                porcProy: +document.getElementById('porcProy').value,
-                porcPrueba: +document.getElementById('porcPrueba').value,
-                porcTareas: +document.getElementById('porcTareas').value,
+                <div class="d-flex align-center gap-2 mt-4">
+                    <span class="badge" id="suma-porcentajes">Suma: 100% ✅</span>
+                    <span id="validacion-porcentajes" class="badge badge-success">Válido</span>
+                </div>
+
+                <div class="toolbar">
+                    <button class="btn" id="guardar-configuracion">💾 Guardar configuración</button>
+                    <button class="btn btn-secondary" id="cargar-configuracion">📂 Cargar configuración</button>
+                    <button class="btn btn-outline" id="restablecer-sistema">⚠️ Restablecer sistema</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">🏫 Centros educativos registrados</h3>
+                </div>
+                <div class="table-container">
+                    <table id="tabla-centros">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Modalidad</th>
+                                <th>Periodo activo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="centros-list">
+                            <!-- Se llena dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- PESTAÑA 2: GRUPOS Y ESTUDIANTES -->
+        <section id="pestana-grupos" class="pestana">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">👥 Gestión de Grupos y Estudiantes</h2>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Nuevo grupo</label>
+                        <div class="d-flex gap-2">
+                            <input type="text" id="nuevo-grupo" placeholder="Ej: 7-1, 2B, 5A">
+                            <button class="btn btn-small" id="btn-agregar-grupo">➕ Agregar</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Seleccionar grupo</label>
+                        <select id="selector-grupo">
+                            <option value="">-- Seleccione --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="toolbar">
+                    <button class="btn btn-secondary" id="importar-csv-estudiantes">📤 Importar CSV</button>
+                    <button class="btn btn-secondary" id="exportar-csv-estudiantes">📥 Exportar CSV</button>
+                    <button class="btn" id="agregar-estudiante">➕ Nuevo estudiante</button>
+                </div>
+
+                <div class="table-container mt-4">
+                    <table id="tabla-estudiantes">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nombre completo</th>
+                                <th>Identificación</th>
+                                <th>Teléfono</th>
+                                <th>Correo</th>
+                                <th>ACS</th>
+                                <th>Adec. no sign.</th>
+                                <th>Observaciones</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="estudiantes-list">
+                            <!-- Datos dinámicos -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- PESTAÑA 3: REGISTRO DE COMPONENTES -->
+        <section id="pestana-componentes" class="pestana">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">📊 Registro de Componentes y Calificaciones</h2>
+                </div>
+
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label>Grupo</label>
+                        <select id="comp-grupo">
+                            <option value="">-- Seleccione --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Estudiante</label>
+                        <select id="comp-estudiante">
+                            <option value="">-- Seleccione --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Periodo</label>
+                        <select id="comp-periodo">
+                            <option value="I">I Periodo</option>
+                            <option value="II">II Periodo</option>
+                            <option value="III">III Periodo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid-4 mt-4">
+                    <div class="form-group">
+                        <label>Trabajo cotidiano</label>
+                        <input type="number" id="nota-tc" step="0.1" min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Proyecto</label>
+                        <input type="number" id="nota-proy" step="0.1" min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Prueba</label>
+                        <input type="number" id="nota-prueba" step="0.1" min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Tareas</label>
+                        <input type="number" id="nota-tareas" step="0.1" min="0" max="100">
+                    </div>
+                </div>
+
+                <div class="grid-2 mt-4">
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="comp-acs"> Estudiante con ACS
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>Fórmula ACS personalizada</label>
+                        <input type="text" id="formula-acs" value="tc*0.25 + proy*0.25 + prueba*0.25 + tareas*0.25">
+                    </div>
+                </div>
+
+                <div class="toolbar">
+                    <button class="btn" id="calcular-promedio">🧮 Calcular promedio</button>
+                    <button class="btn btn-secondary" id="guardar-calificaciones">💾 Guardar calificaciones</button>
+                </div>
+
+                <div class="card mt-4" id="resultado-calculo" style="display: none;">
+                    <h3>Resultado del cálculo</h3>
+                    <p id="promedio-calculado"></p>
+                    <p id="estado-calculo"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PESTAÑA 4: INSTRUMENTOS -->
+        <section id="pestana-instrumentos" class="pestana">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">📋 Instrumentos de Evaluación</h2>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Tipo de instrumento</label>
+                        <select id="instrumento-tipo">
+                            <option value="lista_cotejo">Lista de cotejo</option>
+                            <option value="rubrica">Rúbrica analítica</option>
+                            <option value="escala">Escala de desempeño</option>
+                            <option value="prueba">Prueba estructurada</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Nombre del instrumento</label>
+                        <input type="text" id="instrumento-nombre">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>¿Para estudiantes con ACS?</label>
+                    <input type="checkbox" id="instrumento-acs">
+                </div>
+
+                <div id="indicadores-container">
+                    <h3>Indicadores</h3>
+                    <div id="indicadores-list"></div>
+                    <button class="btn btn-secondary btn-small mt-2" id="agregar-indicador">➕ Agregar indicador</button>
+                </div>
+
+                <div class="toolbar mt-4">
+                    <button class="btn" id="guardar-instrumento">💾 Guardar plantilla</button>
+                    <button class="btn btn-secondary" id="duplicar-instrumento">📑 Duplicar</button>
+                    <button class="btn btn-secondary" id="asignar-grupo">👥 Asignar a grupo</button>
+                </div>
+
+                <div class="table-container mt-4">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Tipo</th>
+                                <th>ACS</th>
+                                <th>Indicadores</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="instrumentos-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- PESTAÑA 5: ASISTENCIA -->
+        <section id="pestana-asistencia" class="pestana">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">📆 Control de Asistencia</h2>
+                </div>
+
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label>Grupo</label>
+                        <select id="asis-grupo"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Mes</label>
+                        <select id="asis-mes">
+                            <option value="1">Enero</option><option value="2">Febrero</option><option value="3">Marzo</option>
+                            <option value="4">Abril</option><option value="5">Mayo</option><option value="6">Junio</option>
+                            <option value="7">Julio</option><option value="8">Agosto</option><option value="9">Setiembre</option>
+                            <option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Año</label>
+                        <input type="number" id="asis-anio" value="2025">
+                    </div>
+                </div>
+
+                <div class="toolbar">
+                    <button class="btn btn-secondary" id="marcar-presente">✅ P (Presente)</button>
+                    <button class="btn btn-secondary" id="marcar-ausente">❌ A (Ausente)</button>
+                    <button class="btn btn-secondary" id="marcar-justificada">📝 J (Justificada)</button>
+                    <button class="btn btn-secondary" id="marcar-tardia">⏰ T (Tardía)</button>
+                </div>
+
+                <div class="table-container mt-4">
+                    <table id="tabla-asistencia">
+                        <thead>
+                            <tr>
+                                <th>Estudiante</th>
+                                <th>Estado</th>
+                                <th>% Asistencia</th>
+                            </tr>
+                        </thead>
+                        <tbody id="asistencia-list"></tbody>
+                    </table>
+                </div>
+
+                <div class="toolbar mt-4">
+                    <button class="btn" id="reporte-ausentismo">📊 Generar reporte ausentismo</button>
+                    <button class="btn btn-secondary" id="exportar-asistencia-pdf">PDF</button>
+                    <button class="btn btn-secondary" id="exportar-asistencia-csv">CSV</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- PESTAÑA 6: BITÁCORA DOCENTE -->
+        <section id="pestana-bitacora" class="pestana">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">📓 Bitácora Docente (DUA)</h2>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Fecha</label>
+                        <input type="date" id="bitacora-fecha">
+                    </div>
+                    <div class="form-group">
+                        <label>Tema</label>
+                        <input type="text" id="bitacora-tema">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Actividad</label>
+                    <textarea id="bitacora-actividad" rows="2"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Observaciones</label>
+                    <textarea id="bitacora-observaciones" rows="2"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Ajustes DUA</label>
+                    <textarea id="bitacora-dua" rows="2" placeholder="Ej: Adaptaciones, materiales, apoyos..."></textarea>
+                </div>
+
+                <div class="toolbar">
+                    <button class="btn" id="agregar-bitacora">➕ Agregar registro</button>
+                    <button class="btn btn-secondary" id="exportar-bitacora-word">📥 Word</button>
+                    <button class="btn btn-secondary" id="exportar-bitacora-pdf">📥 PDF</button>
+                </div>
+
+                <div class="table-container mt-4">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Tema</th>
+                                <th>Actividad</th>
+                                <th>Observaciones</th>
+                                <th>Ajustes DUA</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bitacora-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- PESTAÑA 7: REPORTES POR PERIODO -->
+        <section id="pestana-reportes" class="pestana">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">📈 Reportes Académicos por Periodo</h2>
+                </div>
+
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label>Grupo</label>
+                        <select id="reporte-grupo"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Periodo</label>
+                        <select id="reporte-periodo">
+                            <option value="I">I Periodo</option>
+                            <option value="II">II Periodo</option>
+                            <option value="III">III Periodo</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Año</label>
+                        <input type="number" id="reporte-anio" value="2025">
+                    </div>
+                </div>
+
+                <div class="toolbar">
+                    <button class="btn" id="generar-reporte">📊 Generar reporte</button>
+                    <button class="btn btn-secondary" id="exportar-reporte-pdf">PDF</button>
+                    <button class="btn btn-secondary" id="exportar-reporte-word">Word</button>
+                    <button class="btn btn-secondary" id="exportar-reporte-csv">CSV</button>
+                </div>
+
+                <div id="reporte-contenido" class="mt-4"></div>
+            </div>
+        </section>
+
+        <!-- PESTAÑA 8: ACTA FINAL -->
+        <section id="pestana-acta" class="pestana">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">📜 Acta Final de Evaluación</h2>
+                </div>
+
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label>Grupo</label>
+                        <select id="acta-grupo"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Año lectivo</label>
+                        <input type="number" id="acta-anio" value="2025">
+                    </div>
+                </div>
+
+                <div class="alert alert-warning" id="acta-validacion"></div>
+
+                <div class="toolbar">
+                    <button class="btn" id="consolidar-acta">📋 Consolidar acta</button>
+                    <button class="btn btn-secondary" id="exportar-acta-pdf">PDF</button>
+                    <button class="btn btn-secondary" id="exportar-acta-word">Word</button>
+                </div>
+
+                <div id="acta-contenido" class="mt-4"></div>
+            </div>
+        </section>
+
+        <!-- PESTAÑA 9: RESPALDO GLOBAL -->
+        <section id="pestana-respaldo" class="pestana">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">💾 Respaldo y Exportación Global</h2>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <h3>Exportar datos</h3>
+                        <div class="toolbar">
+                            <button class="btn w-100" id="exportar-json">📦 Exportar todo (JSON)</button>
+                            <button class="btn btn-secondary w-100" id="exportar-masivo-csv">📤 Exportación masiva CSV</button>
+                            <button class="btn btn-secondary w-100" id="generar-copia-seguridad">💿 Generar copia seguridad</button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Importar respaldo</h3>
+                        <div class="form-group">
+                            <label>Seleccionar archivo JSON</label>
+                            <input type="file" id="importar-json" accept=".json">
+                        </div>
+                        <button class="btn w-100" id="restaurar-respaldo">🔄 Restaurar sistema</button>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <h3>📊 Diagnóstico del sistema</h3>
+                    <button class="btn btn-secondary" id="ejecutar-diagnostico">🔍 Ejecutar diagnóstico completo</button>
+                    <div id="diagnostico-resultado" class="mt-4"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // =========================================================================
+        // SISTEMA INTEGRAL DE GESTIÓN DOCENTE MEP - ARQUITECTURA POR CAPAS
+        // VERSIÓN 2.0 - COMPLETAMENTE FUNCIONAL
+        // =========================================================================
+
+        (function() {
+            "use strict";
+
+            // =========================================================================
+            // CAPA 3: MODELO DE DATOS (CORE)
+            // =========================================================================
+            const ModeloMEP = {
+                version: "2.0",
+                centros: [],
+                configuraciones: [],
+                grupos: [],
+                estudiantes: [],
+                calificaciones: [],
+                instrumentos: [],
+                asistencia: [],
+                bitacora: [],
+                periodos: [],
+                respaldos: []
             };
-            centros.push({ nombre: configuraciones.centro, modalidad: configuraciones.modalidad });
-            guardarTodo(); renderListaCentros(); alert('Configuración guardada');
-        });
-        function renderListaCentros() {
-            document.getElementById('listaCentros').innerHTML = centros.map(c=>`<div>🏫 ${c.nombre} (${c.modalidad})</div>`).join('');
-        }
-        document.getElementById('cargarConfig').addEventListener('click', ()=>{
-            if(centros.length) {
-                let ult = centros[centros.length-1];
-                document.getElementById('centroInput').value = ult.nombre;
-                document.getElementById('modalidadSelect').value = ult.modalidad;
-                document.getElementById('periodoSelect').value = configuraciones.periodo || 'I';
-                document.getElementById('porcTC').value = configuraciones.porcTC || 30;
-                document.getElementById('porcProy').value = configuraciones.porcProy || 20;
-                document.getElementById('porcPrueba').value = configuraciones.porcPrueba || 30;
-                document.getElementById('porcTareas').value = configuraciones.porcTareas || 20;
-                actualizarSuma();
-            }
-        });
-        document.getElementById('resetSistema').addEventListener('click', ()=>{
-            if(confirm('Restablecer todo el sistema? ')) { localStorage.clear(); location.reload(); }
-        });
 
-        // 2️⃣ GRUPOS Y ESTUDIANTES
-        function renderGruposSelect() {
-            let sel = document.getElementById('selectorGrupo'); if(!sel) return;
-            sel.innerHTML = grupos.map(g=>`<option>${g}</option>`).join('');
-            document.querySelectorAll('#grupoComp, #grupoAsistencia, #grupoActa').forEach(s=>{ if(s) s.innerHTML = grupos.map(g=>`<option>${g}</option>`).join(''); });
-        }
-        function renderTablaEstudiantes() {
-            let grupo = document.getElementById('selectorGrupo')?.value || grupos[0];
-            let filtro = estudiantes.filter(e=>e.grupo===grupo);
-            let tbody = document.querySelector('#tablaEstudiantes tbody');
-            tbody.innerHTML = filtro.map((e,i)=>`<tr>
-                <td>${e.numLista||i+1}</td>
-                <td contenteditable="true" data-id="${e.id}" data-field="nombre">${e.nombre}</td>
-                <td contenteditable="true" data-id="${e.id}" data-field="tel">${e.tel||''}</td>
-                <td contenteditable="true" data-id="${e.id}" data-field="correo">${e.correo||''}</td>
-                <td><input type="checkbox" ${e.acs?'checked':''} data-id="${e.id}" class="acsCheck"></td>
-                <td><input type="checkbox" ${e.adecuacion?'checked':''} data-id="${e.id}" class="adecCheck"></td>
-                <td contenteditable="true" data-id="${e.id}" data-field="obs">${e.obs||''}</td></tr>`).join('');
-        }
-        document.getElementById('agregarGrupo')?.addEventListener('click', ()=>{
-            let g = document.getElementById('nuevoGrupo').value.trim(); if(g&&!grupos.includes(g)) { grupos.push(g); renderGruposSelect(); guardarTodo(); }
-        });
-        document.getElementById('agregarEstudiante')?.addEventListener('click', ()=>{
-            let grupo = document.getElementById('selectorGrupo')?.value;
-            if(!grupo) return;
-            estudiantes.push({ id: Date.now()+Math.random(), grupo, nombre:'Nuevo', numLista: estudiantes.filter(e=>e.grupo===grupo).length+1, tel:'', correo:'', acs:false, adecuacion:false, obs:'' });
-            guardarTodo(); renderTablaEstudiantes();
-        });
-        document.querySelector('#tablaEstudiantes tbody')?.addEventListener('input', e=>{
-            if(e.target.dataset.id) {
-                let estudiante = estudiantes.find(est=>est.id==e.target.dataset.id);
-                if(estudiante) estudiante[e.target.dataset.field] = e.target.innerText;
-                guardarTodo();
-            }
-        });
-        document.querySelector('#tablaEstudiantes tbody')?.addEventListener('change', e=>{
-            if(e.target.classList.contains('acsCheck')||e.target.classList.contains('adecCheck')) {
-                let id = e.target.dataset.id;
-                let est = estudiantes.find(e=>e.id==id);
-                if(est) { if(e.target.classList.contains('acsCheck')) est.acs = e.target.checked;
-                    else est.adecuacion = e.target.checked; }
-                guardarTodo();
-            }
-        });
+            // =========================================================================
+            // CAPA 3: REPOSITORIO (PERSISTENCIA)
+            // =========================================================================
+            const Repositorio = {
+                // Claves de localStorage
+                KEYS: {
+                    CENTROS: 'mep_centros_v2',
+                    CONFIG: 'mep_config_v2',
+                    GRUPOS: 'mep_grupos_v2',
+                    ESTUDIANTES: 'mep_estudiantes_v2',
+                    CALIFICACIONES: 'mep_calificaciones_v2',
+                    INSTRUMENTOS: 'mep_instrumentos_v2',
+                    ASISTENCIA: 'mep_asistencia_v2',
+                    BITACORA: 'mep_bitacora_v2',
+                    PERIODOS: 'mep_periodos_v2'
+                },
 
-        // 3️⃣ COMPONENTES (motor de cálculo)
-        document.getElementById('calcularPromedio')?.addEventListener('click', ()=>{
-            let tc = +document.getElementById('notaTC').value, proy = +document.getElementById('notaProy').value, pr = +document.getElementById('notaPrueba').value, ta = +document.getElementById('notaTareas').value;
-            if(isNaN(tc)||isNaN(proy)||isNaN(pr)||isNaN(ta)) return alert('Faltan notas');
-            let config = configuraciones;
-            let prom = (tc*config.porcTC + proy*config.porcProy + pr*config.porcPrueba + ta*config.porcTareas)/100;
-            if(document.getElementById('acsCheckbox').checked) {
-                let formula = document.getElementById('formulaACS').value;
-                try { prom = eval(formula.replace(/tc/g,tc).replace(/proy/g,proy).replace(/prueba/g,pr).replace(/tareas/g,ta)); } catch{ alert('Error fórmula'); return; }
-            }
-            document.getElementById('promedioResultado').innerText = prom.toFixed(2);
-        });
+                // Cargar todo desde localStorage
+                cargarTodo: function() {
+                    try {
+                        ModeloMEP.centros = JSON.parse(localStorage.getItem(this.KEYS.CENTROS)) || [];
+                        ModeloMEP.configuraciones = JSON.parse(localStorage.getItem(this.KEYS.CONFIG)) || [];
+                        ModeloMEP.grupos = JSON.parse(localStorage.getItem(this.KEYS.GRUPOS)) || [];
+                        ModeloMEP.estudiantes = JSON.parse(localStorage.getItem(this.KEYS.ESTUDIANTES)) || [];
+                        ModeloMEP.calificaciones = JSON.parse(localStorage.getItem(this.KEYS.CALIFICACIONES)) || [];
+                        ModeloMEP.instrumentos = JSON.parse(localStorage.getItem(this.KEYS.INSTRUMENTOS)) || [];
+                        ModeloMEP.asistencia = JSON.parse(localStorage.getItem(this.KEYS.ASISTENCIA)) || [];
+                        ModeloMEP.bitacora = JSON.parse(localStorage.getItem(this.KEYS.BITACORA)) || [];
+                        ModeloMEP.periodos = JSON.parse(localStorage.getItem(this.KEYS.PERIODOS)) || [];
 
-        // 4 INSTRUMENTOS placeholder
-        document.getElementById('crearInstrumento')?.addEventListener('click', ()=>{
-            let tipo = document.getElementById('tipoInstrumento').value;
-            let nom = document.getElementById('nombreInstrumento').value;
-            if(nom) { instrumentos.push({ tipo, nom, id: Date.now() }); guardarTodo(); document.getElementById('instrumentosGuardados').innerHTML += `<div>📌 ${nom} (${tipo})</div>`; }
-        });
+                        // Datos iniciales si está vacío
+                        if (ModeloMEP.centros.length === 0) {
+                            this.inicializarDatosDemo();
+                        }
+                    } catch (e) {
+                        console.error("Error cargando datos:", e);
+                        this.inicializarDatosDemo();
+                    }
+                },
 
-        // 5 ASISTENCIA esqueleto (tabla simulada)
-        function renderAsistencia(){}
-        document.getElementById('marcarPresente')?.addEventListener('click', ()=>alert('Asistencia marcada (simulado)'));
+                inicializarDatosDemo: function() {
+                    const centroId = this.generarId();
+                    ModeloMEP.centros = [{
+                        id: centroId,
+                        nombre: "Liceo Experimental",
+                        modalidad: "Secundaria",
+                        codigo: "MEP-001",
+                        activo: true
+                    }];
 
-        // 6 BITÁCORA
-        function renderBitacora(){
-            let html = '<table class="tabla"><tr><th>Fecha</th><th>Tema</th><th>Actividad</th><th>Observaciones</th><th>Ajustes DUA</th></tr>';
-            bitacora.forEach(b=> html+=`<tr><td>${b.fecha}</td><td>${b.tema}</td><td>${b.actividad}</td><td>${b.obs}</td><td>${b.dua}</td></tr>`);
-            html+='</table>'; document.getElementById('bitacoraTabla').innerHTML = html;
-        }
-        document.getElementById('agregarBitacora')?.addEventListener('click', ()=>{
-            let b = { fecha:document.getElementById('fechaBit').value, tema:document.getElementById('temaBit').value, actividad:document.getElementById('actividadBit').value, obs:document.getElementById('obsBit').value, dua:document.getElementById('duaBit').value };
-            if(b.fecha && b.tema) { bitacora.push(b); guardarTodo(); renderBitacora(); }
-        });
+                    ModeloMEP.configuraciones = [{
+                        id: this.generarId(),
+                        centroId: centroId,
+                        periodo: "I",
+                        año: 2025,
+                        porcentajes: {
+                            trabajoCotidiano: 30,
+                            proyecto: 20,
+                            prueba: 30,
+                            tareas: 20
+                        },
+                        formulaACS: "tc*0.25 + proy*0.25 + prueba*0.25 + tareas*0.25",
+                        activo: true
+                    }];
 
-        // 7 REPORTES (genérico)
-        document.getElementById('generarReporte')?.addEventListener('click', ()=>{
-            document.getElementById('reporteResultado').innerHTML = '<p>Reporte simulado: promedio general 82</p>';
-        });
+                    ModeloMEP.grupos = [{
+                        id: this.generarId(),
+                        centroId: centroId,
+                        nombre: "7-1",
+                        nivel: "Sétimo",
+                        año: 2025,
+                        periodoActivo: "I"
+                    }];
 
-        // 8 ACTA FINAL simulado
-        document.getElementById('consolidarActa')?.addEventListener('click', ()=>{
-            document.getElementById('actaResultado').innerHTML = '<p>Nota anual: 84 · Aprobado</p>';
-        });
+                    ModeloMEP.periodos = [
+                        { id: this.generarId(), centroId: centroId, año: 2025, periodo: "I", estado: "abierto", validado: false },
+                        { id: this.generarId(), centroId: centroId, año: 2025, periodo: "II", estado: "pendiente", validado: false },
+                        { id: this.generarId(), centroId: centroId, año: 2025, periodo: "III", estado: "pendiente", validado: false }
+                    ];
 
-        // 9 RESPALDO
-        document.getElementById('exportarTodoJSON')?.addEventListener('click', ()=>{
-            let dataStr = JSON.stringify({centros,configuraciones,estudiantes,grupos,notasPeriodo,asistencia,bitacora,instrumentos});
-            let blob = new Blob([dataStr], {type: 'application/json'});
-            let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'respaldo_mep.json'; a.click();
-        });
-        document.getElementById('cargarBackup')?.addEventListener('click', ()=>{
-            let file = document.getElementById('importarJSON').files[0];
-            if(file) { let reader = new FileReader(); reader.onload = e=>{ let d=JSON.parse(e.target.result); Object.assign(window,d); guardarTodo(); alert('Restaurado'); }; reader.readAsText(file); }
-        });
+                    this.guardarTodo();
+                },
 
-        // Pruebas internas automáticas
-        function pruebaInterna() {
-            console.log('🧪 Prueba interna MEP:');
-            if(centros.length) console.log('✅ centro existente');
-            grupos.push('grupo-prueba');
-            estudiantes.push({id:'p1',grupo:'grupo-prueba',nombre:'Estudiante prueba', acs:false});
-            console.log('✅ grupo/estudiante');
-            let tc=80,proy=90,prueba=85,tareas=95, cfg = configuraciones;
-            let prom = (tc*cfg.porcTC + proy*cfg.porcProy + prueba*cfg.porcPrueba + tareas*cfg.porcTareas)/100;
-            console.log('✅ cálculo promedio:', prom);
-            guardarTodo();
-        }
-        pruebaInterna();
+                guardarTodo: function() {
+                    localStorage.setItem(this.KEYS.CENTROS, JSON.stringify(ModeloMEP.centros));
+                    localStorage.setItem(this.KEYS.CONFIG, JSON.stringify(ModeloMEP.configuraciones));
+                    localStorage.setItem(this.KEYS.GRUPOS, JSON.stringify(ModeloMEP.grupos));
+                    localStorage.setItem(this.KEYS.ESTUDIANTES, JSON.stringify(ModeloMEP.estudiantes));
+                    localStorage.setItem(this.KEYS.CALIFICACIONES, JSON.stringify(ModeloMEP.calificaciones));
+                    localStorage.setItem(this.KEYS.INSTRUMENTOS, JSON.stringify(ModeloMEP.instrumentos));
+                    localStorage.setItem(this.KEYS.ASISTENCIA, JSON.stringify(ModeloMEP.asistencia));
+                    localStorage.setItem(this.KEYS.BITACORA, JSON.stringify(ModeloMEP.bitacora));
+                    localStorage.setItem(this.KEYS.PERIODOS, JSON.stringify(ModeloMEP.periodos));
+                },
 
-        // Iniciales
-        actualizarSuma(); renderListaCentros(); renderGruposSelect(); renderTablaEstudiantes(); renderBitacora();
-        // Exportaciones ficticias de PDF/Word usan jsPDF (simulado con alert)
-        document.querySelectorAll('button[id*="PDF"],[id*="Word"],[id*="CSV"],[id*="export"]').forEach(b=> b.addEventListener('click', (e)=> alert('Exportación simulada: ' + e.target.innerText)));
+                generarId: function() {
+                    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+                },
 
-        // Observador para edición estudiantes
-        document.getElementById('selectorGrupo')?.addEventListener('change', renderTablaEstudiantes);
-    })();
-</script>
-<!-- jsPDF simulado para evitar dependencia externa (no se usa realmente) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script>
-    // sobreescribir para evitar errores (simulación)
-    window.jspdf = window.jspdf || {jsPDF: class { constructor(){} text(){} save(){} }};
-</script>
+                // Métodos específicos
+                getConfiguracionActiva: function(centroId, periodo, año) {
+                    return ModeloMEP.configuraciones.find(c => 
+                        c.centroId === centroId && 
+                        c.periodo === periodo && 
+                        c.año === año &&
+                        c.activo === true
+                    );
+                },
+
+                getEstudiantesPorGrupo: function(grupoId) {
+                    return ModeloMEP.estudiantes.filter(e => e.grupoId === grupoId && e.activo !== false);
+                },
+
+                getCalificacionEstudiante: function(estudianteId, periodo, año) {
+                    return ModeloMEP.calificaciones.find(c => 
+                        c.estudianteId === estudianteId && 
+                        c.periodo === periodo && 
+                        c.año === año
+                    );
+                },
+
+                guardarCalificacion: function(calificacion) {
+                    const index = ModeloMEP.calificaciones.findIndex(c => c.id === calificacion.id);
+                    if (index >= 0) {
+                        ModeloMEP.calificaciones[index] = calificacion;
+                    } else {
+                        ModeloMEP.calificaciones.push(calificacion);
+                    }
+                    this.guardarTodo();
+                }
+            };
+
+            // =========================================================================
+            // CAPA 2: MOTOR DE CÁLCULO (REGLAS MEP)
+            // =========================================================================
+            const MotorCalculo = {
+                validarPorcentajes: function(tc, proy, pru, tar) {
+                    const suma = (tc || 0) + (proy || 0) + (pru || 0) + (tar || 0);
+                    return suma === 100 && 
+                           tc >= 0 && tc <= 100 &&
+                           proy >= 0 && proy <= 100 &&
+                           pru >= 0 && pru <= 100 &&
+                           tar >= 0 && tar <= 100;
+                },
+
+                calcularPromedioEstandar: function(notas, porcentajes) {
+                    const { trabajoCotidiano, proyecto, prueba, tareas } = notas;
+                    const { trabajoCotidiano: pTC, proyecto: pProy, prueba: pPru, tareas: pTar } = porcentajes;
+                    
+                    if ([trabajoCotidiano, proyecto, prueba, tareas].some(n => n === null || n === undefined || n === '')) {
+                        throw new Error("Notas incompletas");
+                    }
+
+                    return (
+                        (parseFloat(trabajoCotidiano) * pTC / 100) +
+                        (parseFloat(proyecto) * pProy / 100) +
+                        (parseFloat(prueba) * pPru / 100) +
+                        (parseFloat(tareas) * pTar / 100)
+                    ).toFixed(2);
+                },
+
+                calcularPromedioACS: function(notas, formula) {
+                    const tc = parseFloat(notas.trabajoCotidiano) || 0;
+                    const proy = parseFloat(notas.proyecto) || 0;
+                    const prueba = parseFloat(notas.prueba) || 0;
+                    const tareas = parseFloat(notas.tareas) || 0;
+
+                    // Sanitizar fórmula (solo caracteres seguros)
+                    const formulaLimpia = formula.replace(/[^0-9\s\+\-\*\/\(\)\.tcproypruebatareas]/g, '');
+                    
+                    try {
+                        // Evaluar de forma segura
+                        const resultado = eval(formulaLimpia);
+                        return resultado.toFixed(2);
+                    } catch (e) {
+                        console.error("Error evaluando fórmula ACS:", e);
+                        return null;
+                    }
+                },
+
+                determinarEstado: function(promedio) {
+                    const prom = parseFloat(promedio);
+                    if (prom >= 65) return "APROBADO";
+                    if (prom >= 50) return "CONVOCATORIA";
+                    return "REPROBADO";
+                },
+
+                validarPeriodoCompleto: function(grupoId, periodo, año) {
+                    const estudiantes = Repositorio.getEstudiantesPorGrupo(grupoId);
+                    const calificaciones = ModeloMEP.calificaciones.filter(c => 
+                        c.periodo === periodo && c.año === año
+                    );
+
+                    for (let estudiante of estudiantes) {
+                        const cal = calificaciones.find(c => c.estudianteId === estudiante.id);
+                        if (!cal) return false;
+                        
+                        const notas = cal.notas;
+                        if (notas.trabajoCotidiano === null || 
+                            notas.proyecto === null || 
+                            notas.prueba === null || 
+                            notas.tareas === null) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            };
+
+            // =========================================================================
+            // CAPA 2: VALIDADOR
+            // =========================================================================
+            const Validador = {
+                email: function(email) {
+                    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    return regex.test(email);
+                },
+
+                telefono: function(tel) {
+                    const regex = /^[0-9+\-\s]{8,}$/;
+                    return regex.test(tel);
+                },
+
+                duplicadoEstudiante: function(identificacion, grupoId, excludeId = null) {
+                    return ModeloMEP.estudiantes.some(e => 
+                        e.identificacion === identificacion && 
+                        e.grupoId === grupoId &&
+                        e.id !== excludeId &&
+                        e.activo !== false
+                    );
+                },
+
+                antesDeCerrarPeriodo: function(grupoId, periodo, año) {
+                    const estudiantes = Repositorio.getEstudiantesPorGrupo(grupoId);
+                    const sinCalificar = [];
+
+                    for (let est of estudiantes) {
+                        const cal = ModeloMEP.calificaciones.find(c => 
+                            c.estudianteId === est.id && 
+                            c.periodo === periodo && 
+                            c.año === año
+                        );
+
+                        if (!cal) {
+                            sinCalificar.push(est);
+                            continue;
+                        }
+
+                        const notas = cal.notas;
+                        if (notas.trabajoCotidiano === null || 
+                            notas.proyecto === null || 
+                            notas.prueba === null || 
+                            notas.tareas === null) {
+                            sinCalificar.push(est);
+                        }
+                    }
+
+                    return {
+                        valido: sinCalificar.length === 0,
+                        estudiantesPendientes: sinCalificar,
+                        mensaje: sinCalificar.length === 0 
+                            ? "✅ Periodo listo para cerrar" 
+                            : `⚠️ ${sinCalificar.length} estudiante(s) sin calificar`
+                    };
+                },
+
+                integridadReferencial: function() {
+                    const errores = [];
+
+                    // Validar estudiantes con grupos existentes
+                    ModeloMEP.estudiantes.forEach(est => {
+                        if (!ModeloMEP.grupos.some(g => g.id === est.grupoId)) {
+                            errores.push(`Estudiante ${est.nombreCompleto} (${est.id}) tiene grupo inexistente`);
+                        }
+                    });
+
+                    // Validar calificaciones con estudiantes existentes
+                    ModeloMEP.calificaciones.forEach(cal => {
+                        if (!ModeloMEP.estudiantes.some(e => e.id === cal.estudianteId)) {
+                            errores.push(`Calificación ${cal.id} referenciando estudiante inexistente`);
+                        }
+                    });
+
+                    return errores;
+                }
+            };
+
+            // =========================================================================
+            // CAPA 1: CONTROLADOR DE UI Y RENDERIZADO
+            // =========================================================================
+            const UI = {
+                // Inicialización
+                init: function() {
+                    this.cargarDatos();
+                    this.configurarNavegacion();
+                    this.configurarEventos();
+                    this.actualizarSelectores();
+                    this.renderizarTodo();
+                    this.actualizarSumaPorcentajes();
+                },
+
+                cargarDatos: function() {
+                    Repositorio.cargarTodo();
+                },
+
+                configurarNavegacion: function() {
+                    document.querySelectorAll('.nav-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                            btn.classList.add('active');
+                            
+                            document.querySelectorAll('.pestana').forEach(p => p.classList.remove('active'));
+                            document.getElementById(`pestana-${btn.dataset.pestana}`).classList.add('active');
+                        });
+                    });
+                },
+
+                configurarEventos: function() {
+                    // Eventos de configuración
+                    document.getElementById('guardar-configuracion').addEventListener('click', () => this.guardarConfiguracion());
+                    document.getElementById('cargar-configuracion').addEventListener('click', () => this.cargarConfiguracion());
+                    document.getElementById('restablecer-sistema').addEventListener('click', () => this.restablecerSistema());
+                    
+                    ['porc-tc', 'porc-proy', 'porc-prueba', 'porc-tareas'].forEach(id => {
+                        document.getElementById(id).addEventListener('input', () => this.actualizarSumaPorcentajes());
+                    });
+
+                    // Grupos y estudiantes
+                    document.getElementById('btn-agregar-grupo').addEventListener('click', () => this.agregarGrupo());
+                    document.getElementById('selector-grupo').addEventListener('change', () => this.renderizarEstudiantes());
+                    document.getElementById('agregar-estudiante').addEventListener('click', () => this.agregarEstudiante());
+                    document.getElementById('exportar-csv-estudiantes').addEventListener('click', () => this.exportarEstudiantesCSV());
+                    document.getElementById('importar-csv-estudiantes').addEventListener('click', () => this.importarEstudiantesCSV());
+
+                    // Componentes
+                    document.getElementById('comp-grupo').addEventListener('change', () => this.actualizarSelectEstudiantes());
+                    document.getElementById('calcular-promedio').addEventListener('click', () => this.calcularPromedio());
+                    document.getElementById('guardar-calificaciones').addEventListener('click', () => this.guardarCalificaciones());
+
+                    // Bitácora
+                    document.getElementById('agregar-bitacora').addEventListener('click', () => this.agregarBitacora());
+
+                    // Diagnóstico
+                    document.getElementById('ejecutar-diagnostico').addEventListener('click', () => this.ejecutarDiagnostico());
+
+                    // Respaldos
+                    document.getElementById('exportar-json').addEventListener('click', () => this.exportarJSON());
+                    document.getElementById('restaurar-respaldo').addEventListener('click', () => this.restaurarRespaldo());
+
+                    // Acta final
+                    document.getElementById('consolidar-acta').addEventListener('click', () => this.consolidarActa());
+
+                    // Reportes
+                    document.getElementById('generar-reporte').addEventListener('click', () => this.generarReporte());
+                },
+
+                actualizarSumaPorcentajes: function() {
+                    const tc = parseInt(document.getElementById('porc-tc').value) || 0;
+                    const proy = parseInt(document.getElementById('porc-proy').value) || 0;
+                    const pru = parseInt(document.getElementById('porc-prueba').value) || 0;
+                    const tar = parseInt(document.getElementById('porc-tareas').value) || 0;
+                    
+                    const suma = tc + proy + pru + tar;
+                    const span = document.getElementById('suma-porcentajes');
+                    const validacion = document.getElementById('validacion-porcentajes');
+                    
+                    span.textContent = `Suma: ${suma}% ${suma === 100 ? '✅' : '❌'}`;
+                    
+                    if (suma === 100) {
+                        validacion.textContent = 'Válido';
+                        validacion.className = 'badge badge-success';
+                    } else {
+                        validacion.textContent = 'Debe sumar 100%';
+                        validacion.className = 'badge badge-error';
+                    }
+                },
+
+                guardarConfiguracion: function() {
+                    const tc = parseInt(document.getElementById('porc-tc').value);
+                    const proy = parseInt(document.getElementById('porc-proy').value);
+                    const pru = parseInt(document.getElementById('porc-prueba').value);
+                    const tar = parseInt(document.getElementById('porc-tareas').value);
+
+                    if (!MotorCalculo.validarPorcentajes(tc, proy, pru, tar)) {
+                        alert('❌ Los porcentajes deben sumar exactamente 100%');
+                        return;
+                    }
+
+                    const config = {
+                        id: Repositorio.generarId(),
+                        centroId: ModeloMEP.centros[0]?.id || 'temp',
+                        periodo: document.getElementById('periodo-activo').value,
+                        año: parseInt(document.getElementById('anio-lectivo').value),
+                        porcentajes: {
+                            trabajoCotidiano: tc,
+                            proyecto: proy,
+                            prueba: pru,
+                            tareas: tar
+                        },
+                        formulaACS: document.getElementById('formula-acs')?.value || "tc*0.25+proy*0.25+prueba*0.25+tareas*0.25",
+                        activo: true
+                    };
+
+                    ModeloMEP.configuraciones.push(config);
+                    Repositorio.guardarTodo();
+                    alert('✅ Configuración guardada exitosamente');
+                },
+
+                cargarConfiguracion: function() {
+                    const config = ModeloMEP.configuraciones[ModeloMEP.configuraciones.length - 1];
+                    if (config) {
+                        document.getElementById('porc-tc').value = config.porcentajes.trabajoCotidiano;
+                        document.getElementById('porc-proy').value = config.porcentajes.proyecto;
+                        document.getElementById('porc-prueba').value = config.porcentajes.prueba;
+                        document.getElementById('porc-tareas').value = config.porcentajes.tareas;
+                        document.getElementById('periodo-activo').value = config.periodo;
+                        this.actualizarSumaPorcentajes();
+                    }
+                },
+
+                restablecerSistema: function() {
+                    if (confirm('⚠️ ¿Está seguro de restablecer todo el sistema? Se perderán todos los datos.')) {
+                        localStorage.clear();
+                        location.reload();
+                    }
+                },
+
+                actualizarSelectores: function() {
+                    // Grupos
+                    const selectores = ['selector-grupo', 'comp-grupo', 'asis-grupo', 'reporte-grupo', 'acta-grupo'];
+                    selectores.forEach(id => {
+                        const select = document.getElementById(id);
+                        if (select) {
+                            select.innerHTML = '<option value="">-- Seleccione --</option>';
+                            ModeloMEP.grupos.forEach(grupo => {
+                                select.innerHTML += `<option value="${grupo.id}">${grupo.nombre}</option>`;
+                            });
+                        }
+                    });
+                },
+
+                renderizarTodo: function() {
+                    this.renderizarCentros();
+                    this.renderizarEstudiantes();
+                    this.renderizarBitacora();
+                    this.renderizarInstrumentos();
+                },
+
+                renderizarCentros: function() {
+                    const tbody = document.getElementById('centros-list');
+                    if (!tbody) return;
+
+                    tbody.innerHTML = ModeloMEP.centros.map(centro => `
+                        <tr>
+                            <td>${centro.nombre}</td>
+                            <td>${centro.modalidad}</td>
+                            <td>${ModeloMEP.periodos.find(p => p.centroId === centro.id && p.estado === 'abierto')?.periodo || 'Ninguno'}</td>
+                            <td>
+                                <button class="btn btn-small btn-secondary" onclick="UI.seleccionarCentro('${centro.id}')">Seleccionar</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                },
+
+                renderizarEstudiantes: function() {
+                    const grupoId = document.getElementById('selector-grupo')?.value;
+                    if (!grupoId) return;
+
+                    const estudiantes = Repositorio.getEstudiantesPorGrupo(grupoId);
+                    const tbody = document.getElementById('estudiantes-list');
+                    
+                    tbody.innerHTML = estudiantes.map((est, index) => `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td contenteditable="true" data-id="${est.id}" data-field="nombreCompleto">${est.nombreCompleto || ''}</td>
+                            <td contenteditable="true" data-id="${est.id}" data-field="identificacion">${est.identificacion || ''}</td>
+                            <td contenteditable="true" data-id="${est.id}" data-field="telefonoEncargado">${est.telefonoEncargado || ''}</td>
+                            <td contenteditable="true" data-id="${est.id}" data-field="email">${est.email || ''}</td>
+                            <td><input type="checkbox" ${est.tieneACS ? 'checked' : ''} data-id="${est.id}" class="acs-check"></td>
+                            <td><input type="checkbox" ${est.tieneAdecuacionNoSignificativa ? 'checked' : ''} data-id="${est.id}" class="adec-check"></td>
+                            <td contenteditable="true" data-id="${est.id}" data-field="observaciones">${est.observaciones || ''}</td>
+                            <td>
+                                <button class="btn btn-small btn-outline" onclick="UI.eliminarEstudiante('${est.id}')">🗑️</button>
+                            </td>
+                        </tr>
+                    `).join('');
+
+                    // Eventos para edición inline
+                    tbody.querySelectorAll('[contenteditable="true"]').forEach(el => {
+                        el.addEventListener('blur', (e) => {
+                            const id = e.target.dataset.id;
+                            const field = e.target.dataset.field;
+                            const value = e.target.innerText;
+                            
+                            const estudiante = ModeloMEP.estudiantes.find(e => e.id === id);
+                            if (estudiante) {
+                                estudiante[field] = value;
+                                Repositorio.guardarTodo();
+                            }
+                        });
+                    });
+
+                    // Eventos para checkboxes
+                    tbody.querySelectorAll('.acs-check').forEach(cb => {
+                        cb.addEventListener('change', (e) => {
+                            const id = e.target.dataset.id;
+                            const estudiante = ModeloMEP.estudiantes.find(e => e.id === id);
+                            if (estudiante) {
+                                estudiante.tieneACS = e.target.checked;
+                                Repositorio.guardarTodo();
+                            }
+                        });
+                    });
+
+                    tbody.querySelectorAll('.adec-check').forEach(cb => {
+                        cb.addEventListener('change', (e) => {
+                            const id = e.target.dataset.id;
+                            const estudiante = ModeloMEP.estudiantes.find(e => e.id === id);
+                            if (estudiante) {
+                                estudiante.tieneAdecuacionNoSignificativa = e.target.checked;
+                                Repositorio.guardarTodo();
+                            }
+                        });
+                    });
+                },
+
+                agregarGrupo: function() {
+                    const nombre = document.getElementById('nuevo-grupo').value.trim();
+                    if (!nombre) return alert('Ingrese un nombre para el grupo');
+
+                    const nuevoGrupo = {
+                        id: Repositorio.generarId(),
+                        centroId: ModeloMEP.centros[0]?.id,
+                        nombre: nombre,
+                        nivel: nombre.split('-')[0] || nombre,
+                        año: parseInt(document.getElementById('anio-lectivo').value) || 2025,
+                        periodoActivo: "I"
+                    };
+
+                    ModeloMEP.grupos.push(nuevoGrupo);
+                    Repositorio.guardarTodo();
+                    this.actualizarSelectores();
+                    document.getElementById('nuevo-grupo').value = '';
+                },
+
+                agregarEstudiante: function() {
+                    const grupoId = document.getElementById('selector-grupo').value;
+                    if (!grupoId) return alert('Seleccione un grupo primero');
+
+                    const nuevoEstudiante = {
+                        id: Repositorio.generarId(),
+                        centroId: ModeloMEP.centros[0]?.id,
+                        grupoId: grupoId,
+                        numeroLista: Repositorio.getEstudiantesPorGrupo(grupoId).length + 1,
+                        nombreCompleto: "Nuevo Estudiante",
+                        identificacion: "",
+                        telefonoEncargado: "",
+                        email: "",
+                        tieneACS: false,
+                        tieneAdecuacionNoSignificativa: false,
+                        observaciones: "",
+                        activo: true
+                    };
+
+                    ModeloMEP.estudiantes.push(nuevoEstudiante);
+                    Repositorio.guardarTodo();
+                    this.renderizarEstudiantes();
+                },
+
+                eliminarEstudiante: function(id) {
+                    if (confirm('¿Eliminar este estudiante?')) {
+                        const index = ModeloMEP.estudiantes.findIndex(e => e.id === id);
+                        if (index >= 0) {
+                            ModeloMEP.estudiantes.splice(index, 1);
+                            Repositorio.guardarTodo();
+                            this.renderizarEstudiantes();
+                        }
+                    }
+                },
+
+                exportarEstudiantesCSV: function() {
+                    const grupoId = document.getElementById('selector-grupo').value;
+                    if (!grupoId) return alert('Seleccione un grupo');
+
+                    const estudiantes = Repositorio.getEstudiantesPorGrupo(grupoId);
+                    const grupo = ModeloMEP.grupos.find(g => g.id === grupoId);
+
+                    let csv = "Número,Nombre,Identificación,Teléfono,Correo,ACS,Adecuación,Observaciones\n";
+                    estudiantes.forEach((est, i) => {
+                        csv += `${i+1},"${est.nombreCompleto || ''}","${est.identificacion || ''}","${est.telefonoEncargado || ''}","${est.email || ''}",${est.tieneACS ? 'Sí' : 'No'},${est.tieneAdecuacionNoSignificativa ? 'Sí' : 'No'},"${(est.observaciones || '').replace(/"/g, '""')}"\n`;
+                    });
+
+                    const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `estudiantes_${grupo.nombre}_${new Date().toISOString().slice(0,10)}.csv`;
+                    link.click();
+                },
+
+                importarEstudiantesCSV: function() {
+                    alert('Funcionalidad: Seleccione un archivo CSV con el formato adecuado');
+                    // Implementación completa requeriría FileReader
+                },
+
+                actualizarSelectEstudiantes: function() {
+                    const grupoId = document.getElementById('comp-grupo').value;
+                    const select = document.getElementById('comp-estudiante');
+                    if (!grupoId) return;
+
+                    const estudiantes = Repositorio.getEstudiantesPorGrupo(grupoId);
+                    select.innerHTML = '<option value="">-- Seleccione --</option>';
+                    estudiantes.forEach(est => {
+                        select.innerHTML += `<option value="${est.id}">${est.nombreCompleto}</option>`;
+                    });
+                },
+
+                calcularPromedio: function() {
+                    const estudianteId = document.getElementById('comp-estudiante').value;
+                    const periodo = document.getElementById('comp-periodo').value;
+                    
+                    if (!estudianteId) return alert('Seleccione un estudiante');
+
+                    const notas = {
+                        trabajoCotidiano: document.getElementById('nota-tc').value,
+                        proyecto: document.getElementById('nota-proy').value,
+                        prueba: document.getElementById('nota-prueba').value,
+                        tareas: document.getElementById('nota-tareas').value
+                    };
+
+                    const config = ModeloMEP.configuraciones.find(c => c.periodo === periodo && c.activo) 
+                        || ModeloMEP.configuraciones[0];
+
+                    if (!config) return alert('No hay configuración para este periodo');
+
+                    try {
+                        let promedio;
+                        const estudiante = ModeloMEP.estudiantes.find(e => e.id === estudianteId);
+
+                        if (estudiante?.tieneACS) {
+                            const formula = document.getElementById('formula-acs').value;
+                            promedio = MotorCalculo.calcularPromedioACS(notas, formula);
+                        } else {
+                            promedio = MotorCalculo.calcularPromedioEstandar(notas, config.porcentajes);
+                        }
+
+                        document.getElementById('resultado-calculo').style.display = 'block';
+                        document.getElementById('promedio-calculado').innerHTML = `<strong>Promedio:</strong> ${promedio}`;
+                        document.getElementById('estado-calculo').innerHTML = `<strong>Estado:</strong> ${MotorCalculo.determinarEstado(promedio)}`;
+                    } catch (e) {
+                        alert('Error calculando promedio: ' + e.message);
+                    }
+                },
+
+                guardarCalificaciones: function() {
+                    const estudianteId = document.getElementById('comp-estudiante').value;
+                    const periodo = document.getElementById('comp-periodo').value;
+                    const año = parseInt(document.getElementById('anio-lectivo').value);
+
+                    if (!estudianteId) return alert('Seleccione un estudiante');
+
+                    const calificacion = {
+                        id: Repositorio.generarId(),
+                        estudianteId: estudianteId,
+                        grupoId: document.getElementById('comp-grupo').value,
+                        configuracionId: ModeloMEP.configuraciones.find(c => c.periodo === periodo)?.id,
+                        periodo: periodo,
+                        año: año,
+                        notas: {
+                            trabajoCotidiano: document.getElementById('nota-tc').value || null,
+                            proyecto: document.getElementById('nota-proy').value || null,
+                            prueba: document.getElementById('nota-prueba').value || null,
+                            tareas: document.getElementById('nota-tareas').value || null
+                        },
+                        ultimaModificacion: new Date().toISOString()
+                    };
+
+                    Repositorio.guardarCalificacion(calificacion);
+                    alert('✅ Calificaciones guardadas');
+                },
+
+                agregarBitacora: function() {
+                    const registro = {
+                        id: Repositorio.generarId(),
+                        centroId: ModeloMEP.centros[0]?.id,
+                        fecha: document.getElementById('bitacora-fecha').value,
+                        tema: document.getElementById('bitacora-tema').value,
+                        actividad: document.getElementById('bitacora-actividad').value,
+                        observaciones: document.getElementById('bitacora-observaciones').value,
+                        ajustesDUA: [document.getElementById('bitacora-dua').value],
+                        fechaRegistro: new Date().toISOString()
+                    };
+
+                    if (!registro.fecha || !registro.tema) {
+                        return alert('Fecha y tema son obligatorios');
+                    }
+
+                    ModeloMEP.bitacora.push(registro);
+                    Repositorio.guardarTodo();
+                    this.renderizarBitacora();
+                    
+                    // Limpiar campos
+                    document.getElementById('bitacora-fecha').value = '';
+                    document.getElementById('bitacora-tema').value = '';
+                    document.getElementById('bitacora-actividad').value = '';
+                    document.getElementById('bitacora-observaciones').value = '';
+                    document.getElementById('bitacora-dua').value = '';
+                },
+
+                renderizarBitacora: function() {
+                    const tbody = document.getElementById('bitacora-list');
+                    if (!tbody) return;
+
+                    tbody.innerHTML = ModeloMEP.bitacora.slice(-10).reverse().map(reg => `
+                        <tr>
+                            <td>${reg.fecha}</td>
+                            <td>${reg.tema}</td>
+                            <td>${reg.actividad || ''}</td>
+                            <td>${reg.observaciones || ''}</td>
+                            <td>${reg.ajustesDUA?.[0] || ''}</td>
+                        </tr>
+                    `).join('');
+                },
+
+                renderizarInstrumentos: function() {
+                    // Implementación básica
+                },
+
+                ejecutarDiagnostico: function() {
+                    const resultados = [];
+                    
+                    // 1. Validar centros
+                    resultados.push(ModeloMEP.centros.length > 0 ? '✅ Centros: OK' : '❌ Centros: No hay centros');
+                    
+                    // 2. Validar grupos
+                    resultados.push(ModeloMEP.grupos.length > 0 ? '✅ Grupos: OK' : '❌ Grupos: No hay grupos');
+                    
+                    // 3. Validar estudiantes
+                    resultados.push(ModeloMEP.estudiantes.length > 0 ? '✅ Estudiantes: OK' : '⚠️ Estudiantes: No hay estudiantes');
+                    
+                    // 4. Validar configuración
+                    resultados.push(ModeloMEP.configuraciones.length > 0 ? '✅ Configuración: OK' : '❌ Configuración: No hay configuración');
+                    
+                    // 5. Validar integridad referencial
+                    const errores = Validador.integridadReferencial();
+                    resultados.push(errores.length === 0 ? '✅ Integridad: OK' : `⚠️ Integridad: ${errores.length} error(es)`);
+                    
+                    // 6. Validar periodos
+                    const periodosAbiertos = ModeloMEP.periodos.filter(p => p.estado === 'abierto').length;
+                    resultados.push(`📊 Periodos abiertos: ${periodosAbiertos}`);
+
+                    const div = document.getElementById('diagnostico-resultado');
+                    div.innerHTML = `
+                        <div class="card">
+                            <h4>Resultado del diagnóstico</h4>
+                            <ul>
+                                ${resultados.map(r => `<li>${r}</li>`).join('')}
+                            </ul>
+                            <p class="mt-2">Sistema: ${errores.length === 0 ? '✅ Estable' : '⚠️ Requiere atención'}</p>
+                        </div>
+                    `;
+                },
+
+                exportarJSON: function() {
+                    const data = {
+                        version: "2.0",
+                        fecha: new Date().toISOString(),
+                        centros: ModeloMEP.centros,
+                        configuraciones: ModeloMEP.configuraciones,
+                        grupos: ModeloMEP.grupos,
+                        estudiantes: ModeloMEP.estudiantes,
+                        calificaciones: ModeloMEP.calificaciones,
+                        instrumentos: ModeloMEP.instrumentos,
+                        asistencia: ModeloMEP.asistencia,
+                        bitacora: ModeloMEP.bitacora,
+                        periodos: ModeloMEP.periodos
+                    };
+
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `respaldo_mep_${new Date().toISOString().slice(0,10)}.json`;
+                    link.click();
+                },
+
+                restaurarRespaldo: function() {
+                    const file = document.getElementById('importar-json').files[0];
+                    if (!file) return alert('Seleccione un archivo JSON');
+
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const data = JSON.parse(e.target.result);
+                            
+                            if (confirm('¿Restaurar este respaldo? Se perderán los datos actuales.')) {
+                                ModeloMEP.centros = data.centros || [];
+                                ModeloMEP.configuraciones = data.configuraciones || [];
+                                ModeloMEP.grupos = data.grupos || [];
+                                ModeloMEP.estudiantes = data.estudiantes || [];
+                                ModeloMEP.calificaciones = data.calificaciones || [];
+                                ModeloMEP.instrumentos = data.instrumentos || [];
+                                ModeloMEP.asistencia = data.asistencia || [];
+                                ModeloMEP.bitacora = data.bitacora || [];
+                                ModeloMEP.periodos = data.periodos || [];
+                                
+                                Repositorio.guardarTodo();
+                                location.reload();
+                            }
+                        } catch (e) {
+                            alert('Error: Archivo JSON inválido');
+                        }
+                    };
+                    reader.readAsText(file);
+                },
+
+                consolidarActa: function() {
+                    const grupoId = document.getElementById('acta-grupo').value;
+                    const año = parseInt(document.getElementById('acta-anio').value);
+
+                    if (!grupoId) return alert('Seleccione un grupo');
+
+                    const estudiantes = Repositorio.getEstudiantesPorGrupo(grupoId);
+                    const validacion = Validador.antesDeCerrarPeriodo(grupoId, "III", año);
+                    
+                    document.getElementById('acta-validacion').innerHTML = validacion.mensaje;
+
+                    if (!validacion.valido) {
+                        return;
+                    }
+
+                    // Generar acta simplificada
+                    let html = '<div class="card"><h3>Acta Final de Evaluación</h3><table class="table"><tr><th>Estudiante</th><th>I Periodo</th><th>II Periodo</th><th>III Periodo</th><th>Promedio</th><th>Estado</th></tr>';
+
+                    estudiantes.forEach(est => {
+                        const calI = ModeloMEP.calificaciones.find(c => c.estudianteId === est.id && c.periodo === "I" && c.año === año);
+                        const calII = ModeloMEP.calificaciones.find(c => c.estudianteId === est.id && c.periodo === "II" && c.año === año);
+                        const calIII = ModeloMEP.calificaciones.find(c => c.estudianteId === est.id && c.periodo === "III" && c.año === año);
+
+                        const promI = calI?.promedioCalculado ? parseFloat(calI.promedioCalculado) : 0;
+                        const promII = calII?.promedioCalculado ? parseFloat(calII.promedioCalculado) : 0;
+                        const promIII = calIII?.promedioCalculado ? parseFloat(calIII.promedioCalculado) : 0;
+                        
+                        const promedioAnual = ((promI + promII + promIII) / 3).toFixed(2);
+                        const estado = MotorCalculo.determinarEstado(promedioAnual);
+
+                        html += `<tr>
+                            <td>${est.nombreCompleto}</td>
+                            <td>${promI || '-'}</td>
+                            <td>${promII || '-'}</td>
+                            <td>${promIII || '-'}</td>
+                            <td><strong>${promedioAnual}</strong></td>
+                            <td><span class="badge ${estado === 'APROBADO' ? 'badge-success' : estado === 'CONVOCATORIA' ? 'badge-warning' : 'badge-error'}">${estado}</span></td>
+                        </tr>`;
+                    });
+
+                    html += '</table></div>';
+                    document.getElementById('acta-contenido').innerHTML = html;
+                },
+
+                generarReporte: function() {
+                    const grupoId = document.getElementById('reporte-grupo').value;
+                    const periodo = document.getElementById('reporte-periodo').value;
+                    const año = parseInt(document.getElementById('reporte-anio').value);
+
+                    if (!grupoId) return alert('Seleccione un grupo');
+
+                    const estudiantes = Repositorio.getEstudiantesPorGrupo(grupoId);
+                    const grupo = ModeloMEP.grupos.find(g => g.id === grupoId);
+
+                    let html = `<div class="card">
+                        <h3>Reporte de Calificaciones - ${grupo.nombre} - ${periodo} Periodo ${año}</h3>
+                        <table class="table">
+                            <tr>
+                                <th>Estudiante</th>
+                                <th>Trabajo Cotidiano</th>
+                                <th>Proyecto</th>
+                                <th>Prueba</th>
+                                <th>Tareas</th>
+                                <th>Promedio</th>
+                                <th>Estado</th>
+                            </tr>`;
+
+                    estudiantes.forEach(est => {
+                        const cal = ModeloMEP.calificaciones.find(c => 
+                            c.estudianteId === est.id && 
+                            c.periodo === periodo && 
+                            c.año === año
+                        );
+
+                        if (cal) {
+                            const promedio = cal.promedioCalculado || MotorCalculo.calcularPromedioEstandar(cal.notas, 
+                                ModeloMEP.configuraciones.find(c => c.periodo === periodo)?.porcentajes || 
+                                { trabajoCotidiano: 30, proyecto: 20, prueba: 30, tareas: 20 });
+                            
+                            html += `<tr>
+                                <td>${est.nombreCompleto}</td>
+                                <td>${cal.notas.trabajoCotidiano || '-'}</td>
+                                <td>${cal.notas.proyecto || '-'}</td>
+                                <td>${cal.notas.prueba || '-'}</td>
+                                <td>${cal.notas.tareas || '-'}</td>
+                                <td><strong>${promedio}</strong></td>
+                                <td><span class="badge ${parseFloat(promedio) >= 65 ? 'badge-success' : parseFloat(promedio) >= 50 ? 'badge-warning' : 'badge-error'}">${MotorCalculo.determinarEstado(promedio)}</span></td>
+                            </tr>`;
+                        }
+                    });
+
+                    html += '</table></div>';
+                    document.getElementById('reporte-contenido').innerHTML = html;
+                }
+            };
+
+            // =========================================================================
+            // INICIALIZACIÓN DEL SISTEMA
+            // =========================================================================
+            document.addEventListener('DOMContentLoaded', () => {
+                window.UI = UI;
+                UI.init();
+            });
+        })();
+    </script>
 </body>
 </html>
