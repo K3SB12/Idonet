@@ -3,1855 +3,241 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Integral Gestión Docente · MEP Costa Rica</title>
+    <title>Floristería Santa Bárbara | Flores frescas en Costa Rica</title>
+    <meta name="description" content="Arreglos florales, rosas premium, plantas y entrega express en San José. Desde 2010 sorprendiendo momentos especiales.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        sb: {
+                            green: '#2D5A3D',
+                            'green-light': '#4A7C59',
+                            cream: '#F5F1E8',
+                            rose: '#C41E3A',
+                            'rose-soft': '#E8B4B8',
+                            gold: '#D4AF37',
+                            dark: '#1A1A1A'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
-
-        :root {
-            --verde-mep: #0B3B2F;
-            --verde-claro: #A7C1B0;
-            --fondo: #F4F7F5;
-            --texto: #1E2B28;
-            --borde: #C0CFC5;
-            --alerta: #D32F2F;
-            --exito: #2E7D32;
-        }
-
-        body {
-            display: flex;
-            min-height: 100vh;
-            background: var(--fondo);
-            color: var(--texto);
-        }
-
-        .sidebar {
-            width: 280px;
-            background: var(--verde-mep);
-            color: white;
-            padding: 2rem 1rem;
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-        }
-
-        .sidebar h1 {
-            font-size: 1.3rem;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid var(--verde-claro);
-        }
-
-        .nav-btn {
-            width: 100%;
-            background: transparent;
-            border: none;
-            color: white;
-            padding: 1rem;
-            text-align: left;
-            font-size: 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-bottom: 0.25rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            transition: 0.2s;
-        }
-
-        .nav-btn:hover {
-            background: rgba(255,255,255,0.1);
-        }
-
-        .nav-btn.active {
-            background: var(--fondo);
-            color: var(--verde-mep);
-            font-weight: 600;
-        }
-
-        .main-content {
-            flex: 1;
-            margin-left: 280px;
-            padding: 2rem;
-        }
-
-        .pestana {
-            display: none;
-        }
-
-        .pestana.active {
-            display: block;
-        }
-
-        .card {
-            background: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            border: 1px solid var(--borde);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 2px solid var(--verde-claro);
-        }
-
-        .grid-2, .grid-3, .grid-4 {
-            display: grid;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .grid-2 { grid-template-columns: repeat(2, 1fr); }
-        .grid-3 { grid-template-columns: repeat(3, 1fr); }
-        .grid-4 { grid-template-columns: repeat(4, 1fr); }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-        }
-
-        input, select, textarea {
-            padding: 0.75rem;
-            border: 1px solid var(--borde);
-            border-radius: 8px;
-            font-size: 0.95rem;
-        }
-
-        .btn {
-            background: var(--verde-mep);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 40px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn-secondary {
-            background: var(--verde-claro);
-            color: var(--verde-mep);
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--verde-mep);
-            color: var(--verde-mep);
-        }
-
-        .toolbar {
-            display: flex;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-            margin: 1rem 0;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-        }
-
-        th {
-            background: var(--verde-claro);
-            color: var(--verde-mep);
-            padding: 0.75rem;
-            text-align: left;
-            font-weight: 600;
-        }
-
-        td {
-            padding: 0.75rem;
-            border-bottom: 1px solid var(--borde);
-        }
-
-        .badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 40px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        .badge-success {
-            background: var(--exito);
-            color: white;
-        }
-
-        .badge-warning {
-            background: #ED6C02;
-            color: white;
-        }
-
-        .badge-error {
-            background: var(--alerta);
-            color: white;
-        }
-
-        .alert {
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-        }
-
-        .alert-warning {
-            background: #FFF3E0;
-            border-left: 4px solid #ED6C02;
-        }
-
-        @media (max-width: 768px) {
-            body { flex-direction: column; }
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                padding: 1rem;
-            }
-            .main-content {
-                margin-left: 0;
-                padding: 1rem;
-            }
-            .grid-2, .grid-3, .grid-4 {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .calendario-asistencia {
-            display: grid;
-            grid-template-columns: 200px repeat(31, 1fr);
-            overflow-x: auto;
-            margin: 1rem 0;
-        }
-
-        .calendario-header {
-            display: contents;
-        }
-
-        .calendario-header > div {
-            padding: 0.5rem;
-            background: var(--verde-claro);
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .calendario-fila {
-            display: contents;
-        }
-
-        .calendario-fila > div {
-            padding: 0.5rem;
-            border: 1px solid var(--borde);
-            text-align: center;
-        }
-
-        .estado-asistencia {
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .estado-asistencia.P { color: var(--exito); }
-        .estado-asistencia.A { color: var(--alerta); }
-        .estado-asistencia.J { color: #ED6C02; }
-        .estado-asistencia.T { color: #1976D2; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        .animate-fade-in { animation: fadeIn 0.6s ease-out; }
+        html { scroll-behavior: smooth; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .product-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .product-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
     </style>
 </head>
-<body>
-    <aside class="sidebar">
-        <h1>Sistema Integral<br>Gestión Docente MEP</h1>
-        <nav>
-            <button class="nav-btn active" data-pestana="config">⚙️ 1. CONFIGURACIÓN</button>
-            <button class="nav-btn" data-pestana="grupos">👥 2. GRUPOS Y EST.</button>
-            <button class="nav-btn" data-pestana="componentes">📊 3. COMPONENTES</button>
-            <button class="nav-btn" data-pestana="instrumentos">📋 4. INSTRUMENTOS</button>
-            <button class="nav-btn" data-pestana="asistencia">📆 5. ASISTENCIA</button>
-            <button class="nav-btn" data-pestana="bitacora">📓 6. BITÁCORA</button>
-            <button class="nav-btn" data-pestana="reportes">📈 7. REPORTES</button>
-            <button class="nav-btn" data-pestana="acta">📜 8. ACTA FINAL</button>
-            <button class="nav-btn" data-pestana="respaldo">💾 9. RESPALDO</button>
-        </nav>
-    </aside>
+<body class="font-sans bg-sb-cream text-sb-dark min-h-screen">
+    <!-- Header -->
+    <header class="fixed w-full top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16 md:h-20">
+                <a href="#" class="flex items-center gap-3 group">
+                    <span class="text-3xl animate-float">🌸</span>
+                    <div>
+                        <h1 class="font-serif text-xl md:text-2xl font-bold text-sb-green group-hover:text-sb-green-light">Santa Bárbara</h1>
+                        <p class="text-xs text-gray-500 hidden sm:block">Flores frescas • Costa Rica</p>
+                    </div>
+                </a>
 
-    <main class="main-content">
-        <!-- CONFIGURACIÓN -->
-        <section id="pestana-config" class="pestana active">
-            <div class="card">
-                <div class="card-header">
-                    <h2>⚙️ Configuración General MEP</h2>
-                </div>
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label>Centro Educativo</label>
-                        <input type="text" id="centro-nombre" placeholder="Ej: Liceo de Costa Rica">
-                    </div>
-                    <div class="form-group">
-                        <label>Modalidad</label>
-                        <select id="centro-modalidad">
-                            <option value="Primaria">Primaria</option>
-                            <option value="Secundaria" selected>Secundaria</option>
-                            <option value="Preescolar">Preescolar</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="grid-3">
-                    <div class="form-group">
-                        <label>Periodo Activo</label>
-                        <select id="periodo-activo">
-                            <option value="I">I Periodo</option>
-                            <option value="II">II Periodo</option>
-                            <option value="III">III Periodo</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Año Lectivo</label>
-                        <input type="number" id="anio-lectivo" value="2025">
-                    </div>
-                </div>
-                <h3>📊 Porcentajes de Evaluación</h3>
-                <div class="grid-4">
-                    <div class="form-group">
-                        <label>Trabajo Cotidiano (%)</label>
-                        <input type="number" id="porc-tc" value="30" min="0" max="100">
-                    </div>
-                    <div class="form-group">
-                        <label>Proyecto (%)</label>
-                        <input type="number" id="porc-proy" value="20" min="0" max="100">
-                    </div>
-                    <div class="form-group">
-                        <label>Prueba (%)</label>
-                        <input type="number" id="porc-prueba" value="30" min="0" max="100">
-                    </div>
-                    <div class="form-group">
-                        <label>Tareas (%)</label>
-                        <input type="number" id="porc-tareas" value="20" min="0" max="100">
-                    </div>
-                </div>
-                <div class="toolbar">
-                    <span class="badge" id="suma-porcentajes">Suma: 100% ✅</span>
-                    <button class="btn" id="guardar-config">💾 Guardar Configuración</button>
-                    <button class="btn btn-secondary" id="cargar-config">📂 Cargar Configuración</button>
-                    <button class="btn btn-outline" id="reset-sistema">⚠️ Restablecer Sistema</button>
+                <nav class="hidden md:flex items-center gap-8">
+                    <a href="#" class="text-gray-600 hover:text-sb-green font-medium">Inicio</a>
+                    <a href="#catalogo" class="text-gray-600 hover:text-sb-green font-medium">Catálogo</a>
+                    <a href="#contacto" class="text-gray-600 hover:text-sb-green font-medium">Contacto</a>
+                </nav>
+
+                <div class="flex items-center gap-4">
+                    <a href="carrito-checkout.html" class="relative p-2 text-gray-600 hover:text-sb-green">
+                        <i class="fas fa-shopping-bag text-xl"></i>
+                        <span id="cartCount" class="absolute -top-1 -right-1 bg-sb-rose text-white text-xs w-5 h-5 rounded-full flex items-center justify-center hidden">0</span>
+                    </a>
+                    <a href="https://wa.me/50686053613" target="_blank" class="hidden sm:flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full">
+                        <i class="fab fa-whatsapp"></i> Pedir
+                    </a>
+                    <button class="md:hidden p-2 text-gray-600 hover:text-sb-green" onclick="toggleMenu()">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
                 </div>
             </div>
-            <div class="card">
-                <h3>🏫 Centros Educativos</h3>
-                <div id="centros-list" class="grid-2"></div>
-            </div>
-        </section>
+        </div>
 
-        <!-- GRUPOS Y ESTUDIANTES -->
-        <section id="pestana-grupos" class="pestana">
-            <div class="card">
-                <div class="card-header">
-                    <h2>👥 Grupos y Estudiantes</h2>
-                </div>
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label>Nuevo Grupo</label>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <input type="text" id="nuevo-grupo" placeholder="Ej: 7-1">
-                            <button class="btn" id="agregar-grupo">➕ Agregar</button>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Seleccionar Grupo</label>
-                        <select id="selector-grupo">
-                            <option value="">-- Seleccione --</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="toolbar">
-                    <button class="btn" id="agregar-estudiante">➕ Nuevo Estudiante</button>
-                    <button class="btn btn-secondary" id="importar-csv">📤 Importar CSV</button>
-                    <button class="btn btn-secondary" id="exportar-csv">📥 Exportar CSV</button>
-                </div>
-                <input type="file" id="csv-file" accept=".csv" style="display: none;">
-                <div class="table-container">
-                    <table id="tabla-estudiantes">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Nombre</th>
-                                <th>Identificación</th>
-                                <th>Teléfono</th>
-                                <th>Correo</th>
-                                <th>ACS</th>
-                                <th>Adec.</th>
-                                <th>Observaciones</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="estudiantes-list"></tbody>
-                    </table>
-                </div>
+        <!-- Menú móvil -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t">
+            <div class="px-4 py-3 space-y-2">
+                <a href="#" class="block py-2 text-gray-600 hover:text-sb-green">Inicio</a>
+                <a href="#catalogo" class="block py-2 text-gray-600 hover:text-sb-green">Catálogo</a>
+                <a href="carrito-checkout.html" class="block py-2 text-gray-600 hover:text-sb-green">Carrito</a>
+                <a href="https://wa.me/50686053613" class="block py-2 text-green-600 font-medium">
+                    <i class="fab fa-whatsapp mr-2"></i>WhatsApp
+                </a>
             </div>
-        </section>
+        </div>
+    </header>
 
-        <!-- COMPONENTES -->
-        <section id="pestana-componentes" class="pestana">
-            <div class="card">
-                <div class="card-header">
-                    <h2>📊 Registro de Componentes</h2>
-                </div>
-                <div class="grid-3">
-                    <div class="form-group">
-                        <label>Grupo</label>
-                        <select id="comp-grupo">
-                            <option value="">-- Seleccione --</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Estudiante</label>
-                        <select id="comp-estudiante">
-                            <option value="">-- Seleccione --</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Periodo</label>
-                        <select id="comp-periodo">
-                            <option value="I">I Periodo</option>
-                            <option value="II">II Periodo</option>
-                            <option value="III">III Periodo</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="grid-4">
-                    <div class="form-group">
-                        <label>Trabajo Cotidiano</label>
-                        <input type="number" id="nota-tc" step="0.1" min="0" max="100">
-                    </div>
-                    <div class="form-group">
-                        <label>Proyecto</label>
-                        <input type="number" id="nota-proy" step="0.1" min="0" max="100">
-                    </div>
-                    <div class="form-group">
-                        <label>Prueba</label>
-                        <input type="number" id="nota-prueba" step="0.1" min="0" max="100">
-                    </div>
-                    <div class="form-group">
-                        <label>Tareas</label>
-                        <input type="number" id="nota-tareas" step="0.1" min="0" max="100">
-                    </div>
-                </div>
-                <div class="form-group" style="margin: 1rem 0;">
-                    <label>
-                        <input type="checkbox" id="comp-acs"> Estudiante con ACS
-                    </label>
-                </div>
-                <div class="form-group" id="formula-acs-container" style="display: none;">
-                    <label>Fórmula ACS Personalizada</label>
-                    <input type="text" id="formula-acs" value="tc*0.25 + proy*0.25 + prueba*0.25 + tareas*0.25">
-                </div>
-                <div class="toolbar">
-                    <button class="btn" id="calcular-promedio">🧮 Calcular Promedio</button>
-                    <button class="btn btn-secondary" id="guardar-calificaciones">💾 Guardar Calificaciones</button>
-                </div>
-                <div id="resultado-calculo" class="card" style="display: none;">
-                    <h3>Resultado</h3>
-                    <p id="promedio-calculado"></p>
-                    <p id="estado-calculo"></p>
-                </div>
+    <!-- Hero -->
+    <section class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
+        <!-- ... mantén tu hero tal cual, es hermoso ... -->
+    </section>
+
+    <!-- Catálogo (nueva sección integrada) -->
+    <section id="catalogo" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="font-serif text-4xl text-sb-dark mb-4">Nuestro Catálogo</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Selecciona la categoría o explora todos nuestros arreglos frescos</p>
             </div>
-        </section>
 
-        <!-- INSTRUMENTOS -->
-        <section id="pestana-instrumentos" class="pestana">
-            <div class="card">
-                <div class="card-header">
-                    <h2>📋 Instrumentos de Evaluación</h2>
-                </div>
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label>Tipo</label>
-                        <select id="instrumento-tipo">
-                            <option value="lista_cotejo">Lista de Cotejo</option>
-                            <option value="rubrica">Rúbrica Analítica</option>
-                            <option value="escala">Escala de Desempeño</option>
-                            <option value="prueba">Prueba Estructurada</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Nombre</label>
-                        <input type="text" id="instrumento-nombre">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="instrumento-acs"> Para estudiantes con ACS
-                    </label>
-                </div>
-                <div class="form-group">
-                    <label>Grupo Asignado</label>
-                    <select id="instrumento-grupo">
-                        <option value="">-- Seleccione --</option>
-                    </select>
-                </div>
-                <h3>Indicadores</h3>
-                <div id="indicadores-container"></div>
-                <div class="toolbar">
-                    <button class="btn btn-secondary" id="agregar-indicador">➕ Agregar Indicador</button>
-                    <button class="btn" id="guardar-instrumento">💾 Guardar Plantilla</button>
-                    <button class="btn btn-secondary" id="duplicar-instrumento">📑 Duplicar</button>
-                    <button class="btn btn-secondary" id="asignar-grupo-instrumento">👥 Asignar a Grupo</button>
-                </div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Tipo</th>
-                                <th>ACS</th>
-                                <th>Grupo</th>
-                                <th>Indicadores</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="instrumentos-list"></tbody>
-                    </table>
-                </div>
+            <!-- Filtros -->
+            <div class="flex flex-wrap gap-3 justify-center mb-10 overflow-x-auto pb-4" id="filtros">
+                <!-- Se llenan con JS -->
             </div>
-        </section>
 
-        <!-- ASISTENCIA -->
-        <section id="pestana-asistencia" class="pestana">
-            <div class="card">
-                <div class="card-header">
-                    <h2>📆 Control de Asistencia</h2>
-                </div>
-                <div class="grid-3">
-                    <div class="form-group">
-                        <label>Grupo</label>
-                        <select id="asis-grupo">
-                            <option value="">-- Seleccione --</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Mes</label>
-                        <select id="asis-mes">
-                            <option value="1">Enero</option>
-                            <option value="2">Febrero</option>
-                            <option value="3">Marzo</option>
-                            <option value="4">Abril</option>
-                            <option value="5">Mayo</option>
-                            <option value="6">Junio</option>
-                            <option value="7">Julio</option>
-                            <option value="8">Agosto</option>
-                            <option value="9">Setiembre</option>
-                            <option value="10">Octubre</option>
-                            <option value="11">Noviembre</option>
-                            <option value="12">Diciembre</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Año</label>
-                        <input type="number" id="asis-anio" value="2025">
-                    </div>
-                </div>
-                <div class="toolbar">
-                    <button class="btn btn-secondary" id="generar-calendario">📅 Generar Calendario</button>
-                    <button class="btn" id="reporte-ausentismo">📊 Reporte de Ausentismo</button>
-                    <button class="btn btn-secondary" id="exportar-asistencia-pdf">PDF</button>
-                    <button class="btn btn-secondary" id="exportar-asistencia-csv">CSV</button>
-                </div>
-                <div id="calendario-container" style="overflow-x: auto;"></div>
+            <!-- Productos -->
+            <div id="productosGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+                <!-- Se llenan con JS -->
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- BITÁCORA -->
-        <section id="pestana-bitacora" class="pestana">
-            <div class="card">
-                <div class="card-header">
-                    <h2>📓 Bitácora Docente (DUA)</h2>
-                </div>
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label>Fecha</label>
-                        <input type="date" id="bitacora-fecha">
-                    </div>
-                    <div class="form-group">
-                        <label>Tema</label>
-                        <input type="text" id="bitacora-tema">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Actividad</label>
-                    <textarea id="bitacora-actividad" rows="2"></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Observaciones</label>
-                    <textarea id="bitacora-observaciones" rows="2"></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Ajustes DUA</label>
-                    <textarea id="bitacora-dua" rows="2"></textarea>
-                </div>
-                <div class="toolbar">
-                    <button class="btn" id="agregar-bitacora">➕ Agregar Registro</button>
-                    <button class="btn btn-secondary" id="exportar-bitacora-word">📥 Word</button>
-                    <button class="btn btn-secondary" id="exportar-bitacora-pdf">📥 PDF</button>
-                </div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Fecha</th>
-                                <th>Tema</th>
-                                <th>Actividad</th>
-                                <th>Observaciones</th>
-                                <th>Ajustes DUA</th>
-                            </tr>
-                        </thead>
-                        <tbody id="bitacora-list"></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
+    <!-- Footer -->
+    <footer id="contacto" class="bg-sb-dark text-white pt-16 pb-8">
+        <!-- ... tu footer ... -->
+    </footer>
 
-        <!-- REPORTES -->
-        <section id="pestana-reportes" class="pestana">
-            <div class="card">
-                <div class="card-header">
-                    <h2>📈 Reportes por Periodo</h2>
-                </div>
-                <div class="grid-3">
-                    <div class="form-group">
-                        <label>Grupo</label>
-                        <select id="reporte-grupo">
-                            <option value="">-- Seleccione --</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Periodo</label>
-                        <select id="reporte-periodo">
-                            <option value="I">I Periodo</option>
-                            <option value="II">II Periodo</option>
-                            <option value="III">III Periodo</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Año</label>
-                        <input type="number" id="reporte-anio" value="2025">
-                    </div>
-                </div>
-                <div class="toolbar">
-                    <button class="btn" id="generar-reporte">📊 Generar Reporte</button>
-                    <button class="btn btn-secondary" id="exportar-reporte-pdf">PDF</button>
-                    <button class="btn btn-secondary" id="exportar-reporte-word">Word</button>
-                    <button class="btn btn-secondary" id="exportar-reporte-csv">CSV</button>
-                </div>
-                <div id="reporte-contenido" class="table-container"></div>
-            </div>
-        </section>
+    <!-- WhatsApp flotante -->
+    <a href="https://wa.me/50686053613" target="_blank" class="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-110">
+        <i class="fab fa-whatsapp text-2xl"></i>
+    </a>
 
-        <!-- ACTA FINAL -->
-        <section id="pestana-acta" class="pestana">
-            <div class="card">
-                <div class="card-header">
-                    <h2>📜 Acta Final de Evaluación</h2>
-                </div>
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label>Grupo</label>
-                        <select id="acta-grupo">
-                            <option value="">-- Seleccione --</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Año</label>
-                        <input type="number" id="acta-anio" value="2025">
-                    </div>
-                </div>
-                <div id="acta-validacion" class="alert alert-warning" style="display: none;"></div>
-                <div class="toolbar">
-                    <button class="btn" id="consolidar-acta">📋 Consolidar Acta</button>
-                    <button class="btn btn-secondary" id="exportar-acta-pdf">PDF</button>
-                    <button class="btn btn-secondary" id="exportar-acta-word">Word</button>
-                </div>
-                <div id="acta-contenido" class="table-container"></div>
-            </div>
-        </section>
-
-        <!-- RESPALDO -->
-        <section id="pestana-respaldo" class="pestana">
-            <div class="card">
-                <div class="card-header">
-                    <h2>💾 Respaldo y Exportación Global</h2>
-                </div>
-                <div class="grid-2">
-                    <div class="card">
-                        <h3>Exportar</h3>
-                        <button class="btn w-100" id="exportar-json">📦 Exportar Todo (JSON)</button>
-                        <button class="btn btn-secondary w-100" id="exportar-masivo-csv">📤 Exportación Masiva CSV</button>
-                        <button class="btn btn-secondary w-100" id="generar-copia">💿 Generar Copia Seguridad</button>
-                    </div>
-                    <div class="card">
-                        <h3>Importar</h3>
-                        <input type="file" id="importar-json" accept=".json">
-                        <button class="btn w-100" id="restaurar-respaldo">🔄 Restaurar Sistema</button>
-                    </div>
-                </div>
-                <div class="card">
-                    <h3>🔍 Diagnóstico del Sistema</h3>
-                    <button class="btn btn-secondary" id="ejecutar-diagnostico">Ejecutar Diagnóstico</button>
-                    <div id="diagnostico-resultado"></div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
-        (function() {
-            // ==================== MODELO DE DATOS CENTRAL ====================
-            const Modelo = {
-                centros: [],
-                configuraciones: [],
-                grupos: [],
-                estudiantes: [],
-                calificaciones: [],
-                instrumentos: [],
-                asistencia: [],
-                bitacora: [],
-                periodos: []
-            };
+        let productos = [];
+        let categorias = [];
+        const CART_KEY = 'sb_carrito';
 
-            // ==================== REPOSITORIO (PERSISTENCIA) ====================
-            const Repositorio = {
-                guardarTodo() {
-                    Object.keys(Modelo).forEach(key => {
-                        localStorage.setItem(`mep_${key}`, JSON.stringify(Modelo[key]));
-                    });
-                },
+        async function cargarDatos() {
+            try {
+                const res = await fetch('data/products.json');
+                const data = await res.json();
+                productos = data.productos?.filter(p => p.activo) || [];
+                categorias = data.categorias?.filter(c => c.activa) || [];
+                renderizarFiltros();
+                filtrar('todos');
+                actualizarContadorCarrito();
+            } catch (err) {
+                console.error('Error cargando datos:', err);
+                document.getElementById('productosGrid').innerHTML = '<p class="col-span-full text-center py-12 text-gray-600">Error al cargar el catálogo. Intenta más tarde.</p>';
+            }
+        }
 
-                cargarTodo() {
-                    Object.keys(Modelo).forEach(key => {
-                        const data = localStorage.getItem(`mep_${key}`);
-                        if (data) Modelo[key] = JSON.parse(data);
-                    });
-                    
-                    if (Modelo.centros.length === 0) this.inicializarDatosDemo();
-                },
+        function renderizarFiltros() {
+            const container = document.getElementById('filtros');
+            container.innerHTML = `
+                <button onclick="filtrar('todos')" class="px-6 py-2 rounded-full bg-sb-green text-white font-medium">Todos</button>
+                ${categorias.map(c => `
+                    <button onclick="filtrar('${c.id}')" class="px-6 py-2 rounded-full border-2 border-gray-300 hover:bg-sb-green hover:text-white transition font-medium">
+                        ${c.icono} ${c.nombre}
+                    </button>
+                `).join('')}
+            `;
+        }
 
-                inicializarDatosDemo() {
-                    const centroId = this.generarId();
-                    Modelo.centros = [{ id: centroId, nombre: 'Liceo Experimental', modalidad: 'Secundaria' }];
-                    Modelo.configuraciones = [{
-                        id: this.generarId(),
-                        centroId,
-                        periodo: 'I',
-                        año: 2025,
-                        porcentajes: { trabajoCotidiano: 30, proyecto: 20, prueba: 30, tareas: 20 },
-                        formulaACS: 'tc*0.25 + proy*0.25 + prueba*0.25 + tareas*0.25'
-                    }];
-                    Modelo.grupos = [{ id: this.generarId(), centroId, nombre: '7-1', año: 2025 }];
-                    Modelo.periodos = [
-                        { id: this.generarId(), centroId, año: 2025, periodo: 'I', estado: 'abierto' },
-                        { id: this.generarId(), centroId, año: 2025, periodo: 'II', estado: 'pendiente' },
-                        { id: this.generarId(), centroId, año: 2025, periodo: 'III', estado: 'pendiente' }
-                    ];
-                    this.guardarTodo();
-                },
+        function filtrar(categoria) {
+            const filtrados = categoria === 'todos' 
+                ? productos 
+                : productos.filter(p => p.categoria === categoria);
 
-                generarId() {
-                    return Date.now().toString(36) + Math.random().toString(36).substr(2);
-                }
-            };
-
-            // ==================== MOTOR DE CÁLCULO ====================
-            const MotorCalculo = {
-                validarPorcentajes(tc, proy, pru, tar) {
-                    const suma = (tc || 0) + (proy || 0) + (pru || 0) + (tar || 0);
-                    return suma === 100;
-                },
-
-                calcularPromedio(notas, porcentajes) {
-                    if (Object.values(notas).some(n => n === null || n === undefined || n === '')) {
-                        throw new Error('Todas las notas son requeridas');
-                    }
-                    return (
-                        (parseFloat(notas.trabajoCotidiano) * porcentajes.trabajoCotidiano / 100) +
-                        (parseFloat(notas.proyecto) * porcentajes.proyecto / 100) +
-                        (parseFloat(notas.prueba) * porcentajes.prueba / 100) +
-                        (parseFloat(notas.tareas) * porcentajes.tareas / 100)
-                    ).toFixed(2);
-                },
-
-                calcularACS(notas, formula) {
-                    const tc = parseFloat(notas.trabajoCotidiano) || 0;
-                    const proy = parseFloat(notas.proyecto) || 0;
-                    const prueba = parseFloat(notas.prueba) || 0;
-                    const tareas = parseFloat(notas.tareas) || 0;
-                    try {
-                        return eval(formula).toFixed(2);
-                    } catch {
-                        return 'Error';
-                    }
-                },
-
-                determinarEstado(promedio) {
-                    const p = parseFloat(promedio);
-                    if (p >= 65) return 'APROBADO';
-                    if (p >= 50) return 'CONVOCATORIA';
-                    return 'REPROBADO';
-                }
-            };
-
-            // ==================== VALIDADOR ====================
-            const Validador = {
-                email(email) {
-                    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-                },
-
-                telefono(tel) {
-                    return /^[0-9+\-\s]{8,}$/.test(tel);
-                },
-
-                antesDeCerrarPeriodo(grupoId, periodo, año) {
-                    const estudiantes = Modelo.estudiantes.filter(e => e.grupoId === grupoId);
-                    const pendientes = estudiantes.filter(est => {
-                        const cal = Modelo.calificaciones.find(c => 
-                            c.estudianteId === est.id && c.periodo === periodo && c.año === año
-                        );
-                        return !cal || Object.values(cal.notas).some(n => n === null);
-                    });
-                    return pendientes.length === 0;
-                }
-            };
-
-            // ==================== UI CONTROLLER ====================
-            const UI = {
-                init() {
-                    Repositorio.cargarTodo();
-                    this.configurarNavegacion();
-                    this.configurarEventos();
-                    this.actualizarSelectores();
-                    this.renderizarTodo();
-                },
-
-                configurarNavegacion() {
-                    document.querySelectorAll('.nav-btn').forEach(btn => {
-                        btn.addEventListener('click', () => {
-                            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-                            document.querySelectorAll('.pestana').forEach(p => p.classList.remove('active'));
-                            btn.classList.add('active');
-                            document.getElementById(`pestana-${btn.dataset.pestana}`).classList.add('active');
-                        });
-                    });
-                },
-
-                configurarEventos() {
-                    // Configuración
-                    document.getElementById('guardar-config').addEventListener('click', () => this.guardarConfiguracion());
-                    document.getElementById('cargar-config').addEventListener('click', () => this.cargarConfiguracion());
-                    document.getElementById('reset-sistema').addEventListener('click', () => this.resetSistema());
-                    ['porc-tc', 'porc-proy', 'porc-prueba', 'porc-tareas'].forEach(id => {
-                        document.getElementById(id).addEventListener('input', () => this.actualizarSuma());
-                    });
-
-                    // Grupos
-                    document.getElementById('agregar-grupo').addEventListener('click', () => this.agregarGrupo());
-                    document.getElementById('selector-grupo').addEventListener('change', () => this.renderizarEstudiantes());
-                    document.getElementById('agregar-estudiante').addEventListener('click', () => this.agregarEstudiante());
-                    document.getElementById('exportar-csv').addEventListener('click', () => this.exportarCSV());
-                    document.getElementById('importar-csv').addEventListener('click', () => document.getElementById('csv-file').click());
-                    document.getElementById('csv-file').addEventListener('change', (e) => this.importarCSV(e));
-
-                    // Componentes
-                    document.getElementById('comp-grupo').addEventListener('change', () => this.actualizarSelectEstudiantes());
-                    document.getElementById('comp-estudiante').addEventListener('change', () => this.cargarNotasEstudiante());
-                    document.getElementById('comp-acs').addEventListener('change', (e) => {
-                        document.getElementById('formula-acs-container').style.display = e.target.checked ? 'block' : 'none';
-                    });
-                    document.getElementById('calcular-promedio').addEventListener('click', () => this.calcularPromedio());
-                    document.getElementById('guardar-calificaciones').addEventListener('click', () => this.guardarCalificaciones());
-
-                    // Instrumentos
-                    document.getElementById('agregar-indicador').addEventListener('click', () => this.agregarIndicador());
-                    document.getElementById('guardar-instrumento').addEventListener('click', () => this.guardarInstrumento());
-                    document.getElementById('duplicar-instrumento').addEventListener('click', () => this.duplicarInstrumento());
-                    document.getElementById('asignar-grupo-instrumento').addEventListener('click', () => this.asignarInstrumentoAGrupo());
-
-                    // Asistencia
-                    document.getElementById('generar-calendario').addEventListener('click', () => this.generarCalendarioAsistencia());
-                    document.getElementById('reporte-ausentismo').addEventListener('click', () => this.generarReporteAusentismo());
-                    document.getElementById('exportar-asistencia-pdf').addEventListener('click', () => this.exportarAsistenciaPDF());
-                    document.getElementById('exportar-asistencia-csv').addEventListener('click', () => this.exportarAsistenciaCSV());
-
-                    // Bitácora
-                    document.getElementById('agregar-bitacora').addEventListener('click', () => this.agregarBitacora());
-                    document.getElementById('exportar-bitacora-word').addEventListener('click', () => this.exportarBitacoraWord());
-                    document.getElementById('exportar-bitacora-pdf').addEventListener('click', () => this.exportarBitacoraPDF());
-
-                    // Reportes
-                    document.getElementById('generar-reporte').addEventListener('click', () => this.generarReporte());
-                    document.getElementById('exportar-reporte-pdf').addEventListener('click', () => this.exportarReportePDF());
-                    document.getElementById('exportar-reporte-word').addEventListener('click', () => this.exportarReporteWord());
-                    document.getElementById('exportar-reporte-csv').addEventListener('click', () => this.exportarReporteCSV());
-
-                    // Acta
-                    document.getElementById('consolidar-acta').addEventListener('click', () => this.consolidarActa());
-                    document.getElementById('exportar-acta-pdf').addEventListener('click', () => this.exportarActaPDF());
-                    document.getElementById('exportar-acta-word').addEventListener('click', () => this.exportarActaWord());
-
-                    // Respaldo
-                    document.getElementById('exportar-json').addEventListener('click', () => this.exportarJSON());
-                    document.getElementById('exportar-masivo-csv').addEventListener('click', () => this.exportarMasivoCSV());
-                    document.getElementById('generar-copia').addEventListener('click', () => this.generarCopiaSeguridad());
-                    document.getElementById('restaurar-respaldo').addEventListener('click', () => this.restaurarRespaldo());
-                    document.getElementById('ejecutar-diagnostico').addEventListener('click', () => this.ejecutarDiagnostico());
-                },
-
-                actualizarSuma() {
-                    const tc = parseInt(document.getElementById('porc-tc').value) || 0;
-                    const proy = parseInt(document.getElementById('porc-proy').value) || 0;
-                    const pru = parseInt(document.getElementById('porc-prueba').value) || 0;
-                    const tar = parseInt(document.getElementById('porc-tareas').value) || 0;
-                    const suma = tc + proy + pru + tar;
-                    const span = document.getElementById('suma-porcentajes');
-                    span.textContent = `Suma: ${suma}% ${suma === 100 ? '✅' : '❌'}`;
-                    span.className = `badge ${suma === 100 ? 'badge-success' : 'badge-error'}`;
-                },
-
-                guardarConfiguracion() {
-                    const tc = parseInt(document.getElementById('porc-tc').value);
-                    const proy = parseInt(document.getElementById('porc-proy').value);
-                    const pru = parseInt(document.getElementById('porc-prueba').value);
-                    const tar = parseInt(document.getElementById('porc-tareas').value);
-                    
-                    if (!MotorCalculo.validarPorcentajes(tc, proy, pru, tar)) {
-                        return alert('❌ Los porcentajes deben sumar 100%');
-                    }
-
-                    const centroId = Modelo.centros[0]?.id || Repositorio.generarId();
-                    const config = {
-                        id: Repositorio.generarId(),
-                        centroId,
-                        periodo: document.getElementById('periodo-activo').value,
-                        año: parseInt(document.getElementById('anio-lectivo').value),
-                        porcentajes: { trabajoCotidiano: tc, proyecto: proy, prueba: pru, tareas: tar },
-                        formulaACS: 'tc*0.25 + proy*0.25 + prueba*0.25 + tareas*0.25'
-                    };
-
-                    if (!Modelo.centros.length) {
-                        Modelo.centros.push({ id: centroId, nombre: document.getElementById('centro-nombre').value || 'Centro MEP', modalidad: document.getElementById('centro-modalidad').value });
-                    }
-
-                    Modelo.configuraciones.push(config);
-                    Repositorio.guardarTodo();
-                    alert('✅ Configuración guardada');
-                    this.renderizarCentros();
-                },
-
-                cargarConfiguracion() {
-                    const config = Modelo.configuraciones[Modelo.configuraciones.length - 1];
-                    if (config) {
-                        document.getElementById('porc-tc').value = config.porcentajes.trabajoCotidiano;
-                        document.getElementById('porc-proy').value = config.porcentajes.proyecto;
-                        document.getElementById('porc-prueba').value = config.porcentajes.prueba;
-                        document.getElementById('porc-tareas').value = config.porcentajes.tareas;
-                        document.getElementById('periodo-activo').value = config.periodo;
-                        this.actualizarSuma();
-                    }
-                },
-
-                resetSistema() {
-                    if (confirm('⚠️ ¿Restablecer todo el sistema? Se perderán todos los datos.')) {
-                        localStorage.clear();
-                        location.reload();
-                    }
-                },
-
-                actualizarSelectores() {
-                    const selects = ['selector-grupo', 'comp-grupo', 'instrumento-grupo', 'asis-grupo', 'reporte-grupo', 'acta-grupo'];
-                    selects.forEach(id => {
-                        const select = document.getElementById(id);
-                        if (select) {
-                            select.innerHTML = '<option value="">-- Seleccione --</option>';
-                            Modelo.grupos.forEach(g => {
-                                select.innerHTML += `<option value="${g.id}">${g.nombre}</option>`;
-                            });
-                        }
-                    });
-                },
-
-                renderizarTodo() {
-                    this.renderizarCentros();
-                    this.renderizarEstudiantes();
-                    this.renderizarBitacora();
-                    this.renderizarInstrumentos();
-                },
-
-                renderizarCentros() {
-                    const container = document.getElementById('centros-list');
-                    container.innerHTML = Modelo.centros.map(c => `
-                        <div class="card">
-                            <strong>${c.nombre}</strong><br>
-                            <small>${c.modalidad}</small>
+            const container = document.getElementById('productosGrid');
+            container.innerHTML = filtrados.map(p => {
+                const precio = p.precioTemporadaActivo && p.precioTemporada ? p.precioTemporada : p.precioRegular;
+                const imagen = p.imagenes?.[0] || 'https://via.placeholder.com/400?text=Sin+Imagen';
+                
+                return `
+                    <div class="product-card bg-white rounded-xl overflow-hidden shadow-md">
+                        <div class="relative aspect-square">
+                            <img src="${imagen}" alt="${p.nombre}" class="w-full h-full object-cover" loading="lazy">
+                            ${p.precioTemporadaActivo ? `<span class="absolute top-3 left-3 bg-sb-rose text-white px-3 py-1 rounded-full text-xs font-bold">OFERTA</span>` : ''}
                         </div>
-                    `).join('');
-                },
-
-                renderizarEstudiantes() {
-                    const grupoId = document.getElementById('selector-grupo').value;
-                    if (!grupoId) return;
-
-                    const estudiantes = Modelo.estudiantes.filter(e => e.grupoId === grupoId);
-                    const tbody = document.getElementById('estudiantes-list');
-                    
-                    tbody.innerHTML = estudiantes.map((est, i) => `
-                        <tr>
-                            <td>${i + 1}</td>
-                            <td contenteditable="true" data-id="${est.id}" data-field="nombre">${est.nombre || ''}</td>
-                            <td contenteditable="true" data-id="${est.id}" data-field="identificacion">${est.identificacion || ''}</td>
-                            <td contenteditable="true" data-id="${est.id}" data-field="telefono">${est.telefono || ''}</td>
-                            <td contenteditable="true" data-id="${est.id}" data-field="email">${est.email || ''}</td>
-                            <td><input type="checkbox" ${est.acs ? 'checked' : ''} data-id="${est.id}" class="acs-check"></td>
-                            <td><input type="checkbox" ${est.adecuacion ? 'checked' : ''} data-id="${est.id}" class="adec-check"></td>
-                            <td contenteditable="true" data-id="${est.id}" data-field="observaciones">${est.observaciones || ''}</td>
-                            <td><button class="btn btn-outline btn-small" onclick="UI.eliminarEstudiante('${est.id}')">🗑️</button></td>
-                        </tr>
-                    `).join('');
-
-                    // Eventos para edición inline
-                    tbody.querySelectorAll('[contenteditable="true"]').forEach(el => {
-                        el.addEventListener('blur', (e) => {
-                            const id = e.target.dataset.id;
-                            const field = e.target.dataset.field;
-                            const estudiante = Modelo.estudiantes.find(e => e.id === id);
-                            if (estudiante) {
-                                estudiante[field] = e.target.innerText;
-                                Repositorio.guardarTodo();
-                            }
-                        });
-                    });
-
-                    // Eventos para checkboxes
-                    tbody.querySelectorAll('.acs-check').forEach(cb => {
-                        cb.addEventListener('change', (e) => {
-                            const id = e.target.dataset.id;
-                            const estudiante = Modelo.estudiantes.find(e => e.id === id);
-                            if (estudiante) {
-                                estudiante.acs = e.target.checked;
-                                Repositorio.guardarTodo();
-                            }
-                        });
-                    });
-
-                    tbody.querySelectorAll('.adec-check').forEach(cb => {
-                        cb.addEventListener('change', (e) => {
-                            const id = e.target.dataset.id;
-                            const estudiante = Modelo.estudiantes.find(e => e.id === id);
-                            if (estudiante) {
-                                estudiante.adecuacion = e.target.checked;
-                                Repositorio.guardarTodo();
-                            }
-                        });
-                    });
-                },
-
-                agregarGrupo() {
-                    const nombre = document.getElementById('nuevo-grupo').value.trim();
-                    if (!nombre) return alert('Ingrese un nombre');
-                    
-                    if (Modelo.grupos.some(g => g.nombre === nombre)) {
-                        return alert('Ya existe un grupo con ese nombre');
-                    }
-
-                    Modelo.grupos.push({
-                        id: Repositorio.generarId(),
-                        centroId: Modelo.centros[0]?.id,
-                        nombre,
-                        año: parseInt(document.getElementById('anio-lectivo').value)
-                    });
-
-                    Repositorio.guardarTodo();
-                    this.actualizarSelectores();
-                    document.getElementById('nuevo-grupo').value = '';
-                },
-
-                agregarEstudiante() {
-                    const grupoId = document.getElementById('selector-grupo').value;
-                    if (!grupoId) return alert('Seleccione un grupo');
-
-                    Modelo.estudiantes.push({
-                        id: Repositorio.generarId(),
-                        grupoId,
-                        nombre: 'Nuevo Estudiante',
-                        identificacion: '',
-                        telefono: '',
-                        email: '',
-                        acs: false,
-                        adecuacion: false,
-                        observaciones: ''
-                    });
-
-                    Repositorio.guardarTodo();
-                    this.renderizarEstudiantes();
-                },
-
-                eliminarEstudiante(id) {
-                    if (confirm('¿Eliminar este estudiante?')) {
-                        Modelo.estudiantes = Modelo.estudiantes.filter(e => e.id !== id);
-                        Repositorio.guardarTodo();
-                        this.renderizarEstudiantes();
-                    }
-                },
-
-                exportarCSV() {
-                    const grupoId = document.getElementById('selector-grupo').value;
-                    if (!grupoId) return alert('Seleccione un grupo');
-
-                    const estudiantes = Modelo.estudiantes.filter(e => e.grupoId === grupoId);
-                    const grupo = Modelo.grupos.find(g => g.id === grupoId);
-
-                    let csv = "Nombre,Identificación,Teléfono,Correo,ACS,Adecuación,Observaciones\n";
-                    estudiantes.forEach(est => {
-                        csv += `"${est.nombre || ''}","${est.identificacion || ''}","${est.telefono || ''}","${est.email || ''}",${est.acs ? 'Sí' : 'No'},${est.adecuacion ? 'Sí' : 'No'},"${(est.observaciones || '').replace(/"/g, '""')}"\n`;
-                    });
-
-                    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(blob);
-                    link.download = `estudiantes_${grupo.nombre}_${new Date().toISOString().slice(0,10)}.csv`;
-                    link.click();
-                },
-
-                importarCSV(event) {
-                    const file = event.target.files[0];
-                    if (!file) return;
-
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const lines = e.target.result.split('\n');
-                        const headers = lines[0].split(',');
-                        
-                        for (let i = 1; i < lines.length; i++) {
-                            if (!lines[i].trim()) continue;
-                            
-                            const values = lines[i].split(',');
-                            const estudiante = {
-                                id: Repositorio.generarId(),
-                                grupoId: document.getElementById('selector-grupo').value,
-                                nombre: values[0]?.replace(/"/g, '') || 'Nuevo',
-                                identificacion: values[1]?.replace(/"/g, '') || '',
-                                telefono: values[2]?.replace(/"/g, '') || '',
-                                email: values[3]?.replace(/"/g, '') || '',
-                                acs: values[4] === 'Sí',
-                                adecuacion: values[5] === 'Sí',
-                                observaciones: values[6]?.replace(/"/g, '') || ''
-                            };
-                            Modelo.estudiantes.push(estudiante);
-                        }
-
-                        Repositorio.guardarTodo();
-                        this.renderizarEstudiantes();
-                        alert('✅ Estudiantes importados');
-                    };
-                    reader.readAsText(file, 'UTF-8');
-                },
-
-                actualizarSelectEstudiantes() {
-                    const grupoId = document.getElementById('comp-grupo').value;
-                    const select = document.getElementById('comp-estudiante');
-                    select.innerHTML = '<option value="">-- Seleccione --</option>';
-                    
-                    Modelo.estudiantes.filter(e => e.grupoId === grupoId).forEach(est => {
-                        select.innerHTML += `<option value="${est.id}">${est.nombre}</option>`;
-                    });
-                },
-
-                cargarNotasEstudiante() {
-                    const estudianteId = document.getElementById('comp-estudiante').value;
-                    const periodo = document.getElementById('comp-periodo').value;
-                    const año = parseInt(document.getElementById('anio-lectivo').value);
-
-                    if (!estudianteId) return;
-
-                    const cal = Modelo.calificaciones.find(c => 
-                        c.estudianteId === estudianteId && c.periodo === periodo && c.año === año
-                    );
-
-                    if (cal) {
-                        document.getElementById('nota-tc').value = cal.notas.trabajoCotidiano || '';
-                        document.getElementById('nota-proy').value = cal.notas.proyecto || '';
-                        document.getElementById('nota-prueba').value = cal.notas.prueba || '';
-                        document.getElementById('nota-tareas').value = cal.notas.tareas || '';
-                        
-                        const estudiante = Modelo.estudiantes.find(e => e.id === estudianteId);
-                        document.getElementById('comp-acs').checked = estudiante?.acs || false;
-                        document.getElementById('formula-acs-container').style.display = estudiante?.acs ? 'block' : 'none';
-                    }
-                },
-
-                calcularPromedio() {
-                    const estudianteId = document.getElementById('comp-estudiante').value;
-                    if (!estudianteId) return alert('Seleccione un estudiante');
-
-                    const notas = {
-                        trabajoCotidiano: document.getElementById('nota-tc').value,
-                        proyecto: document.getElementById('nota-proy').value,
-                        prueba: document.getElementById('nota-prueba').value,
-                        tareas: document.getElementById('nota-tareas').value
-                    };
-
-                    const config = Modelo.configuraciones[Modelo.configuraciones.length - 1];
-                    if (!config) return alert('No hay configuración');
-
-                    try {
-                        let promedio;
-                        const estudiante = Modelo.estudiantes.find(e => e.id === estudianteId);
-
-                        if (estudiante?.acs) {
-                            const formula = document.getElementById('formula-acs').value;
-                            promedio = MotorCalculo.calcularACS(notas, formula);
-                        } else {
-                            promedio = MotorCalculo.calcularPromedio(notas, config.porcentajes);
-                        }
-
-                        document.getElementById('resultado-calculo').style.display = 'block';
-                        document.getElementById('promedio-calculado').innerHTML = `<strong>Promedio:</strong> ${promedio}`;
-                        document.getElementById('estado-calculo').innerHTML = `<strong>Estado:</strong> ${MotorCalculo.determinarEstado(promedio)}`;
-                    } catch (e) {
-                        alert('Error: ' + e.message);
-                    }
-                },
-
-                guardarCalificaciones() {
-                    const estudianteId = document.getElementById('comp-estudiante').value;
-                    if (!estudianteId) return alert('Seleccione un estudiante');
-
-                    const calificacion = {
-                        id: Repositorio.generarId(),
-                        estudianteId,
-                        grupoId: document.getElementById('comp-grupo').value,
-                        periodo: document.getElementById('comp-periodo').value,
-                        año: parseInt(document.getElementById('anio-lectivo').value),
-                        notas: {
-                            trabajoCotidiano: document.getElementById('nota-tc').value || null,
-                            proyecto: document.getElementById('nota-proy').value || null,
-                            prueba: document.getElementById('nota-prueba').value || null,
-                            tareas: document.getElementById('nota-tareas').value || null
-                        }
-                    };
-
-                    const index = Modelo.calificaciones.findIndex(c => 
-                        c.estudianteId === estudianteId && 
-                        c.periodo === calificacion.periodo && 
-                        c.año === calificacion.año
-                    );
-
-                    if (index >= 0) {
-                        Modelo.calificaciones[index] = calificacion;
-                    } else {
-                        Modelo.calificaciones.push(calificacion);
-                    }
-
-                    Repositorio.guardarTodo();
-                    alert('✅ Calificaciones guardadas');
-                },
-
-                agregarIndicador() {
-                    const container = document.getElementById('indicadores-container');
-                    const index = container.children.length;
-                    const div = document.createElement('div');
-                    div.className = 'grid-2';
-                    div.innerHTML = `
-                        <input type="text" placeholder="Descripción del indicador" class="indicador-desc" data-index="${index}">
-                        <input type="number" placeholder="Puntuación máxima" class="indicador-punt" data-index="${index}" min="0" max="100">
-                    `;
-                    container.appendChild(div);
-                },
-
-                guardarInstrumento() {
-                    const indicadores = [];
-                    document.querySelectorAll('.indicador-desc').forEach((desc, i) => {
-                        const punt = document.querySelector(`.indicador-punt[data-index="${i}"]`);
-                        if (desc.value && punt.value) {
-                            indicadores.push({
-                                descripcion: desc.value,
-                                puntuacion: parseFloat(punt.value)
-                            });
-                        }
-                    });
-
-                    const instrumento = {
-                        id: Repositorio.generarId(),
-                        tipo: document.getElementById('instrumento-tipo').value,
-                        nombre: document.getElementById('instrumento-nombre').value,
-                        acs: document.getElementById('instrumento-acs').checked,
-                        grupoId: document.getElementById('instrumento-grupo').value || null,
-                        indicadores,
-                        fecha: new Date().toISOString()
-                    };
-
-                    if (!instrumento.nombre) return alert('Ingrese un nombre');
-                    
-                    Modelo.instrumentos.push(instrumento);
-                    Repositorio.guardarTodo();
-                    this.renderizarInstrumentos();
-                    alert('✅ Instrumento guardado');
-                },
-
-                duplicarInstrumento() {
-                    const instrumentos = Modelo.instrumentos;
-                    if (!instrumentos.length) return alert('No hay instrumentos para duplicar');
-                    
-                    const ultimo = instrumentos[instrumentos.length - 1];
-                    const copia = { ...ultimo, id: Repositorio.generarId(), nombre: `${ultimo.nombre} (copia)` };
-                    Modelo.instrumentos.push(copia);
-                    Repositorio.guardarTodo();
-                    this.renderizarInstrumentos();
-                    alert('✅ Instrumento duplicado');
-                },
-
-                asignarInstrumentoAGrupo() {
-                    const instrumentos = Modelo.instrumentos;
-                    if (!instrumentos.length) return alert('No hay instrumentos');
-                    
-                    const grupoId = document.getElementById('instrumento-grupo').value;
-                    if (!grupoId) return alert('Seleccione un grupo');
-
-                    instrumentos.forEach(i => i.grupoId = grupoId);
-                    Repositorio.guardarTodo();
-                    this.renderizarInstrumentos();
-                    alert('✅ Instrumentos asignados al grupo');
-                },
-
-                renderizarInstrumentos() {
-                    const tbody = document.getElementById('instrumentos-list');
-                    tbody.innerHTML = Modelo.instrumentos.map(i => `
-                        <tr>
-                            <td>${i.nombre}</td>
-                            <td>${i.tipo}</td>
-                            <td>${i.acs ? 'Sí' : 'No'}</td>
-                            <td>${Modelo.grupos.find(g => g.id === i.grupoId)?.nombre || 'No asignado'}</td>
-                            <td>${i.indicadores?.length || 0} indicadores</td>
-                            <td>
-                                <button class="btn btn-small btn-outline" onclick="UI.eliminarInstrumento('${i.id}')">🗑️</button>
-                            </td>
-                        </tr>
-                    `).join('');
-                },
-
-                eliminarInstrumento(id) {
-                    if (confirm('¿Eliminar instrumento?')) {
-                        Modelo.instrumentos = Modelo.instrumentos.filter(i => i.id !== id);
-                        Repositorio.guardarTodo();
-                        this.renderizarInstrumentos();
-                    }
-                },
-
-                generarCalendarioAsistencia() {
-                    const grupoId = document.getElementById('asis-grupo').value;
-                    const mes = parseInt(document.getElementById('asis-mes').value);
-                    const año = parseInt(document.getElementById('asis-anio').value);
-
-                    if (!grupoId) return alert('Seleccione un grupo');
-
-                    const estudiantes = Modelo.estudiantes.filter(e => e.grupoId === grupoId);
-                    const dias = new Date(año, mes, 0).getDate();
-
-                    let html = '<div class="calendario-asistencia">';
-                    html += '<div class="calendario-header"><div>Estudiante</div>';
-                    for (let d = 1; d <= dias; d++) {
-                        html += `<div>${d}</div>`;
-                    }
-                    html += '<div>% Asistencia</div></div>';
-
-                    estudiantes.forEach(est => {
-                        html += '<div class="calendario-fila">';
-                        html += `<div>${est.nombre}</div>`;
-                        
-                        for (let d = 1; d <= dias; d++) {
-                            const fecha = `${año}-${String(mes).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-                            const registro = Modelo.asistencia.find(a => 
-                                a.estudianteId === est.id && a.fecha === fecha
-                            );
-                            const estado = registro?.estado || 'P';
-                            html += `<div class="estado-asistencia ${estado}" data-estudiante="${est.id}" data-fecha="${fecha}">${estado}</div>`;
-                        }
-
-                        const asistencias = Modelo.asistencia.filter(a => 
-                            a.estudianteId === est.id && 
-                            a.fecha.startsWith(`${año}-${String(mes).padStart(2,'0')}`)
-                        );
-                        const presentes = asistencias.filter(a => a.estado === 'P').length;
-                        const porcentaje = dias > 0 ? Math.round((presentes / dias) * 100) : 0;
-                        html += `<div>${porcentaje}%</div>`;
-                        html += '</div>';
-                    });
-
-                    html += '</div>';
-                    document.getElementById('calendario-container').innerHTML = html;
-
-                    // Eventos para cambiar estado
-                    document.querySelectorAll('.estado-asistencia').forEach(el => {
-                        el.addEventListener('click', (e) => {
-                            const estados = ['P', 'A', 'J', 'T'];
-                            const actual = e.target.innerText;
-                            const siguiente = estados[(estados.indexOf(actual) + 1) % estados.length];
-                            
-                            const registro = {
-                                id: Repositorio.generarId(),
-                                estudianteId: e.target.dataset.estudiante,
-                                fecha: e.target.dataset.fecha,
-                                estado: siguiente
-                            };
-
-                            const index = Modelo.asistencia.findIndex(a => 
-                                a.estudianteId === registro.estudianteId && a.fecha === registro.fecha
-                            );
-
-                            if (index >= 0) {
-                                Modelo.asistencia[index] = registro;
-                            } else {
-                                Modelo.asistencia.push(registro);
-                            }
-
-                            Repositorio.guardarTodo();
-                            this.generarCalendarioAsistencia(); // Recargar
-                        });
-                    });
-                },
-
-                generarReporteAusentismo() {
-                    const grupoId = document.getElementById('asis-grupo').value;
-                    const mes = parseInt(document.getElementById('asis-mes').value);
-                    const año = parseInt(document.getElementById('asis-anio').value);
-
-                    if (!grupoId) return alert('Seleccione un grupo');
-
-                    const estudiantes = Modelo.estudiantes.filter(e => e.grupoId === grupoId);
-                    const dias = new Date(año, mes, 0).getDate();
-
-                    let reporte = 'REPORTE DE AUSENTISMO\n';
-                    reporte += `Grupo: ${Modelo.grupos.find(g => g.id === grupoId)?.nombre}\n`;
-                    reporte += `Mes: ${document.getElementById('asis-mes').selectedOptions[0].text} ${año}\n\n`;
-                    reporte += 'Estudiante,Presentes,Ausencias,Justificadas,Tardías,Porcentaje\n';
-
-                    estudiantes.forEach(est => {
-                        const asistencias = Modelo.asistencia.filter(a => 
-                            a.estudianteId === est.id && 
-                            a.fecha.startsWith(`${año}-${String(mes).padStart(2,'0')}`)
-                        );
-
-                        const presentes = asistencias.filter(a => a.estado === 'P').length;
-                        const ausencias = asistencias.filter(a => a.estado === 'A').length;
-                        const justificadas = asistencias.filter(a => a.estado === 'J').length;
-                        const tardias = asistencias.filter(a => a.estado === 'T').length;
-                        const porcentaje = dias > 0 ? Math.round((presentes / dias) * 100) : 0;
-
-                        reporte += `${est.nombre},${presentes},${ausencias},${justificadas},${tardias},${porcentaje}%\n`;
-                    });
-
-                    alert(reporte);
-                },
-
-                exportarAsistenciaPDF() {
-                    const { jsPDF } = window.jspdf;
-                    const doc = new jsPDF();
-                    
-                    doc.text('Reporte de Asistencia', 10, 10);
-                    doc.text(`Grupo: ${document.getElementById('asis-grupo').selectedOptions[0]?.text || ''}`, 10, 20);
-                    doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 10, 30);
-                    
-                    doc.save('asistencia.pdf');
-                },
-
-                exportarAsistenciaCSV() {
-                    const grupoId = document.getElementById('asis-grupo').value;
-                    if (!grupoId) return alert('Seleccione un grupo');
-
-                    let csv = 'Fecha,Estudiante,Estado\n';
-                    Modelo.asistencia
-                        .filter(a => Modelo.estudiantes.find(e => e.id === a.estudianteId)?.grupoId === grupoId)
-                        .forEach(a => {
-                            const estudiante = Modelo.estudiantes.find(e => e.id === a.estudianteId);
-                            csv += `${a.fecha},"${estudiante?.nombre}",${a.estado}\n`;
-                        });
-
-                    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(blob);
-                    link.download = `asistencia_${new Date().toISOString().slice(0,10)}.csv`;
-                    link.click();
-                },
-
-                agregarBitacora() {
-                    const registro = {
-                        id: Repositorio.generarId(),
-                        fecha: document.getElementById('bitacora-fecha').value,
-                        tema: document.getElementById('bitacora-tema').value,
-                        actividad: document.getElementById('bitacora-actividad').value,
-                        observaciones: document.getElementById('bitacora-observaciones').value,
-                        dua: document.getElementById('bitacora-dua').value
-                    };
-
-                    if (!registro.fecha || !registro.tema) {
-                        return alert('Fecha y tema son obligatorios');
-                    }
-
-                    Modelo.bitacora.push(registro);
-                    Repositorio.guardarTodo();
-                    this.renderizarBitacora();
-                    
-                    document.getElementById('bitacora-fecha').value = '';
-                    document.getElementById('bitacora-tema').value = '';
-                    document.getElementById('bitacora-actividad').value = '';
-                    document.getElementById('bitacora-observaciones').value = '';
-                    document.getElementById('bitacora-dua').value = '';
-                },
-
-                renderizarBitacora() {
-                    const tbody = document.getElementById('bitacora-list');
-                    tbody.innerHTML = Modelo.bitacora.slice(-20).reverse().map(b => `
-                        <tr>
-                            <td>${b.fecha}</td>
-                            <td>${b.tema}</td>
-                            <td>${b.actividad || ''}</td>
-                            <td>${b.observaciones || ''}</td>
-                            <td>${b.dua || ''}</td>
-                        </tr>
-                    `).join('');
-                },
-
-                exportarBitacoraWord() {
-                    let html = '<html><head><meta charset="UTF-8"></head><body>';
-                    html += '<h1>Bitácora Docente</h1>';
-                    html += '<table border="1" style="border-collapse: collapse; width: 100%;">';
-                    html += '<tr><th>Fecha</th><th>Tema</th><th>Actividad</th><th>Observaciones</th><th>Ajustes DUA</th></tr>';
-                    
-                    Modelo.bitacora.forEach(b => {
-                        html += `<tr>
-                            <td>${b.fecha}</td>
-                            <td>${b.tema}</td>
-                            <td>${b.actividad || ''}</td>
-                            <td>${b.observaciones || ''}</td>
-                            <td>${b.dua || ''}</td>
-                        </tr>`;
-                    });
-                    
-                    html += '</table></body></html>';
-
-                    const blob = new Blob([html], { type: 'application/msword' });
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(blob);
-                    link.download = `bitacora_${new Date().toISOString().slice(0,10)}.doc`;
-                    link.click();
-                },
-
-                exportarBitacoraPDF() {
-                    const { jsPDF } = window.jspdf;
-                    const doc = new jsPDF();
-                    
-                    doc.text('Bitácora Docente', 10, 10);
-                    doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 10, 20);
-                    
-                    let y = 40;
-                    Modelo.bitacora.slice(-10).forEach((b, i) => {
-                        if (y > 280) {
-                            doc.addPage();
-                            y = 20;
-                        }
-                        doc.text(`${i+1}. ${b.fecha} - ${b.tema}`, 10, y);
-                        y += 7;
-                        if (b.actividad) {
-                            doc.text(`   Act: ${b.actividad.substring(0, 50)}...`, 10, y);
-                            y += 7;
-                        }
-                        y += 3;
-                    });
-                    
-                    doc.save('bitacora.pdf');
-                },
-
-                generarReporte() {
-                    const grupoId = document.getElementById('reporte-grupo').value;
-                    const periodo = document.getElementById('reporte-periodo').value;
-                    const año = parseInt(document.getElementById('reporte-anio').value);
-
-                    if (!grupoId) return alert('Seleccione un grupo');
-
-                    const estudiantes = Modelo.estudiantes.filter(e => e.grupoId === grupoId);
-                    const config = Modelo.configuraciones.find(c => c.periodo === periodo && c.año === año) || 
-                                   Modelo.configuraciones[0];
-
-                    let html = '<table><tr><th>Estudiante</th><th>TC</th><th>Proy</th><th>Prueba</th><th>Tareas</th><th>Promedio</th><th>Estado</th></tr>';
-
-                    estudiantes.forEach(est => {
-                        const cal = Modelo.calificaciones.find(c => 
-                            c.estudianteId === est.id && c.periodo === periodo && c.año === año
-                        );
-
-                        if (cal) {
-                            let promedio;
-                            if (est.acs && config?.formulaACS) {
-                                promedio = MotorCalculo.calcularACS(cal.notas, config.formulaACS);
-                            } else if (config) {
-                                promedio = MotorCalculo.calcularPromedio(cal.notas, config.porcentajes);
-                            } else {
-                                promedio = 'N/A';
-                            }
-
-                            html += `<tr>
-                                <td>${est.nombre}</td>
-                                <td>${cal.notas.trabajoCotidiano || '-'}</td>
-                                <td>${cal.notas.proyecto || '-'}</td>
-                                <td>${cal.notas.prueba || '-'}</td>
-                                <td>${cal.notas.tareas || '-'}</td>
-                                <td><strong>${promedio}</strong></td>
-                                <td><span class="badge ${parseFloat(promedio) >= 65 ? 'badge-success' : parseFloat(promedio) >= 50 ? 'badge-warning' : 'badge-error'}">${MotorCalculo.determinarEstado(promedio)}</span></td>
-                            </tr>`;
-                        }
-                    });
-
-                    html += '</table>';
-                    document.getElementById('reporte-contenido').innerHTML = html;
-                },
-
-                exportarReportePDF() {
-                    const { jsPDF } = window.jspdf;
-                    const doc = new jsPDF();
-                    
-                    doc.text('Reporte de Calificaciones', 10, 10);
-                    doc.text(`Grupo: ${document.getElementById('reporte-grupo').selectedOptions[0]?.text || ''}`, 10, 20);
-                    doc.text(`Periodo: ${document.getElementById('reporte-periodo').value}`, 10, 30);
-                    
-                    doc.save('reporte.pdf');
-                },
-
-                exportarReporteWord() {
-                    const contenido = document.getElementById('reporte-contenido').innerHTML;
-                    const html = `
-                        <html>
-                            <head><meta charset="UTF-8"></head>
-                            <body>
-                                <h1>Reporte de Calificaciones</h1>
-                                ${contenido}
-                            </body>
-                        </html>
-                    `;
-                    
-                    const blob = new Blob([html], { type: 'application/msword' });
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(blob);
-                    link.download = `reporte_${new Date().toISOString().slice(0,10)}.doc`;
-                    link.click();
-                },
-
-                exportarReporteCSV() {
-                    const tabla = document.querySelector('#reporte-contenido table');
-                    if (!tabla) return alert('Genere un reporte primero');
-
-                    let csv = '';
-                    tabla.querySelectorAll('tr').forEach(row => {
-                        const cells = row.querySelectorAll('th, td');
-                        const rowData = Array.from(cells).map(cell => `"${cell.innerText}"`).join(',');
-                        csv += rowData + '\n';
-                    });
-
-                    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(blob);
-                    link.download = `reporte_${new Date().toISOString().slice(0,10)}.csv`;
-                    link.click();
-                },
-
-                consolidarActa() {
-                    const grupoId = document.getElementById('acta-grupo').value;
-                    const año = parseInt(document.getElementById('acta-anio').value);
-
-                    if (!grupoId) return alert('Seleccione un grupo');
-
-                    // Validar que todos los periodos estén completos
-                    const periodosCompletos = ['I', 'II', 'III'].every(p => 
-                        Validador.antesDeCerrarPeriodo(grupoId, p, año)
-                    );
-
-                    const validacionDiv = document.getElementById('acta-validacion');
-                    if (!periodosCompletos) {
-                        validacionDiv.style.display = 'block';
-                        validacionDiv.textContent = '⚠️ No se puede generar el acta: hay periodos incompletos';
-                        return;
-                    }
-                    validacionDiv.style.display = 'none';
-
-                    const estudiantes = Modelo.estudiantes.filter(e => e.grupoId === grupoId);
-                    const grupo = Modelo.grupos.find(g => g.id === grupoId);
-                    const config = Modelo.configuraciones[0];
-
-                    let html = `<h3>Acta Final - ${grupo.nombre} - ${año}</h3>`;
-                    html += '<table><tr><th>Estudiante</th><th>I Per.</th><th>II Per.</th><th>III Per.</th><th>Promedio</th><th>Estado</th></tr>';
-
-                    estudiantes.forEach(est => {
-                        const notasPeriodos = [];
-                        
-                        ['I', 'II', 'III'].forEach(p => {
-                            const cal = Modelo.calificaciones.find(c => 
-                                c.estudianteId === est.id && c.periodo === p && c.año === año
-                            );
-                            if (cal) {
-                                if (est.acs && config?.formulaACS) {
-                                    notasPeriodos.push(parseFloat(MotorCalculo.calcularACS(cal.notas, config.formulaACS)));
-                                } else if (config) {
-                                    notasPeriodos.push(parseFloat(MotorCalculo.calcularPromedio(cal.notas, config.porcentajes)));
-                                }
-                            }
-                        });
-
-                        const promedioAnual = notasPeriodos.length === 3 ? 
-                            (notasPeriodos.reduce((a, b) => a + b, 0) / 3).toFixed(2) : 'N/A';
-                        const estado = promedioAnual !== 'N/A' ? MotorCalculo.determinarEstado(promedioAnual) : 'Incompleto';
-
-                        html += `<tr>
-                            <td>${est.nombre}</td>
-                            <td>${notasPeriodos[0]?.toFixed(2) || '-'}</td>
-                            <td>${notasPeriodos[1]?.toFixed(2) || '-'}</td>
-                            <td>${notasPeriodos[2]?.toFixed(2) || '-'}</td>
-                            <td><strong>${promedioAnual}</strong></td>
-                            <td><span class="badge ${estado === 'APROBADO' ? 'badge-success' : estado === 'CONVOCATORIA' ? 'badge-warning' : 'badge-error'}">${estado}</span></td>
-                        </tr>`;
-                    });
-
-                    html += '</table>';
-                    document.getElementById('acta-contenido').innerHTML = html;
-                },
-
-                exportarActaPDF() {
-                    const { jsPDF } = window.jspdf;
-                    const doc = new jsPDF();
-                    
-                    doc.text('Acta Final de Evaluación', 10, 10);
-                    doc.text(`Grupo: ${document.getElementById('acta-grupo').selectedOptions[0]?.text || ''}`, 10, 20);
-                    doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 10, 30);
-                    
-                    doc.save('acta_final.pdf');
-                },
-
-                exportarActaWord() {
-                    const contenido = document.getElementById('acta-contenido').innerHTML;
-                    const html = `
-                        <html>
-                            <head><meta charset="UTF-8"></head>
-                            <body>
-                                <h1>Acta Final de Evaluación</h1>
-                                ${contenido}
-                            </body>
-                        </html>
-                    `;
-                    
-                    const blob = new Blob([html], { type: 'application/msword' });
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(blob);
-                    link.download = `acta_final_${new Date().toISOString().slice(0,10)}.doc`;
-                    link.click();
-                },
-
-                exportarJSON() {
-                    const data = {
-                        fecha: new Date().toISOString(),
-                        ...Modelo
-                    };
-
-                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(blob);
-                    link.download = `respaldo_mep_${new Date().toISOString().slice(0,10)}.json`;
-                    link.click();
-                },
-
-                exportarMasivoCSV() {
-                    let csv = '=== RESPALDO MASIVO MEP ===\n\n';
-                    
-                    csv += '=== CENTROS ===\n';
-                    csv += 'ID,Nombre,Modalidad\n';
-                    Modelo.centros.forEach(c => csv += `${c.id},"${c.nombre}","${c.modalidad}"\n`);
-                    
-                    csv += '\n=== GRUPOS ===\n';
-                    csv += 'ID,Nombre,Año\n';
-                    Modelo.grupos.forEach(g => csv += `${g.id},"${g.nombre}",${g.año}\n`);
-                    
-                    csv += '\n=== ESTUDIANTES ===\n';
-                    csv += 'ID,Nombre,Grupo,ACS\n';
-                    Modelo.estudiantes.forEach(e => csv += `${e.id},"${e.nombre}",${e.grupoId},${e.acs}\n`);
-
-                    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(blob);
-                    link.download = `respaldo_masivo_${new Date().toISOString().slice(0,10)}.csv`;
-                    link.click();
-                },
-
-                generarCopiaSeguridad() {
-                    this.exportarJSON();
-                    alert('✅ Copia de seguridad generada');
-                },
-
-                restaurarRespaldo() {
-                    const file = document.getElementById('importar-json').files[0];
-                    if (!file) return alert('Seleccione un archivo');
-
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        try {
-                            const data = JSON.parse(e.target.result);
-                            if (confirm('¿Restaurar este respaldo? Se perderán los datos actuales.')) {
-                                Object.keys(Modelo).forEach(key => {
-                                    if (data[key]) Modelo[key] = data[key];
-                                });
-                                Repositorio.guardarTodo();
-                                location.reload();
-                            }
-                        } catch {
-                            alert('Archivo inválido');
-                        }
-                    };
-                    reader.readAsText(file);
-                },
-
-                ejecutarDiagnostico() {
-                    const resultados = [];
-                    
-                    resultados.push(`✅ Centros: ${Modelo.centros.length}`);
-                    resultados.push(`✅ Grupos: ${Modelo.grupos.length}`);
-                    resultados.push(`✅ Estudiantes: ${Modelo.estudiantes.length}`);
-                    resultados.push(`✅ Calificaciones: ${Modelo.calificaciones.length}`);
-                    resultados.push(`✅ Configuraciones: ${Modelo.configuraciones.length}`);
-                    
-                    const periodosCompletos = ['I', 'II', 'III'].filter(p => {
-                        return Modelo.grupos.some(g => 
-                            Validador.antesDeCerrarPeriodo(g.id, p, new Date().getFullYear())
-                        );
-                    }).length;
-                    
-                    resultados.push(`✅ Periodos completos: ${periodosCompletos}/3`);
-
-                    const div = document.getElementById('diagnostico-resultado');
-                    div.innerHTML = `
-                        <div class="card">
-                            <h4>Resultado del Diagnóstico</h4>
-                            <ul>${resultados.map(r => `<li>${r}</li>`).join('')}</ul>
-                            <p class="badge badge-success">Sistema funcionando correctamente</p>
+                        <div class="p-4">
+                            <h3 class="font-serif text-lg font-semibold text-sb-dark">${p.nombre}</h3>
+                            <p class="text-sm text-gray-600 mt-1 line-clamp-2">${p.descripcion || ''}</p>
+                            <p class="text-xl font-bold text-sb-green mt-3">₡${precio.toLocaleString()}</p>
+                            <button onclick="agregarAlCarrito('${p.id}')" class="w-full mt-4 bg-sb-green hover:bg-sb-green-light text-white py-3 rounded-xl font-medium transition">
+                                <i class="fas fa-shopping-bag mr-2"></i>Agregar al carrito
+                            </button>
                         </div>
-                    `;
-                }
-            };
+                    </div>
+                `;
+            }).join('');
+        }
 
-            window.UI = UI;
-            document.addEventListener('DOMContentLoaded', () => UI.init());
-        })();
+        function agregarAlCarrito(id) {
+            const producto = productos.find(p => p.id === id);
+            if (!producto) return;
+
+            let carrito = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+            const precio = producto.precioTemporadaActivo && producto.precioTemporada ? producto.precioTemporada : producto.precioRegular;
+            const existente = carrito.find(item => item.id === id);
+
+            if (existente) {
+                existente.cantidad++;
+                existente.subtotal = existente.cantidad * precio;
+            } else {
+                carrito.push({
+                    id: producto.id,
+                    nombre: producto.nombre,
+                    precioUnitario: precio,
+                    imagen: producto.imagenes?.[0] || '',
+                    cantidad: 1,
+                    subtotal: precio
+                });
+            }
+
+            localStorage.setItem(CART_KEY, JSON.stringify(carrito));
+            actualizarContadorCarrito();
+
+            // Feedback visual
+            event.target.innerHTML = '<i class="fas fa-check mr-2"></i>¡Agregado!';
+            event.target.classList.add('bg-green-600');
+            setTimeout(() => {
+                event.target.innerHTML = '<i class="fas fa-shopping-bag mr-2"></i>Agregar al carrito';
+                event.target.classList.remove('bg-green-600');
+            }, 1500);
+        }
+
+        function actualizarContadorCarrito() {
+            const carrito = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+            const total = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+            const badge = document.getElementById('cartCount');
+            badge.textContent = total;
+            badge.classList.toggle('hidden', total === 0);
+        }
+
+        function toggleMenu() {
+            document.getElementById('mobileMenu').classList.toggle('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarDatos();
+            actualizarContadorCarrito();
+        });
     </script>
 </body>
 </html>
