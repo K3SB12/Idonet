@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Floristería Santa Bárbara | Flores frescas en Costa Rica</title>
-    <meta name="description" content="Arreglos florales, rosas premium, plantas y entrega express en San José. Desde 2010 sorprendiendo momentos especiales.">
+    <meta name="description" content="Arreglos florales frescos, rosas premium, plantas y entrega express en San José. Desde 2010 creando momentos especiales.">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
+
     <script>
         tailwind.config = {
             theme: {
@@ -38,11 +38,10 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-float { animation: float 3s ease-in-out infinite; }
         .animate-fade-in { animation: fadeIn 0.6s ease-out; }
-        html { scroll-behavior: smooth; }
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         .product-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .product-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="font-sans bg-sb-cream text-sb-dark min-h-screen">
@@ -53,26 +52,27 @@
                 <a href="#" class="flex items-center gap-3 group">
                     <span class="text-3xl animate-float">🌸</span>
                     <div>
-                        <h1 class="font-serif text-xl md:text-2xl font-bold text-sb-green group-hover:text-sb-green-light">Santa Bárbara</h1>
+                        <h1 class="font-serif text-xl md:text-2xl font-bold text-sb-green group-hover:text-sb-green-light transition-colors">Santa Bárbara</h1>
                         <p class="text-xs text-gray-500 hidden sm:block">Flores frescas • Costa Rica</p>
                     </div>
                 </a>
 
                 <nav class="hidden md:flex items-center gap-8">
-                    <a href="#" class="text-gray-600 hover:text-sb-green font-medium">Inicio</a>
-                    <a href="#catalogo" class="text-gray-600 hover:text-sb-green font-medium">Catálogo</a>
-                    <a href="#contacto" class="text-gray-600 hover:text-sb-green font-medium">Contacto</a>
+                    <a href="#" class="text-gray-600 hover:text-sb-green font-medium transition-colors">Inicio</a>
+                    <a href="#catalogo" class="text-gray-600 hover:text-sb-green font-medium transition-colors">Catálogo</a>
+                    <a href="carrito-checkout.html" class="text-gray-600 hover:text-sb-green font-medium transition-colors">Carrito</a>
                 </nav>
 
                 <div class="flex items-center gap-4">
-                    <a href="carrito-checkout.html" class="relative p-2 text-gray-600 hover:text-sb-green">
+                    <a href="carrito-checkout.html" class="relative p-2 text-gray-600 hover:text-sb-green transition-colors">
                         <i class="fas fa-shopping-bag text-xl"></i>
                         <span id="cartCount" class="absolute -top-1 -right-1 bg-sb-rose text-white text-xs w-5 h-5 rounded-full flex items-center justify-center hidden">0</span>
                     </a>
-                    <a href="https://wa.me/50686053613" target="_blank" class="hidden sm:flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full">
-                        <i class="fab fa-whatsapp"></i> Pedir
+                    <a href="https://wa.me/50686053613" target="_blank" class="hidden sm:flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full transition-all">
+                        <i class="fab fa-whatsapp"></i>
+                        <span class="text-sm font-medium">Pedir</span>
                     </a>
-                    <button class="md:hidden p-2 text-gray-600 hover:text-sb-green" onclick="toggleMenu()">
+                    <button onclick="toggleMenu()" class="md:hidden p-2 text-gray-600 hover:text-sb-green">
                         <i class="fas fa-bars text-xl"></i>
                     </button>
                 </div>
@@ -94,32 +94,92 @@
 
     <!-- Hero -->
     <section class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
-        <!-- ... mantén tu hero tal cual, es hermoso ... -->
-    </section>
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=1920" alt="Flores de fondo" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-r from-sb-dark/80 via-sb-dark/50 to-transparent"></div>
+        </div>
 
-    <!-- Catálogo (nueva sección integrada) -->
-    <section id="catalogo" class="py-20 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h2 class="font-serif text-4xl text-sb-dark mb-4">Nuestro Catálogo</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto">Selecciona la categoría o explora todos nuestros arreglos frescos</p>
-            </div>
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white text-center">
+            <div class="max-w-3xl mx-auto animate-fade-in">
+                <span class="inline-block px-6 py-2 bg-sb-rose/20 text-sb-rose-soft rounded-full text-sm font-medium mb-6 backdrop-blur-sm">
+                    💐 Desde 2010 en Costa Rica
+                </span>
+                <h2 class="font-serif text-4xl md:text-6xl lg:text-7xl leading-tight mb-6">
+                    Flores que cuentan<br>
+                    <span class="italic text-sb-rose-soft">tu historia</span>
+                </h2>
+                <p class="text-lg md:text-xl text-gray-200 mb-10 max-w-xl mx-auto">
+                    Arreglos frescos, entrega el mismo día en San José. Cada flor seleccionada a mano para tus momentos especiales.
+                </p>
 
-            <!-- Filtros -->
-            <div class="flex flex-wrap gap-3 justify-center mb-10 overflow-x-auto pb-4" id="filtros">
-                <!-- Se llenan con JS -->
-            </div>
-
-            <!-- Productos -->
-            <div id="productosGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
-                <!-- Se llenan con JS -->
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="#catalogo" class="inline-flex items-center gap-2 bg-sb-rose hover:bg-rose-700 text-white px-8 py-4 rounded-full font-semibold transition-all transform hover:scale-105 shadow-lg">
+                        Ver Catálogo
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="https://wa.me/50686053613" target="_blank" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur text-white border-2 border-white/30 px-8 py-4 rounded-full font-semibold transition-all">
+                        <i class="fab fa-whatsapp text-green-400"></i>
+                        WhatsApp Directo
+                    </a>
+                </div>
             </div>
         </div>
     </section>
 
+    <!-- Catálogo -->
+    <section id="catalogo" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="font-serif text-4xl text-sb-dark mb-4">Nuestro Catálogo</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Explora por categoría o todos nuestros arreglos frescos</p>
+            </div>
+
+            <div class="flex flex-wrap gap-3 justify-center mb-10 overflow-x-auto pb-4" id="filtros"></div>
+
+            <div id="productosGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6"></div>
+        </div>
+    </section>
+
     <!-- Footer -->
-    <footer id="contacto" class="bg-sb-dark text-white pt-16 pb-8">
-        <!-- ... tu footer ... -->
+    <footer class="bg-sb-dark text-white pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8 mb-12">
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="text-2xl">🌸</span>
+                        <span class="font-serif text-xl font-bold">Santa Bárbara</span>
+                    </div>
+                    <p class="text-gray-400 text-sm">Flores frescas y arreglos personalizados en Costa Rica desde 2010.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Enlaces</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="#" class="hover:text-white transition-colors">Inicio</a></li>
+                        <li><a href="#catalogo" class="hover:text-white transition-colors">Catálogo</a></li>
+                        <li><a href="carrito-checkout.html" class="hover:text-white transition-colors">Carrito</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Contacto</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><i class="fab fa-whatsapp mr-2"></i>8605-3613</li>
+                        <li><i class="fas fa-envelope mr-2"></i>info@floristeriasantabarbara.com</li>
+                        <li><i class="fas fa-map-marker-alt mr-2"></i>San José, Costa Rica</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Horario</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li>Lunes - Sábado: 7am - 7pm</li>
+                        <li>Domingo: 8am - 2pm</li>
+                        <li>Express: Todos los días</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8 text-center text-gray-500 text-sm">
+                © 2025 Floristería Santa Bárbara. Todos los derechos reservados.
+            </div>
+        </div>
     </footer>
 
     <!-- WhatsApp flotante -->
@@ -142,17 +202,17 @@
                 filtrar('todos');
                 actualizarContadorCarrito();
             } catch (err) {
-                console.error('Error cargando datos:', err);
-                document.getElementById('productosGrid').innerHTML = '<p class="col-span-full text-center py-12 text-gray-600">Error al cargar el catálogo. Intenta más tarde.</p>';
+                console.error(err);
+                document.getElementById('productosGrid').innerHTML = '<p class="col-span-full text-center py-12 text-gray-600 text-lg">No pudimos cargar el catálogo. Intenta más tarde.</p>';
             }
         }
 
         function renderizarFiltros() {
             const container = document.getElementById('filtros');
             container.innerHTML = `
-                <button onclick="filtrar('todos')" class="px-6 py-2 rounded-full bg-sb-green text-white font-medium">Todos</button>
+                <button onclick="filtrar('todos')" class="px-6 py-3 rounded-full bg-sb-green text-white font-medium shadow-sm">Todos</button>
                 ${categorias.map(c => `
-                    <button onclick="filtrar('${c.id}')" class="px-6 py-2 rounded-full border-2 border-gray-300 hover:bg-sb-green hover:text-white transition font-medium">
+                    <button onclick="filtrar('${c.id}')" class="px-6 py-3 rounded-full border-2 border-gray-300 hover:bg-sb-green hover:text-white transition font-medium shadow-sm">
                         ${c.icono} ${c.nombre}
                     </button>
                 `).join('')}
@@ -168,19 +228,19 @@
             container.innerHTML = filtrados.map(p => {
                 const precio = p.precioTemporadaActivo && p.precioTemporada ? p.precioTemporada : p.precioRegular;
                 const imagen = p.imagenes?.[0] || 'https://via.placeholder.com/400?text=Sin+Imagen';
-                
+
                 return `
                     <div class="product-card bg-white rounded-xl overflow-hidden shadow-md">
                         <div class="relative aspect-square">
-                            <img src="${imagen}" alt="${p.nombre}" class="w-full h-full object-cover" loading="lazy">
-                            ${p.precioTemporadaActivo ? `<span class="absolute top-3 left-3 bg-sb-rose text-white px-3 py-1 rounded-full text-xs font-bold">OFERTA</span>` : ''}
+                            <img src="${imagen}" alt="${p.nombre}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" loading="lazy">
+                            ${p.precioTemporadaActivo ? `<span class="absolute top-3 left-3 bg-sb-rose text-white px-3 py-1 rounded-full text-xs font-bold shadow">OFERTA</span>` : ''}
                         </div>
-                        <div class="p-4">
-                            <h3 class="font-serif text-lg font-semibold text-sb-dark">${p.nombre}</h3>
-                            <p class="text-sm text-gray-600 mt-1 line-clamp-2">${p.descripcion || ''}</p>
-                            <p class="text-xl font-bold text-sb-green mt-3">₡${precio.toLocaleString()}</p>
-                            <button onclick="agregarAlCarrito('${p.id}')" class="w-full mt-4 bg-sb-green hover:bg-sb-green-light text-white py-3 rounded-xl font-medium transition">
-                                <i class="fas fa-shopping-bag mr-2"></i>Agregar al carrito
+                        <div class="p-5">
+                            <h3 class="font-serif text-lg font-semibold text-sb-dark line-clamp-2">${p.nombre}</h3>
+                            <p class="text-sm text-gray-600 mt-2 line-clamp-2">${p.descripcion || ''}</p>
+                            <p class="text-xl font-bold text-sb-green mt-4">₡${precio.toLocaleString()}</p>
+                            <button onclick="agregarAlCarrito('${p.id}')" class="w-full mt-4 bg-sb-green hover:bg-sb-green-light text-white py-3 rounded-xl font-medium transition flex items-center justify-center gap-2">
+                                <i class="fas fa-shopping-bag"></i> Agregar al carrito
                             </button>
                         </div>
                     </div>
@@ -213,12 +273,13 @@
             localStorage.setItem(CART_KEY, JSON.stringify(carrito));
             actualizarContadorCarrito();
 
-            // Feedback visual
-            event.target.innerHTML = '<i class="fas fa-check mr-2"></i>¡Agregado!';
-            event.target.classList.add('bg-green-600');
+            const btn = event.target;
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> ¡Agregado!';
+            btn.classList.add('bg-green-600');
             setTimeout(() => {
-                event.target.innerHTML = '<i class="fas fa-shopping-bag mr-2"></i>Agregar al carrito';
-                event.target.classList.remove('bg-green-600');
+                btn.innerHTML = original;
+                btn.classList.remove('bg-green-600');
             }, 1500);
         }
 
