@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin | Floristería Santa Bárbara</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        sb: { green: '#2D5A3D', 'green-light': '#4A7C59', cream: '#F5F1E8', rose: '#C41E3A', dark: '#1A1A1A', gold: '#D4AF37' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .drop-zone { border: 3px dashed #ccc; transition: all 0.3s; }
+        .drop-zone:hover, .drop-zone.dragover { border-color: #2D5A3D; background: #f0fdf4; }
+        .preview-img { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Login -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center">
+        <div class="bg-white p-8 rounded-2xl shadow-lg max-w-md w-full">
+            <div class="text-center mb-6">
+                <span class="text-4xl">🌸</span>
+                <h1 class="text-2xl font-bold text-sb-green mt-2">Santa Bárbara Admin</h1>
+            </div>
+            <input type="email" id="email" placeholder="Correo electrónico" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 mb-4 focus:border-sb-green focus:outline-none">
+            <input type="password" id="clave" placeholder="Contraseña" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 mb-4 focus:border-sb-green focus:outline-none">
+            <button onclick="login()" class="w-full bg-sb-green text-white py-3 rounded-xl font-semibold hover:bg-sb-green-light transition-colors">
+                Entrar
+            </button>
+            <p class="text-center text-sm text-gray-500 mt-4">Primera vez? Usa cualquier email + contraseña. Se guardará en tu navegador.</p>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="hidden min-h-screen">
+        <aside class="fixed left-0 top-0 w-64 h-screen bg-sb-dark text-white overflow-y-auto">
+            <div class="p-6 border-b border-gray-700">
+                <h2 class="text-xl font-bold">🌸 Santa Bárbara</h2>
+                <p class="text-sm text-gray-400">Panel Admin</p>
+            </div>
+            <nav class="p-4 space-y-2">
+                <button onclick="showTab('productos')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/10 transition flex items-center gap-3">
+                    <i class="fas fa-box"></i> Productos
+                </button>
+                <button onclick="showTab('categorias')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/10 transition flex items-center gap-3">
+                    <i class="fas fa-tags"></i> Categorías
+                </button>
+                <button onclick="showTab('config')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/10 transition flex items-center gap-3">
+                    <i class="fas fa-cog"></i> Configuración
+                </button>
+                <button onclick="exportarJSON()" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/10 transition flex items-center gap-3 text-green-400">
+                    <i class="fas fa-download"></i> Exportar Datos
+                </button>
+                <button onclick="logout()" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/10 transition flex items-center gap-3 text-red-400">
+                    <i class="fas fa-sign-out-alt"></i> Salir
+                </button>
+            </nav>
+        </aside>
+
+        <main class="ml-0 md:ml-64 p-6 md:p-8">
+            <!-- Productos -->
+            <div id="tab-productos" class="tab-content">
+                <div class="flex justify-between items-center mb-6 flex-wrap gap-4">
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-800">Gestión de Productos</h2>
+                    <button onclick="abrirModalProducto()" class="bg-sb-green text-white px-6 py-3 rounded-xl hover:bg-sb-green-light transition flex items-center gap-2">
+                        <i class="fas fa-plus"></i> Nuevo Producto
+                    </button>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Imagen</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Producto</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Precio</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Estado</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listaProductos" class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categorías -->
+            <div id="tab-categorias" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-6 flex-wrap gap-4">
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-800">Categorías</h2>
+                    <button onclick="abrirModalCategoria()" class="bg-sb-green text-white px-6 py-3 rounded-xl hover:bg-sb-green-light transition flex items-center gap-2">
+                        <i class="fas fa-plus"></i> Nueva Categoría
+                    </button>
+                </div>
+                <div id="listaCategorias" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </div>
+
+            <!-- Configuración -->
+            <div id="tab-config" class="tab-content hidden">
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Configuración General</h2>
+                <div class="bg-white rounded-2xl shadow-sm p-6 max-w-2xl space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nombre del negocio</label>
+                        <input type="text" id="configNombre" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">WhatsApp (506XXXXXXXX)</label>
+                        <input type="text" id="configWhatsapp" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Tarifa express por km (₡)</label>
+                        <input type="number" id="configTarifa" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none">
+                    </div>
+                    <button onclick="guardarConfig()" class="bg-sb-green text-white px-8 py-3 rounded-xl hover:bg-sb-green-light transition">
+                        Guardar Cambios
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Producto -->
+    <div id="modalProducto" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b flex justify-between items-center sticky top-0 bg-white z-10">
+                <h3 class="text-xl font-bold" id="tituloModal">Nuevo Producto</h3>
+                <button onclick="cerrarModal('modalProducto')" class="text-gray-500 hover:text-gray-700 text-2xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-6">
+                <input type="hidden" id="prodId">
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Código *</label>
+                        <input type="text" id="prodCodigo" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none" placeholder="SB-ROS-001">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nombre *</label>
+                        <input type="text" id="prodNombre" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none" placeholder="Ramo de 12 Rosas Rojas">
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Categoría *</label>
+                        <select id="prodCategoria" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none"></select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Stock inicial</label>
+                        <input type="number" id="prodStock" min="0" value="10" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
+                    <textarea id="prodDescripcion" rows="4" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none" placeholder="Detalles del arreglo..."></textarea>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-xl">
+                    <h4 class="font-semibold mb-4 text-lg">Precios</h4>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-sm text-gray-600 mb-2">Precio regular (₡) *</label>
+                            <input type="number" id="prodPrecioRegular" required min="0" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-600 mb-2">Precio temporada (₡)</label>
+                            <input type="number" id="prodPrecioTemporada" min="0" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none">
+                        </div>
+                        <div class="flex items-end">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="prodTemporadaActivo" class="w-5 h-5 text-sb-green rounded">
+                                <span class="text-sm font-medium">Activar precio temporada ahora</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fotos (15 máximo) -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Fotos del producto (máx. 15)</label>
+                    <div class="drop-zone rounded-xl p-8 text-center cursor-pointer bg-gray-50 border-2 border-dashed border-gray-300 hover:border-sb-green hover:bg-sb-green/5 transition-all" onclick="document.getElementById('inputFotos').click()">
+                        <i class="fas fa-cloud-upload-alt text-5xl text-sb-green mb-4"></i>
+                        <p class="text-lg font-medium text-gray-700">Arrastra o haz clic para subir fotos</p>
+                        <p class="text-sm text-gray-500 mt-2">Desde tu celular o PC. Se comprimen automáticamente.</p>
+                        <input type="file" id="inputFotos" multiple accept="image/*" class="hidden" onchange="procesarFotos(this)">
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <span id="contadorFotos" class="text-xl font-bold text-sb-green">0</span>
+                        <span class="text-gray-600"> / 15 fotos</span>
+                    </div>
+
+                    <div id="previewFotos" class="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 max-h-80 overflow-y-auto p-2 bg-gray-50 rounded-xl"></div>
+
+                    <button type="button" onclick="limpiarFotos()" class="mt-4 text-red-600 hover:text-red-800 text-sm underline">
+                        Limpiar todas las fotos
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" id="prodActivo" checked class="w-5 h-5 text-sb-green rounded">
+                    <label for="prodActivo" class="text-sm font-medium">Producto activo (visible en la tienda)</label>
+                </div>
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" id="prodDestacado" class="w-5 h-5 text-sb-gold rounded">
+                    <label for="prodDestacado" class="text-sm font-medium">Destacado (aparece en página principal)</label>
+                </div>
+            </div>
+
+            <div class="p-6 border-t flex justify-end gap-4 sticky bottom-0 bg-white">
+                <button onclick="cerrarModal('modalProducto')" class="px-8 py-3 rounded-xl border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition">
+                    Cancelar
+                </button>
+                <button onclick="guardarProducto()" class="px-8 py-3 rounded-xl bg-sb-green text-white hover:bg-sb-green-light transition font-medium">
+                    Guardar Producto
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Categoría -->
+    <div id="modalCategoria" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6">
+            <h3 class="text-xl font-bold mb-6" id="tituloModalCat">Nueva Categoría</h3>
+            <input type="hidden" id="catId">
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">ID único (ej: rosas-verano) *</label>
+                    <input type="text" id="catIdInput" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nombre visible *</label>
+                    <input type="text" id="catNombre" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Icono (emoji)</label>
+                    <input type="text" id="catIcono" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none" value="🌸">
+                </div>
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" id="catActiva" checked class="w-5 h-5 text-sb-green rounded">
+                    <label for="catActiva" class="text-sm font-medium">Activa ahora (visible en tienda)</label>
+                </div>
+            </div>
+            <div class="mt-8 flex justify-end gap-4">
+                <button onclick="cerrarModal('modalCategoria')" class="px-6 py-3 rounded-xl border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition">
+                    Cancelar
+                </button>
+                <button onclick="guardarCategoria()" class="px-6 py-3 rounded-xl bg-sb-green text-white hover:bg-sb-green-light transition">
+                    Guardar Categoría
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let datos = {
+            productos: [],
+            categorias: [],
+            config: {
+                nombre: 'Floristería Santa Bárbara',
+                whatsapp: '50686053613',
+                tarifaExpress: 650
+            }
+        };
+
+        let fotosTemp = [];
+
+        // Login simple con hash (persiste en localStorage)
+        async function login() {
+            const email = document.getElementById('email').value.trim();
+            const clave = document.getElementById('clave').value;
+            if (!email || !clave) return alert('Ingresa email y contraseña');
+
+            const hash = await hashPassword(clave + email);
+            const guardado = localStorage.getItem('admin_hash');
+            if (!guardado) {
+                if (confirm('¿Es tu primera vez? Se guardará esta combinación como acceso.')) {
+                    localStorage.setItem('admin_hash', hash);
+                    entrarDashboard();
+                }
+            } else if (guardado === hash) {
+                entrarDashboard();
+            } else {
+                alert('Email o contraseña incorrectos');
+            }
+        }
+
+        async function hashPassword(str) {
+            const msgBuffer = new TextEncoder().encode(str);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function entrarDashboard() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            cargarDatos();
+        }
+
+        function logout() {
+            if (confirm('¿Cerrar sesión?')) {
+                document.getElementById('dashboard').classList.add('hidden');
+                document.getElementById('loginScreen').classList.remove('hidden');
+            }
+        }
+
+        function cargarDatos() {
+            const guardado = localStorage.getItem('floristeria_datos');
+            if (guardado) datos = JSON.parse(guardado);
+            else {
+                datos.categorias = [
+                    { id: 'rosas', nombre: 'Rosas', icono: '🌹', activa: true },
+                    { id: 'arreglos', nombre: 'Arreglos', icono: '💐', activa: true },
+                    { id: 'plantas', nombre: 'Plantas', icono: '🪴', activa: true }
+                ];
+                guardarDatos();
+            }
+            renderizarProductos();
+            renderizarCategorias();
+            cargarConfig();
+        }
+
+        function guardarDatos() {
+            localStorage.setItem('floristeria_datos', JSON.stringify(datos));
+        }
+
+        function showTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+        }
+
+        // Productos CRUD
+        function renderizarProductos() {
+            const tbody = document.getElementById('listaProductos');
+            if (datos.productos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-12 text-gray-500">No hay productos aún. Crea el primero.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = datos.productos.map(p => {
+                const precio = p.precioTemporadaActivo && p.precioTemporada ? p.precioTemporada : p.precioRegular;
+                const img = p.imagenes?.[0] || 'https://via.placeholder.com/80?text=Sin+foto';
+                return `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4"><img src="${img}" class="w-16 h-16 object-cover rounded-lg"></td>
+                        <td class="px-6 py-4">
+                            <div class="font-medium">${p.nombre}</div>
+                            <div class="text-sm text-gray-500">${p.codigo}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="font-bold text-sb-green">₡${precio.toLocaleString()}</div>
+                            ${p.precioTemporadaActivo ? `<div class="text-xs text-gray-400 line-through">₡${p.precioRegular.toLocaleString()}</div>` : ''}
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-3 py-1 rounded-full text-xs font-medium ${p.activo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}">
+                                ${p.activo ? 'Activo' : 'Inactivo'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <button onclick="abrirModalProducto('${p.id}')" class="text-blue-600 hover:text-blue-800 mr-3">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="eliminarProducto('${p.id}')" class="text-red-600 hover:text-red-800">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function abrirModalProducto(id = null) {
+            document.getElementById('modalProducto').classList.remove('hidden');
+            document.getElementById('tituloModal').textContent = id ? 'Editar Producto' : 'Nuevo Producto';
+
+            const select = document.getElementById('prodCategoria');
+            select.innerHTML = datos.categorias.filter(c => c.activa).map(c => 
+                `<option value="${c.id}">${c.icono} ${c.nombre}</option>`
+            ).join('');
+
+            fotosTemp = [];
+            renderizarPreviews();
+
+            if (id) {
+                const p = datos.productos.find(x => x.id === id);
+                document.getElementById('prodId').value = p.id;
+                document.getElementById('prodCodigo').value = p.codigo;
+                document.getElementById('prodNombre').value = p.nombre;
+                document.getElementById('prodCategoria').value = p.categoria;
+                document.getElementById('prodDescripcion').value = p.descripcion || '';
+                document.getElementById('prodStock').value = p.stock || 0;
+                document.getElementById('prodPrecioRegular').value = p.precioRegular;
+                document.getElementById('prodPrecioTemporada').value = p.precioTemporada || '';
+                document.getElementById('prodTemporadaActivo').checked = p.precioTemporadaActivo || false;
+                document.getElementById('prodActivo').checked = p.activo || true;
+                document.getElementById('prodDestacado').checked = p.destacado || false;
+                fotosTemp = p.imagenes || [];
+                renderizarPreviews();
+            } else {
+                document.getElementById('prodId').value = '';
+                document.getElementById('prodCodigo').value = '';
+                document.getElementById('prodNombre').value = '';
+                document.getElementById('prodDescripcion').value = '';
+                document.getElementById('prodStock').value = '10';
+                document.getElementById('prodPrecioRegular').value = '';
+                document.getElementById('prodPrecioTemporada').value = '';
+                document.getElementById('prodTemporadaActivo').checked = false;
+                document.getElementById('prodActivo').checked = true;
+                document.getElementById('prodDestacado').checked = false;
+            }
+        }
+
+        // ... (resto de funciones de fotos, guardarProducto, eliminarProducto, renderizarCategorias, guardarCategoria, etc. como en mensajes anteriores)
+
+        function cerrarModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
