@@ -3,29 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carrito y Checkout | Floristería Santa Bárbara</title>
+    <title>Carrito y Pedido | Floristería Santa Bárbara</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        sb: { green: '#2D5A3D', 'green-light': '#4A7C59', cream: '#F5F1E8', rose: '#C41E3A', 'rose-soft': '#E8B4B8', gold: '#D4AF37', dark: '#1A1A1A' }
+                        sb: {
+                            green: '#2D5A3D',
+                            'green-light': '#4A7C59',
+                            cream: '#F5F1E8',
+                            rose: '#C41E3A',
+                            'rose-soft': '#E8B4B8',
+                            gold: '#D4AF37',
+                            dark: '#1A1A1A'
+                        }
                     },
-                    fontFamily: { serif: ['Playfair Display', 'serif'], sans: ['Inter', 'sans-serif'] }
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
                 }
             }
         }
     </script>
+
     <style>
-        #map { height: 350px; border-radius: 1rem; }
-        @media (max-width: 640px) { #map { height: 280px; } }
-        .step-active { background-color: #2D5A3D; color: white; }
-        .step-completed { background-color: #4A7C59; color: white; }
-        .step-pending { background-color: #e5e7eb; color: #6b7280; }
+        #map { height: 380px; border-radius: 1rem; }
+        @media (max-width: 640px) { #map { height: 300px; } }
+        .step-active { @apply bg-sb-green text-white; }
+        .step-completed { @apply bg-sb-green-light text-white; }
+        .step-pending { @apply bg-gray-200 text-gray-600; }
     </style>
 </head>
 <body class="font-sans bg-sb-cream text-sb-dark min-h-screen">
@@ -36,89 +49,254 @@
                 <span class="text-3xl animate-float">🌸</span>
                 <h1 class="font-serif text-xl font-bold text-sb-green">Santa Bárbara</h1>
             </a>
-            <a href="index.html" class="text-sb-green hover:text-sb-green-light">
+            <a href="index.html" class="text-sb-green hover:text-sb-green-light font-medium">
                 ← Seguir comprando
             </a>
         </div>
     </header>
 
-    <main class="pt-24 pb-16 max-w-4xl mx-auto px-4">
-        <h1 class="font-serif text-3xl md:text-4xl text-center mb-8">Finalizar tu pedido</h1>
+    <main class="pt-24 max-w-4xl mx-auto px-4 sm:px-6 pb-20">
+        <h1 class="font-serif text-3xl md:text-4xl text-center mb-10">Finalizar tu pedido</h1>
 
-        <!-- Progress Steps -->
-        <div class="flex justify-center gap-4 mb-10">
+        <!-- Progress -->
+        <div class="flex justify-center items-center gap-3 md:gap-6 mb-10 flex-wrap">
             <div class="flex items-center gap-2">
-                <div id="step1" class="w-10 h-10 rounded-full flex items-center justify-center font-bold step-active">1</div>
-                <span class="hidden sm:block">Carrito</span>
+                <div id="step1" class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg step-active">1</div>
+                <span class="hidden sm:inline font-medium">Carrito</span>
             </div>
-            <div class="w-12 h-0.5 bg-gray-300 self-center"></div>
+            <div class="hidden sm:block w-16 h-0.5 bg-gray-300"></div>
             <div class="flex items-center gap-2">
-                <div id="step2" class="w-10 h-10 rounded-full flex items-center justify-center font-bold step-pending">2</div>
-                <span class="hidden sm:block">Datos & Entrega</span>
+                <div id="step2" class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg step-pending">2</div>
+                <span class="hidden sm:inline font-medium">Entrega</span>
             </div>
-            <div class="w-12 h-0.5 bg-gray-300 self-center"></div>
+            <div class="hidden sm:block w-16 h-0.5 bg-gray-300"></div>
             <div class="flex items-center gap-2">
-                <div id="step3" class="w-10 h-10 rounded-full flex items-center justify-center font-bold step-pending">3</div>
-                <span class="hidden sm:block">Confirmar</span>
+                <div id="step3" class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg step-pending">3</div>
+                <span class="hidden sm:inline font-medium">Confirmar</span>
             </div>
         </div>
 
         <!-- Paso 1: Carrito -->
-        <div id="stepContent1" class="bg-white rounded-2xl shadow-lg p-6 md:p-8 mb-8">
-            <h2 class="font-serif text-2xl mb-6">Tu carrito</h2>
+        <div id="stepContent1" class="bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-10">
+            <h2 class="font-serif text-2xl md:text-3xl mb-6 text-center md:text-left">Tu carrito</h2>
             <div id="carritoItems" class="space-y-6 mb-8"></div>
+
             <div class="bg-sb-cream rounded-xl p-6">
-                <div class="flex justify-between text-lg font-medium mb-2">
-                    <span>Subtotal:</span>
+                <div class="flex justify-between text-lg mb-3">
+                    <span class="text-gray-700">Subtotal productos:</span>
                     <span id="subtotal">₡0</span>
                 </div>
-                <div class="flex justify-between text-2xl font-bold text-sb-green">
-                    <span>Total:</span>
-                    <span id="total">₡0</span>
+                <div id="filaExpress" class="flex justify-between text-lg hidden">
+                    <span class="text-gray-700">Envío express:</span>
+                    <span id="costoExpress">₡0</span>
+                </div>
+                <div class="border-t border-gray-300 pt-4 mt-4 flex justify-between text-2xl font-bold">
+                    <span>Total a pagar:</span>
+                    <span id="totalFinal" class="text-sb-green">₡0</span>
                 </div>
             </div>
-            <button onclick="goToStep(2)" class="w-full mt-6 bg-sb-green text-white py-4 rounded-xl font-bold text-lg hover:bg-sb-green-light transition">
-                Continuar a entrega <i class="fas fa-arrow-right ml-2"></i>
+
+            <button onclick="goToStep(2)" class="w-full mt-8 bg-sb-green text-white py-4 rounded-xl font-bold text-lg hover:bg-sb-green-light transition flex items-center justify-center gap-2">
+                Continuar a entrega <i class="fas fa-arrow-right"></i>
             </button>
         </div>
 
-        <!-- Paso 2: Datos y entrega (el resto del checkout que ya tenías) -->
-        <!-- ... Aquí va todo el contenido de tu checkout anterior: datos personales, mapa, tipo entrega, referencias, etc. ... -->
-        <!-- Copia el contenido de tu checkout.html desde <div id="step2"> hasta el final del form y pégalo aquí -->
-        <!-- Asegúrate de cambiar el fetch del carrito a localStorage.getItem('sb_carrito') -->
+        <!-- Paso 2: Datos y entrega -->
+        <div id="stepContent2" class="hidden bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-10">
+            <h2 class="font-serif text-2xl md:text-3xl mb-6 text-center md:text-left">Datos de entrega</h2>
+
+            <div class="space-y-6">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nombre completo *</label>
+                        <input type="text" id="nombre" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none" placeholder="Ej: María López">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono *</label>
+                        <input type="tel" id="telefono" required pattern="[0-9]{8}" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none" placeholder="8888-8888">
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de entrega *</label>
+                        <input type="date" id="fecha" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Horario preferido</label>
+                        <select id="horario" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none">
+                            <option value="cualquiera">Cualquiera</option>
+                            <option value="manana">Mañana (8am-12pm)</option>
+                            <option value="tarde">Tarde (12pm-6pm)</option>
+                            <option value="noche">Noche (después 6pm)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Mensaje para la tarjeta (opcional)</label>
+                    <textarea id="mensajeTarjeta" rows="3" maxlength="150" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none" placeholder="Ej: Feliz cumpleaños, te quiero mucho. Con amor, Juan."></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Observaciones / Instrucciones</label>
+                    <textarea id="observaciones" rows="2" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none" placeholder="Ej: Dejar en portería, llamar antes..."></textarea>
+                </div>
+
+                <div class="mt-8">
+                    <h3 class="text-xl font-semibold mb-4">Tipo de entrega</h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="tipoEntrega" value="recogida" class="hidden peer" onchange="toggleEntrega()">
+                            <div class="p-6 rounded-xl border-2 border-gray-300 peer-checked:border-sb-green peer-checked:bg-sb-green/10 text-center transition-all">
+                                <i class="fas fa-store text-4xl text-sb-green mb-3"></i>
+                                <h4 class="font-semibold">Recoger en tienda</h4>
+                                <p class="text-sm text-gray-600">Sin costo adicional</p>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="tipoEntrega" value="express" class="hidden peer" checked onchange="toggleEntrega()">
+                            <div class="p-6 rounded-xl border-2 border-sb-green bg-sb-green/10 text-center transition-all">
+                                <i class="fas fa-truck text-4xl text-sb-green mb-3"></i>
+                                <h4 class="font-semibold">Express a domicilio</h4>
+                                <p class="text-sm text-gray-600">₡650 por km</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="seccionExpress" class="mt-8">
+                    <p class="text-gray-700 mb-4 font-medium">Toca en el mapa para marcar la ubicación exacta</p>
+                    <div id="map" class="shadow-lg border border-gray-200"></div>
+                    <div id="infoExpress" class="hidden mt-4 bg-sb-cream p-6 rounded-xl">
+                        <div class="flex justify-between text-lg mb-3">
+                            <span>Distancia aproximada:</span>
+                            <span id="distanciaTexto" class="font-bold">0 km</span>
+                        </div>
+                        <div class="flex justify-between text-2xl font-bold">
+                            <span>Costo envío:</span>
+                            <span id="costoExpress" class="text-sb-green">₡0</span>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Referencias de dirección *</label>
+                        <textarea id="referencias" rows="3" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none" placeholder="Ej: Condominio Las Flores, torre 3, apto 502. Tocar timbre 3 veces. Portería 24h."></textarea>
+                    </div>
+                </div>
+
+                <div id="seccionRecogida" class="hidden mt-8 bg-sb-cream p-6 rounded-xl text-center">
+                    <i class="fas fa-map-marker-alt text-5xl text-sb-green mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Recogida en tienda</h3>
+                    <p class="text-gray-600 mb-4">San José, Costa Rica<br>Dirección exacta y horario se confirmarán por WhatsApp</p>
+                    <a href="https://maps.google.com/?q=9.9281,-84.0907" target="_blank" class="text-sb-green underline font-medium">Ver ubicación aproximada</a>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-4 mt-10">
+                <button onclick="goToStep(1)" class="flex-1 py-4 rounded-xl border-2 border-gray-300 text-gray-700 font-bold hover:bg-gray-50 transition">
+                    Volver al carrito
+                </button>
+                <button onclick="goToStep(3)" class="flex-1 bg-sb-green text-white py-4 rounded-xl font-bold hover:bg-sb-green-light transition">
+                    Confirmar pedido <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
 
         <!-- Paso 3: Confirmación -->
-        <!-- ... Copia también el paso 3 de confirmación y el botón de WhatsApp ... -->
+        <div id="stepContent3" class="hidden bg-white rounded-2xl shadow-xl p-6 md:p-8">
+            <h2 class="font-serif text-2xl md:text-3xl mb-6 text-center">Confirma tu pedido</h2>
 
+            <div class="bg-sb-cream rounded-xl p-6 mb-8">
+                <h3 class="text-xl font-semibold mb-4">Resumen</h3>
+                <div id="resumenProductos" class="space-y-4 mb-6"></div>
+
+                <div class="space-y-3 text-lg">
+                    <div class="flex justify-between">
+                        <span class="text-gray-700">Subtotal productos:</span>
+                        <span id="resumenSubtotal">₡0</span>
+                    </div>
+                    <div id="filaExpressResumen" class="flex justify-between hidden">
+                        <span class="text-gray-700">Envío express (<span id="resumenDistancia">0</span> km):</span>
+                        <span id="resumenExpress">₡0</span>
+                    </div>
+                    <div class="border-t border-gray-300 pt-4 mt-4 flex justify-between text-2xl font-bold">
+                        <span>Total a pagar:</span>
+                        <span id="resumenTotal" class="text-sb-green">₡0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold mb-4">Método de pago</h3>
+                <div class="space-y-4">
+                    <label class="flex items-center gap-3 p-4 rounded-xl border-2 border-sb-green bg-sb-green/5 cursor-pointer">
+                        <input type="radio" name="pago" value="sinpe" checked class="w-5 h-5 text-sb-green">
+                        <div>
+                            <span class="font-bold">SINPE Móvil</span>
+                            <p class="text-sm text-gray-600">Transferencia al 8605-3613</p>
+                        </div>
+                    </label>
+                    <label class="flex items-center gap-3 p-4 rounded-xl border-2 border-gray-300 cursor-pointer">
+                        <input type="radio" name="pago" value="efectivo" class="w-5 h-5 text-sb-green">
+                        <div>
+                            <span class="font-bold">Efectivo contra entrega</span>
+                            <p class="text-sm text-gray-600">Solo para recogida en tienda</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <label class="flex items-start gap-3 mb-6">
+                <input type="checkbox" id="terminos" required class="mt-1 w-5 h-5 text-sb-green rounded">
+                <span class="text-sm text-gray-600">Confirmo que los datos son correctos y acepto que el pedido se procesará por WhatsApp. No hay reserva hasta confirmar pago.</span>
+            </label>
+
+            <button onclick="enviarPedido()" class="w-full bg-green-600 hover:bg-green-700 text-white py-5 rounded-xl font-bold text-xl transition flex items-center justify-center gap-3 shadow-lg">
+                <i class="fab fa-whatsapp text-2xl"></i>
+                Enviar pedido por WhatsApp
+            </button>
+
+            <p class="text-center text-sm text-gray-500 mt-6">
+                <i class="fas fa-lock mr-1"></i>Serás redirigido a WhatsApp con todos los detalles del pedido
+            </p>
+        </div>
     </main>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         const CART_KEY = 'sb_carrito';
+        const CONFIG = {
+            whatsapp: '50686053613',
+            tarifaExpress: 650,
+            floristeria: { lat: 9.9281, lng: -84.0907 }
+        };
+
         let carrito = [];
+        let map = null;
+        let marker = null;
         let paso = 1;
 
         function cargarCarrito() {
             carrito = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
             if (carrito.length === 0) {
-                document.getElementById('carritoItems').innerHTML = '<p class="text-center text-gray-600 py-12">Tu carrito está vacío</p>';
+                document.getElementById('carritoItems').innerHTML = '<p class="text-center text-gray-600 py-12 text-lg">Tu carrito está vacío. <a href="index.html" class="text-sb-green underline">Ver catálogo</a></p>';
                 return;
             }
 
             document.getElementById('carritoItems').innerHTML = carrito.map((item, i) => `
-                <div class="flex gap-4 bg-white p-4 rounded-xl shadow-sm">
+                <div class="flex flex-col sm:flex-row gap-4 items-center bg-white p-4 rounded-xl shadow-sm">
                     <img src="${item.imagen}" class="w-24 h-24 object-cover rounded-lg" alt="${item.nombre}">
                     <div class="flex-1">
-                        <h3 class="font-medium">${item.nombre}</h3>
+                        <h3 class="font-medium text-lg">${item.nombre}</h3>
                         <p class="text-sb-green">₡${item.precioUnitario.toLocaleString()} c/u</p>
-                        <div class="flex items-center gap-4 mt-2">
-                            <div class="flex border rounded">
-                                <button onclick="cambiarCantidad(${i}, -1)" class="px-3 py-1 hover:bg-gray-100">-</button>
-                                <span class="px-4 py-1">${item.cantidad}</span>
-                                <button onclick="cambiarCantidad(${i}, 1)" class="px-3 py-1 hover:bg-gray-100">+</button>
+                        <div class="flex items-center gap-4 mt-3 flex-wrap">
+                            <div class="flex border rounded-lg overflow-hidden">
+                                <button onclick="cambiarCantidad(${i}, -1)" class="px-4 py-2 bg-gray-100 hover:bg-gray-200">-</button>
+                                <span class="px-6 py-2 font-medium">${item.cantidad}</span>
+                                <button onclick="cambiarCantidad(${i}, 1)" class="px-4 py-2 bg-gray-100 hover:bg-gray-200">+</button>
                             </div>
-                            <span class="font-bold">₡${item.subtotal.toLocaleString()}</span>
-                            <button onclick="eliminarItem(${i})" class="text-red-500 hover:text-red-700 ml-auto">
+                            <span class="font-bold text-lg">₡${item.subtotal.toLocaleString()}</span>
+                            <button onclick="eliminarItem(${i})" class="text-red-500 hover:text-red-700 ml-auto text-xl">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -130,8 +308,7 @@
         }
 
         function cambiarCantidad(index, delta) {
-            carrito[index].cantidad += delta;
-            if (carrito[index].cantidad < 1) carrito[index].cantidad = 1;
+            carrito[index].cantidad = Math.max(1, carrito[index].cantidad + delta);
             carrito[index].subtotal = carrito[index].cantidad * carrito[index].precioUnitario;
             localStorage.setItem(CART_KEY, JSON.stringify(carrito));
             cargarCarrito();
@@ -148,21 +325,123 @@
         function calcularTotales() {
             const subtotal = carrito.reduce((sum, item) => sum + item.subtotal, 0);
             document.getElementById('subtotal').textContent = '₡' + subtotal.toLocaleString();
-            document.getElementById('total').textContent = '₡' + subtotal.toLocaleString(); // + express cuando lo implementes
+            actualizarTotalFinal(subtotal, 0);
+        }
+
+        function actualizarTotalFinal(subtotal, express) {
+            const total = subtotal + express;
+            document.getElementById('totalFinal').textContent = '₡' + total.toLocaleString();
         }
 
         function goToStep(nuevoPaso) {
+            if (nuevoPaso === 2 && !validarCarrito()) return;
+            if (nuevoPaso === 3 && !validarPaso2()) return;
+
             document.getElementById(`stepContent${paso}`).classList.add('hidden');
             document.getElementById(`stepContent${nuevoPaso}`).classList.remove('hidden');
+
             document.getElementById(`step${paso}`).classList.replace('step-active', 'step-completed');
             document.getElementById(`step${nuevoPaso}`).classList.replace('step-pending', 'step-active');
+
             paso = nuevoPaso;
-            window.scrollTo(0, 0);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function validarCarrito() {
+            if (carrito.length === 0) {
+                alert('Tu carrito está vacío.');
+                return false;
+            }
+            return true;
+        }
+
+        function toggleEntrega() {
+            const tipo = document.querySelector('input[name="tipoEntrega"]:checked').value;
+            document.getElementById('seccionExpress').classList.toggle('hidden', tipo !== 'express');
+            document.getElementById('seccionRecogida').classList.toggle('hidden', tipo !== 'recogida');
+            if (tipo === 'express') setTimeout(() => map?.invalidateSize(), 100);
+        }
+
+        function inicializarMapa() {
+            map = L.map('map').setView([CONFIG.floristeria.lat, CONFIG.floristeria.lng], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+
+            L.marker([CONFIG.floristeria.lat, CONFIG.floristeria.lng]).addTo(map).bindPopup('Floristería').openPopup();
+
+            map.on('click', e => {
+                if (marker) map.removeLayer(marker);
+                marker = L.marker(e.latlng).addTo(map).bindPopup('Tu ubicación').openPopup();
+                calcularExpress(e.latlng.lat, e.latlng.lng);
+            });
+        }
+
+        function calcularExpress(lat, lng) {
+            const R = 6371;
+            const dLat = (lat - CONFIG.floristeria.lat) * Math.PI / 180;
+            const dLng = (lng - CONFIG.floristeria.lng) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(CONFIG.floristeria.lat * Math.PI / 180) * Math.cos(lat * Math.PI / 180) * Math.sin(dLng/2) * Math.sin(dLng/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            const distancia = R * c;
+            const costo = Math.round(distancia * CONFIG.tarifaExpress);
+
+            document.getElementById('infoExpress').classList.remove('hidden');
+            document.getElementById('distanciaTexto').textContent = distancia.toFixed(1) + ' km';
+            document.getElementById('costoExpress').textContent = '₡' + costo.toLocaleString();
+        }
+
+        function enviarPedido() {
+            if (!document.getElementById('terminos').checked) {
+                alert('Debes aceptar los términos');
+                return;
+            }
+
+            const nombre = document.getElementById('nombre').value;
+            const telefono = document.getElementById('telefono').value;
+            const fecha = document.getElementById('fecha').value;
+            const horario = document.getElementById('horario').value;
+            const mensajeTarjeta = document.getElementById('mensajeTarjeta').value;
+            const observaciones = document.getElementById('observaciones').value;
+            const tipoEntrega = document.querySelector('input[name="tipoEntrega"]:checked').value;
+            const pago = document.querySelector('input[name="pago"]:checked').value;
+
+            const subtotal = carrito.reduce((sum, item) => sum + item.subtotal, 0);
+            let distancia = 0;
+            let costoExpress = 0;
+
+            if (tipoEntrega === 'express') {
+                distancia = document.getElementById('distanciaTexto').textContent.replace(' km', '');
+                costoExpress = parseInt(document.getElementById('costoExpress').textContent.replace('₡', '').replace(/,/g, '')) || 0;
+            }
+
+            const total = subtotal + costoExpress;
+
+            let texto = `¡Hola Floristería Santa Bárbara! 🌸\n\n*NUEVO PEDIDO*\n━━━━━━━━━━━━━━━\n\n`;
+            texto += `*Cliente:* ${nombre} - ${telefono}\n`;
+            texto += `*Entrega:* ${fecha} - ${horario}\n`;
+            texto += tipoEntrega === 'express' ? `Express a domicilio - ${distancia} km\nReferencias: ${document.getElementById('referencias').value}\n` : `Recogida en tienda\n`;
+            texto += `*Observaciones:* ${observaciones || 'Ninguna'}\n`;
+            if (mensajeTarjeta) texto += `*Mensaje tarjeta:* ${mensajeTarjeta}\n`;
+            texto += `\n*Productos:*\n`;
+            carrito.forEach(item => {
+                texto += `• ${item.nombre} x${item.cantidad} = ₡${item.subtotal.toLocaleString()}\n`;
+            });
+            texto += `\n*PAGO:* ${pago === 'sinpe' ? 'SINPE Móvil' : 'Efectivo contra entrega'}\n`;
+            texto += `💰 *Total:* ₡${total.toLocaleString()}\n\n`;
+            texto += `Por favor confirmar disponibilidad. ¡Gracias! 🌺`;
+
+            const url = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(texto)}`;
+            window.open(url, '_blank');
+
+            localStorage.removeItem(CART_KEY);
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             cargarCarrito();
-            // Inicializa mapa y resto de checkout aquí (copia tu código anterior)
+            inicializarMapa();
+            document.getElementById('fecha').min = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+            document.getElementById('fecha').value = new Date(Date.now() + 86400000).toISOString().split('T')[0];
         });
     </script>
 </body>
