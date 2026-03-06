@@ -1001,12 +1001,12 @@
                 document.getElementById('terminos').focus();
                 return;
             }
-
+        
             // Deshabilitar botón y mostrar loading
             btn.disabled = true;
             const btnOriginalHTML = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparando pedido...';
-
+        
             try {
                 const nombreComprador = document.getElementById('nombreComprador').value.trim();
                 const telefonoComprador = document.getElementById('telefonoComprador').value.trim();
@@ -1023,15 +1023,15 @@
                 const direccionTexto = document.getElementById('direccionTexto')?.value.trim() || '';
                 const emailCopia = document.getElementById('emailCopia').value.trim();
                 const enviarCopia = document.getElementById('enviarCopiaEmail').checked;
-
+        
                 // Validar datos mínimos
                 if (!nombreComprador || !telefonoComprador || !fecha) {
                     throw new Error('Faltan datos obligatorios');
                 }
-
+        
                 const subtotal = carrito.reduce((sum, item) => sum + item.subtotal, 0);
                 const total = subtotal + costoExpress;
-
+        
                 const pedido = {
                     id: 'PED-' + Date.now().toString().slice(-6),
                     fecha: new Date().toISOString(),
@@ -1053,9 +1053,9 @@
                     direccion: direccionTexto || referencias,
                     coordenadas: marker ? { lat: marker.getLatLng().lat, lng: marker.getLatLng().lng } : null
                 };
-
+        
                 guardarPedidoEnHistorial(pedido);
-
+        
                 // Construir mensaje de WhatsApp
                 let texto = `¡Hola! Nuevo pedido en *Floristería Santa Bárbara* 🌸\n\n`;
                 texto += `*PEDIDO:* #${pedido.id}\n`;
@@ -1112,21 +1112,49 @@
                 texto += `*💰 TOTAL: ₡${total.toLocaleString()}*\n\n`;
                 
                 texto += `Por favor confirmar disponibilidad. ¡Gracias! 🌺`;
-
+        
                 textoPedidoGlobal = texto;
-
+        
                 if (enviarCopia && emailCopia) {
                     enviarEmailCopia(emailCopia, pedido, texto);
                 }
-
+        
+                // 🔥 VACIAR EL CARRITO DESPUÉS DE ENVIAR EL PEDIDO 🔥
+                localStorage.removeItem(CART_KEY);
+                carrito = [];
+                
+                // Limpiar el marcador del mapa y distancia
+                if (marker) {
+                    map.removeLayer(marker);
+                    marker = null;
+                }
+                distanciaKm = 0;
+                costoExpress = 0;
+                usarDireccionManual = false;
+                
+                // Ocultar info del express
+                document.getElementById('infoExpress').classList.add('hidden');
+                
+                // Reiniciar el tipo de entrega a express (por defecto)
+                document.querySelector('input[name="tipoEntrega"][value="express"]').checked = true;
+                toggleEntrega();
+        
                 // Mostrar modal de opciones de WhatsApp
                 setTimeout(() => {
                     btn.disabled = false;
                     btn.innerHTML = '<i class="fab fa-whatsapp text-2xl md:text-3xl"></i><span>Enviar pedido por WhatsApp</span>';
                     mostrarWhatsAppModal();
                     limpiarFormularioGuardado();
+                    
+                    // Regresar al paso 1 (carrito) después de enviar
+                    setTimeout(() => {
+                        goToStep(1);
+                        // Recargar la vista del carrito (vacío)
+                        cargarCarrito();
+                        mostrarToast('¡Pedido enviado! El carrito se ha vaciado');
+                    }, 500);
                 }, 500);
-
+        
             } catch (error) {
                 console.error('Error al preparar pedido:', error);
                 mostrarToast('Error al preparar el pedido. Intenta de nuevo.', 'error');
