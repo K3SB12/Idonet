@@ -620,38 +620,88 @@
         }
 
         function guardarProducto() {
+            // RECOLECTAR TODOS LOS DATOS DEL FORMULARIO
+            const id = document.getElementById('prodId').value;
+            const codigo = document.getElementById('prodCodigo').value.trim();
+            const nombre = document.getElementById('prodNombre').value.trim();
+            const categoria = document.getElementById('prodCategoria').value;
+            const descripcion = document.getElementById('prodDescripcion').value.trim();
+            const stock = parseInt(document.getElementById('prodStock').value) || 0;
+            const precioRegular = parseInt(document.getElementById('prodPrecioRegular').value) || 0;
+            const precioTemporada = parseInt(document.getElementById('prodPrecioTemporada').value) || null;
+            const precioTemporadaActivo = document.getElementById('prodTemporadaActivo').checked;
+            const activo = document.getElementById('prodActivo').checked;
+            const destacado = document.getElementById('prodDestacado').checked;
+            
+            // VALIDACIONES BÁSICAS
+            if (!codigo || !nombre) {
+                alert('❌ Código y nombre son obligatorios');
+                return;
+            }
+            
+            if (!categoria) {
+                alert('❌ Selecciona una categoría');
+                return;
+            }
+            
+            if (precioRegular <= 0) {
+                alert('❌ El precio regular debe ser mayor a 0');
+                return;
+            }
+            
+            // CREAR OBJETO PRODUCTO
             const producto = {
-                id: document.getElementById('prodId').value || 'prod-' + Date.now(),
-                codigo: document.getElementById('prodCodigo').value.trim(),
-                nombre: document.getElementById('prodNombre').value.trim(),
-                categoria: document.getElementById('prodCategoria').value,
-                descripcion: document.getElementById('prodDescripcion').value.trim(),
-                stock: parseInt(document.getElementById('prodStock').value) || 0,
-                precioRegular: parseInt(document.getElementById('prodPrecioRegular').value) || 0,
-                precioTemporada: parseInt(document.getElementById('prodPrecioTemporada').value) || null,
-                precioTemporadaActivo: document.getElementById('prodTemporadaActivo').checked,
-                imagenes: [...fotosTemp],
-                activo: document.getElementById('prodActivo').checked,
-                destacado: document.getElementById('prodDestacado').checked
+                id: id || 'prod-' + Date.now(),
+                codigo: codigo,
+                nombre: nombre,
+                categoria: categoria,
+                descripcion: descripcion,
+                stock: stock,
+                precioRegular: precioRegular,
+                precioTemporada: precioTemporada,
+                precioTemporadaActivo: precioTemporadaActivo,
+                imagenes: [...fotosTemp],  // IMPORTANTE: COPIAR LAS FOTOS
+                activo: activo,
+                destacado: destacado
             };
             
-            if (!producto.codigo || !producto.nombre) return alert('❌ Código y nombre obligatorios');
-            if (!producto.categoria) return alert('❌ Selecciona una categoría');
+            console.log('📦 Guardando producto:', producto);
+            console.log('📸 Fotos incluidas:', fotosTemp.length);
             
-            if (document.getElementById('prodId').value) {
-                const index = datos.productos.findIndex(p => p.id === producto.id);
-                if (index !== -1) datos.productos[index] = producto;
+            // GUARDAR EN localStorage
+            if (id) {
+                // EDITAR PRODUCTO EXISTENTE
+                const index = datos.productos.findIndex(p => p.id === id);
+                if (index !== -1) {
+                    datos.productos[index] = producto;
+                } else {
+                    datos.productos.push(producto);
+                }
             } else {
+                // NUEVO PRODUCTO
                 datos.productos.push(producto);
             }
             
-            if (guardarDatos()) {
+            // INTENTAR GUARDAR EN LOCALSTORAGE
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(datos));
+                
+                // LIMPIAR Y CERRAR
+                fotosTemp = [];
                 cerrarModal('modalProducto');
                 renderizarProductos();
-                alert('✅ Producto guardado');
+                alert('✅ Producto guardado correctamente');
+                
+            } catch (e) {
+                console.error('Error al guardar:', e);
+                
+                if (e.name === 'QuotaExceededError') {
+                    alert('❌ ERROR: Las fotos pesan demasiado. Usa fotos más pequeñas o menos fotos.');
+                } else {
+                    alert('❌ Error al guardar. Intenta de nuevo.');
+                }
             }
         }
-
         function eliminarProducto(id) {
             if (confirm('¿Eliminar producto?')) {
                 datos.productos = datos.productos.filter(p => p.id !== id);
