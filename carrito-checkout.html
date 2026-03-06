@@ -534,10 +534,9 @@
             
             cargarCarrito();
             
-            // Configurar fecha mínima (mañana)
-            const manana = new Date();
-            manana.setDate(manana.getDate() + 1);
-            const fechaStr = manana.toISOString().split('T')[0];
+            // Configurar fecha mínima (Hoy)
+            const hoy = new Date();
+            const fechaStr = hoy.toISOString().split('T')[0];
             document.getElementById('fecha').min = fechaStr;
             document.getElementById('fecha').value = fechaStr;
             
@@ -994,128 +993,146 @@
         }
 
         function enviarPedido() {
+            const btn = document.getElementById('btnEnviar');
+            
+            // Validar términos primero (antes de deshabilitar botón)
             if (!document.getElementById('terminos').checked) {
                 mostrarToast('Debes aceptar los términos para continuar', 'error');
                 document.getElementById('terminos').focus();
                 return;
             }
 
-            const btn = document.getElementById('btnEnviar');
+            // Deshabilitar botón y mostrar loading
             btn.disabled = true;
+            const btnOriginalHTML = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparando pedido...';
 
-            const nombreComprador = document.getElementById('nombreComprador').value.trim();
-            const telefonoComprador = document.getElementById('telefonoComprador').value.trim();
-            const esMismoReceptor = document.getElementById('mismoReceptor').checked;
-            const nombreReceptor = esMismoReceptor ? nombreComprador : document.getElementById('nombreReceptor').value.trim();
-            const telefonoReceptor = esMismoReceptor ? telefonoComprador : document.getElementById('telefonoReceptor').value.trim();
-            const fecha = document.getElementById('fecha').value;
-            const horario = document.getElementById('horario').value;
-            const mensajeTarjeta = document.getElementById('mensajeTarjeta').value.trim();
-            const observaciones = document.getElementById('observaciones').value.trim();
-            const tipoEntrega = document.querySelector('input[name="tipoEntrega"]:checked').value;
-            const metodoPago = document.querySelector('input[name="pago"]:checked').value;
-            const referencias = document.getElementById('referencias')?.value.trim() || '';
-            const direccionTexto = document.getElementById('direccionTexto')?.value.trim() || '';
-            const emailCopia = document.getElementById('emailCopia').value.trim();
-            const enviarCopia = document.getElementById('enviarCopiaEmail').checked;
+            try {
+                const nombreComprador = document.getElementById('nombreComprador').value.trim();
+                const telefonoComprador = document.getElementById('telefonoComprador').value.trim();
+                const esMismoReceptor = document.getElementById('mismoReceptor').checked;
+                const nombreReceptor = esMismoReceptor ? nombreComprador : document.getElementById('nombreReceptor').value.trim();
+                const telefonoReceptor = esMismoReceptor ? telefonoComprador : document.getElementById('telefonoReceptor').value.trim();
+                const fecha = document.getElementById('fecha').value;
+                const horario = document.getElementById('horario').value;
+                const mensajeTarjeta = document.getElementById('mensajeTarjeta').value.trim();
+                const observaciones = document.getElementById('observaciones').value.trim();
+                const tipoEntrega = document.querySelector('input[name="tipoEntrega"]:checked').value;
+                const metodoPago = document.querySelector('input[name="pago"]:checked').value;
+                const referencias = document.getElementById('referencias')?.value.trim() || '';
+                const direccionTexto = document.getElementById('direccionTexto')?.value.trim() || '';
+                const emailCopia = document.getElementById('emailCopia').value.trim();
+                const enviarCopia = document.getElementById('enviarCopiaEmail').checked;
 
-            const subtotal = carrito.reduce((sum, item) => sum + item.subtotal, 0);
-            const total = subtotal + costoExpress;
-
-            const pedido = {
-                id: 'PED-' + Date.now().toString().slice(-6),
-                fecha: new Date().toISOString(),
-                cliente: nombreComprador,
-                telefonoCliente: telefonoComprador,
-                receptor: nombreReceptor,
-                telefonoReceptor: telefonoReceptor,
-                fechaEntrega: fecha,
-                horario: horario,
-                productos: carrito,
-                subtotal: subtotal,
-                envio: tipoEntrega === 'express' ? costoExpress : 0,
-                total: total,
-                tipoEntrega: tipoEntrega,
-                metodoPago: metodoPago,
-                estado: 'nuevo',
-                mensajeTarjeta: mensajeTarjeta,
-                observaciones: observaciones,
-                direccion: direccionTexto || referencias,
-                coordenadas: marker ? { lat: marker.getLatLng().lat, lng: marker.getLatLng().lng } : null
-            };
-
-            guardarPedidoEnHistorial(pedido);
-
-            let texto = `¡Hola! Nuevo pedido en *Floristería Santa Bárbara* 🌸\n\n`;
-            texto += `*PEDIDO:* #${pedido.id}\n`;
-            texto += `━━━━━━━━━━━━━━━━━━━━\n\n`;
-            
-            texto += `*👤 QUIEN COMPRA:*\n`;
-            texto += `Nombre: ${nombreComprador}\n`;
-            texto += `Teléfono: ${telefonoComprador}\n\n`;
-            
-            texto += `*🎁 QUIEN RECIBE:*\n`;
-            texto += `Nombre: ${nombreReceptor}\n`;
-            texto += `Teléfono: ${telefonoReceptor}\n`;
-            if (esMismoReceptor) texto += `_(Misma persona que compra)_\n`;
-            texto += `\n`;
-            
-            texto += `*🚚 ENTREGA:*\n`;
-            texto += `Fecha: ${fecha}\n`;
-            texto += `Horario: ${horario}\n`;
-            texto += `Tipo: ${tipoEntrega === 'express' ? 'Express a domicilio 🚚' : 'Recogida en tienda 🏪'}\n`;
-            
-            if (tipoEntrega === 'express') {
-                texto += `Distancia: ${distanciaKm > 0 ? distanciaKm.toFixed(1) + ' km' : '~5 km (estimado)'}\n`;
-                texto += `Costo envío: ₡${costoExpress.toLocaleString()}\n`;
-                if (direccionTexto || referencias) {
-                    texto += `Dirección: ${direccionTexto || referencias}\n`;
+                // Validar datos mínimos
+                if (!nombreComprador || !telefonoComprador || !fecha) {
+                    throw new Error('Faltan datos obligatorios');
                 }
-                if (pedido.coordenadas) {
-                    texto += `Maps: https://maps.google.com/?q=${pedido.coordenadas.lat},${pedido.coordenadas.lng}\n`;
+
+                const subtotal = carrito.reduce((sum, item) => sum + item.subtotal, 0);
+                const total = subtotal + costoExpress;
+
+                const pedido = {
+                    id: 'PED-' + Date.now().toString().slice(-6),
+                    fecha: new Date().toISOString(),
+                    cliente: nombreComprador,
+                    telefonoCliente: telefonoComprador,
+                    receptor: nombreReceptor,
+                    telefonoReceptor: telefonoReceptor,
+                    fechaEntrega: fecha,
+                    horario: horario,
+                    productos: carrito,
+                    subtotal: subtotal,
+                    envio: tipoEntrega === 'express' ? costoExpress : 0,
+                    total: total,
+                    tipoEntrega: tipoEntrega,
+                    metodoPago: metodoPago,
+                    estado: 'nuevo',
+                    mensajeTarjeta: mensajeTarjeta,
+                    observaciones: observaciones,
+                    direccion: direccionTexto || referencias,
+                    coordenadas: marker ? { lat: marker.getLatLng().lat, lng: marker.getLatLng().lng } : null
+                };
+
+                guardarPedidoEnHistorial(pedido);
+
+                // Construir mensaje de WhatsApp
+                let texto = `¡Hola! Nuevo pedido en *Floristería Santa Bárbara* 🌸\n\n`;
+                texto += `*PEDIDO:* #${pedido.id}\n`;
+                texto += `━━━━━━━━━━━━━━━━━━━━\n\n`;
+                
+                texto += `*👤 QUIEN COMPRA:*\n`;
+                texto += `Nombre: ${nombreComprador}\n`;
+                texto += `Teléfono: ${telefonoComprador}\n\n`;
+                
+                texto += `*🎁 QUIEN RECIBE:*\n`;
+                texto += `Nombre: ${nombreReceptor}\n`;
+                texto += `Teléfono: ${telefonoReceptor}\n`;
+                if (esMismoReceptor) texto += `_(Misma persona que compra)_\n`;
+                texto += `\n`;
+                
+                texto += `*🚚 ENTREGA:*\n`;
+                texto += `Fecha: ${fecha}\n`;
+                texto += `Horario: ${horario}\n`;
+                texto += `Tipo: ${tipoEntrega === 'express' ? 'Express a domicilio 🚚' : 'Recogida en tienda 🏪'}\n`;
+                
+                if (tipoEntrega === 'express') {
+                    texto += `Distancia: ${distanciaKm > 0 ? distanciaKm.toFixed(1) + ' km' : '~5 km (estimado)'}\n`;
+                    texto += `Costo envío: ₡${costoExpress.toLocaleString()}\n`;
+                    if (direccionTexto || referencias) {
+                        texto += `Dirección: ${direccionTexto || referencias}\n`;
+                    }
+                    if (pedido.coordenadas) {
+                        texto += `Maps: https://maps.google.com/?q=${pedido.coordenadas.lat},${pedido.coordenadas.lng}\n`;
+                    }
                 }
-            }
-            texto += `\n`;
-            
-            texto += `*🛍️ PRODUCTOS:*\n`;
-            carrito.forEach(item => {
-                texto += `• ${item.nombre} x${item.cantidad} = ₡${item.subtotal.toLocaleString()}\n`;
-            });
-            texto += `\n`;
-            
-            if (mensajeTarjeta) {
-                texto += `*💌 MENSAJE TARJETA:*\n_"${mensajeTarjeta}"_\n\n`;
-            }
-            
-            if (observaciones) {
-                texto += `*📝 OBSERVACIONES:*\n${observaciones}\n\n`;
-            }
-            
-            texto += `*💳 PAGO:*\n`;
-            texto += `Método: ${metodoPago === 'sinpe' ? 'SINPE Móvil' : 'Efectivo'}\n`;
-            if (metodoPago === 'sinpe') {
-                texto += `Enviar comprobado al: ${config.whatsapp.replace('506', '')}\n`;
-            }
-            texto += `Subtotal: ₡${subtotal.toLocaleString()}\n`;
-            if (tipoEntrega === 'express') texto += `Envío: ₡${costoExpress.toLocaleString()}\n`;
-            texto += `*💰 TOTAL: ₡${total.toLocaleString()}*\n\n`;
-            
-            texto += `Por favor confirmar disponibilidad. ¡Gracias! 🌺`;
+                texto += `\n`;
+                
+                texto += `*🛍️ PRODUCTOS:*\n`;
+                carrito.forEach(item => {
+                    texto += `• ${item.nombre} x${item.cantidad} = ₡${item.subtotal.toLocaleString()}\n`;
+                });
+                texto += `\n`;
+                
+                if (mensajeTarjeta) {
+                    texto += `*💌 MENSAJE TARJETA:*\n_"${mensajeTarjeta}"_\n\n`;
+                }
+                
+                if (observaciones) {
+                    texto += `*📝 OBSERVACIONES:*\n${observaciones}\n\n`;
+                }
+                
+                texto += `*💳 PAGO:*\n`;
+                texto += `Método: ${metodoPago === 'sinpe' ? 'SINPE Móvil' : 'Efectivo'}\n`;
+                if (metodoPago === 'sinpe') {
+                    texto += `Enviar comprobante al: ${config.whatsapp.replace('506', '')}\n`;
+                }
+                texto += `Subtotal: ₡${subtotal.toLocaleString()}\n`;
+                if (tipoEntrega === 'express') texto += `Envío: ₡${costoExpress.toLocaleString()}\n`;
+                texto += `*💰 TOTAL: ₡${total.toLocaleString()}*\n\n`;
+                
+                texto += `Por favor confirmar disponibilidad. ¡Gracias! 🌺`;
 
-            textoPedidoGlobal = texto;
+                textoPedidoGlobal = texto;
 
-            if (enviarCopia && emailCopia) {
-                enviarEmailCopia(emailCopia, pedido, texto);
-            }
+                if (enviarCopia && emailCopia) {
+                    enviarEmailCopia(emailCopia, pedido, texto);
+                }
 
-            // Mostrar modal de opciones de WhatsApp en lugar de abrir directo
-            setTimeout(() => {
+                // Mostrar modal de opciones de WhatsApp
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fab fa-whatsapp text-2xl md:text-3xl"></i><span>Enviar pedido por WhatsApp</span>';
+                    mostrarWhatsAppModal();
+                    limpiarFormularioGuardado();
+                }, 500);
+
+            } catch (error) {
+                console.error('Error al preparar pedido:', error);
+                mostrarToast('Error al preparar el pedido. Intenta de nuevo.', 'error');
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fab fa-whatsapp text-2xl md:text-3xl"></i><span>Enviar pedido por WhatsApp</span>';
-                mostrarWhatsAppModal();
-                limpiarFormularioGuardado();
-            }, 500);
+                btn.innerHTML = btnOriginalHTML;
+            }
         }
 
         function mostrarWhatsAppModal() {
