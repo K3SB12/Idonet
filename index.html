@@ -161,22 +161,28 @@
         // ============================================
         // CARGAR DATOS
         // ============================================
+
         function cargarDatos() {
+            console.log('📢 Cargando datos...');
+            
             // Mostrar loading
             document.getElementById('loadingCatalogo').classList.remove('hidden');
             document.getElementById('mensajeVacio').classList.add('hidden');
             
             try {
-                const guardado = localStorage.getItem(STORAGE_KEY);
+                const guardado = localStorage.getItem('floristeria_completa');
+                console.log('🔍 Datos en localStorage:', guardado ? '✅ Existen' : '❌ Vacío');
                 
                 if (guardado) {
                     const datos = JSON.parse(guardado);
+                    console.log('📦 Datos parseados:', datos);
                     
                     // Filtrar solo activos
                     productos = datos.productos?.filter(p => p.activo !== false) || [];
                     categorias = datos.categorias?.filter(c => c.activa !== false) || [];
                     
                     console.log('✅ Productos cargados:', productos.length);
+                    console.log('✅ Categorías cargadas:', categorias.length);
                 } else {
                     console.log('📭 No hay datos guardados');
                     productos = [];
@@ -186,10 +192,12 @@
                 document.getElementById('loadingCatalogo').classList.add('hidden');
                 
                 if (productos.length === 0) {
+                    console.log('⚠️ No hay productos, mostrando mensaje vacío');
                     document.getElementById('mensajeVacio').classList.remove('hidden');
                     document.getElementById('filtros').classList.add('hidden');
                     document.getElementById('productosGrid').innerHTML = '';
                 } else {
+                    console.log('🎉 Hay productos, renderizando...');
                     document.getElementById('mensajeVacio').classList.add('hidden');
                     document.getElementById('filtros').classList.remove('hidden');
                     renderizarFiltros();
@@ -199,9 +207,10 @@
                 actualizarContadorCarrito();
                 
             } catch (error) {
-                console.error('Error:', error);
+                console.error('❌ ERROR CRÍTICO:', error);
                 document.getElementById('loadingCatalogo').classList.add('hidden');
                 document.getElementById('mensajeVacio').classList.remove('hidden');
+                document.getElementById('productosGrid').innerHTML = '<p class="text-center text-red-600">Error al cargar. Intente recargar.</p>';
             }
         }
 
