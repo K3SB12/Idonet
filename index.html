@@ -187,48 +187,67 @@
         let categorias = [];
 
         // ============================================
-        // CARGAR DATOS
+        // NUEVA FUNCIÓN - CATÁLOGO PÚBLICO (PONER AQUÍ)
         // ============================================
-        function cargarDatos() {
+        async function cargarCatalogoPublico() {
+            try {
+                // Agregar timestamp para evitar caché
+                const respuesta = await fetch('catalogo.json?t=' + Date.now());
+                if (!respuesta.ok) throw new Error('No hay catálogo público');
+                
+                const datosPublicos = await respuesta.json();
+                productos = datosPublicos.productos || [];
+                categorias = datosPublicos.categorias || [];
+                
+                console.log('✅ Catálogo público cargado:', productos.length, 'productos');
+                return true;
+            } catch (error) {
+                console.log('ℹ️ Usando datos locales');
+                return false;
+            }
+        }
+        
+        // ============================================
+        // CARGAR DATOS (MODIFICADA)
+        // ============================================
+        async function cargarDatos() {  // <-- AHORA ES ASYNC
             console.log('📢 Cargando datos...');
             document.getElementById('loadingCatalogo').classList.remove('hidden');
             document.getElementById('mensajeVacio').classList.add('hidden');
             
-            try {
-                const guardado = localStorage.getItem(STORAGE_KEY);
-                console.log('🔍 Datos en localStorage:', guardado ? '✅ Existen' : '❌ Vacío');
-                
-                if (guardado) {
-                    const datos = JSON.parse(guardado);
-                    console.log('📦 Datos parseados:', datos);
-                    
-                    productos = datos.productos?.filter(p => p.activo !== false) || [];
-                    categorias = datos.categorias?.filter(c => c.activa !== false) || [];
-                    
-                    console.log('✅ Productos cargados:', productos.length);
-                    console.log('✅ Categorías cargadas:', categorias.length);
-                } else {
-                    console.log('📭 No hay datos guardados');
-                    productos = [];
-                    categorias = [];
+            // PRIMERO: Intentar cargar catálogo público
+            const cargoPublico = await cargarCatalogoPublico();
+            
+            // SEGUNDO: Si no hay público, usar localStorage (para la dueña)
+            if (!cargoPublico) {
+                try {
+                    const guardado = localStorage.getItem(STORAGE_KEY);
+                    if (guardado) {
+                        const datos = JSON.parse(guardado);
+                        productos = datos.productos?.filter(p => p.activo !== false) || [];
+                        categorias = datos.categorias?.filter(c => c.activa !== false) || [];
+                        console.log('✅ Productos locales cargados:', productos.length);
+                    }
+                } catch (e) {
+                    console.error('Error con localStorage:', e);
                 }
-                
-                document.getElementById('loadingCatalogo').classList.add('hidden');
-                
-                if (productos.length === 0) {
-                    console.log('⚠️ No hay productos, mostrando mensaje vacío');
-                    document.getElementById('mensajeVacio').classList.remove('hidden');
-                    document.getElementById('filtros').classList.add('hidden');
-                    document.getElementById('productosGrid').innerHTML = '';
-                } else {
-                    console.log('🎉 Hay productos, renderizando...');
-                    document.getElementById('mensajeVacio').classList.add('hidden');
-                    document.getElementById('filtros').classList.remove('hidden');
-                    renderizarFiltros();
-                    filtrar('todos');
-                }
-                
-                actualizarContadorCarrito();
+            }
+            
+            document.getElementById('loadingCatalogo').classList.add('hidden');
+            
+            if (productos.length === 0) {
+                document.getElementById('mensajeVacio').classList.remove('hidden');
+                document.getElementById('filtros').classList.add('hidden');
+                document.getElementById('productosGrid').innerHTML = '';
+            } else {
+                document.getElementById('mensajeVacio').classList.add('hidden');
+                document.getElementById('filtros').classList.remove('hidden');
+                renderizarFiltros();
+                filtrar('todos');
+            }
+            
+            actualizarContadorCarrito();
+        }
                 
             } catch (error) {
                 console.error('❌ ERROR CRÍTICO:', error);
@@ -400,6 +419,8 @@
             localStorage.setItem('sb_version', version);
             console.log('🔄 Nueva versión detectada, recargando...');
         }
+
+        
     </script>
 </body>
 </html>
