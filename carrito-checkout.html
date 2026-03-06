@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Carrito y Pedido | Floristería Santa Bárbara</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -34,8 +34,11 @@
     </script>
 
     <style>
-        #map { height: 380px; border-radius: 1rem; z-index: 1; }
-        @media (max-width: 640px) { #map { height: 300px; } }
+        #map { height: 380px; border-radius: 1rem; z-index: 1; width: 100%; }
+        @media (max-width: 640px) { 
+            #map { height: 300px; } 
+            .mobile-full { width: 100vw; margin-left: -1rem; }
+        }
         .step-active { background-color: #2D5A3D; color: white; }
         .step-completed { background-color: #4A7C59; color: white; }
         .step-pending { background-color: #e5e7eb; color: #6b7280; }
@@ -43,6 +46,21 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-pulse-soft { animation: pulseSoft 2s infinite; }
         @keyframes pulseSoft { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        
+        /* Mejoras de accesibilidad */
+        .focus-ring:focus { outline: none; ring: 2px; ring-color: #2D5A3D; ring-offset: 2px; }
+        
+        /* Estilos para el modal de fallback */
+        .modal-backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
+        
+        /* Scrollbar personalizado */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #2D5A3D; border-radius: 4px; }
+        
+        /* Loading states */
+        .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
+        @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
     </style>
 </head>
 <body class="font-sans bg-sb-cream text-sb-dark min-h-screen">
@@ -53,38 +71,38 @@
                 <span class="text-3xl animate-float">🌸</span>
                 <h1 class="font-serif text-xl font-bold text-sb-green group-hover:text-sb-green-light transition-colors">Santa Bárbara</h1>
             </a>
-            <a href="index.html" class="text-sb-green hover:text-sb-green-light font-medium transition-colors flex items-center gap-2">
-                <i class="fas fa-arrow-left"></i> Seguir comprando
+            <a href="index.html" class="text-sb-green hover:text-sb-green-light font-medium transition-colors flex items-center gap-2 text-sm md:text-base">
+                <i class="fas fa-arrow-left"></i> <span class="hidden sm:inline">Seguir comprando</span>
             </a>
         </div>
     </header>
 
-    <main class="pt-24 max-w-4xl mx-auto px-4 sm:px-6 pb-20">
-        <h1 class="font-serif text-3xl md:text-4xl text-center mb-8">Finalizar tu pedido</h1>
+    <main class="pt-20 md:pt-24 max-w-4xl mx-auto px-4 sm:px-6 pb-20">
+        <h1 class="font-serif text-2xl md:text-4xl text-center mb-6 md:mb-8">Finalizar tu pedido</h1>
 
         <!-- Progress Steps -->
-        <div class="flex justify-center items-center gap-2 md:gap-6 mb-10 flex-wrap">
+        <div class="flex justify-center items-center gap-2 md:gap-6 mb-8 md:mb-10">
             <div class="flex items-center gap-2">
-                <div id="step1" class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg step-active transition-all">1</div>
-                <span class="hidden sm:inline font-medium text-sm">Carrito</span>
+                <div id="step1" class="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold text-sm md:text-lg step-active transition-all">1</div>
+                <span class="hidden sm:inline font-medium text-xs md:text-sm">Carrito</span>
             </div>
-            <div class="hidden sm:block w-12 h-0.5 bg-gray-300"></div>
+            <div class="hidden sm:block w-8 md:w-12 h-0.5 bg-gray-300"></div>
             <div class="flex items-center gap-2">
-                <div id="step2" class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg step-pending transition-all">2</div>
-                <span class="hidden sm:inline font-medium text-sm text-gray-500">Entrega</span>
+                <div id="step2" class="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold text-sm md:text-lg step-pending transition-all">2</div>
+                <span class="hidden sm:inline font-medium text-xs md:text-sm text-gray-500">Entrega</span>
             </div>
-            <div class="hidden sm:block w-12 h-0.5 bg-gray-300"></div>
+            <div class="hidden sm:block w-8 md:w-12 h-0.5 bg-gray-300"></div>
             <div class="flex items-center gap-2">
-                <div id="step3" class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg step-pending transition-all">3</div>
-                <span class="hidden sm:inline font-medium text-sm text-gray-500">Confirmar</span>
+                <div id="step3" class="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold text-sm md:text-lg step-pending transition-all">3</div>
+                <span class="hidden sm:inline font-medium text-xs md:text-sm text-gray-500">Confirmar</span>
             </div>
         </div>
 
         <!-- Paso 1: Carrito -->
-        <div id="stepContent1" class="bg-white rounded-2xl shadow-lg p-6 md:p-8 mb-6 animate-fade-in border border-gray-100">
+        <div id="stepContent1" class="bg-white rounded-2xl shadow-lg p-4 md:p-8 mb-6 animate-fade-in border border-gray-100">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="font-serif text-2xl font-bold">Tu carrito</h2>
-                <button onclick="vaciarCarrito()" class="text-red-600 hover:text-red-800 text-sm font-medium">
+                <h2 class="font-serif text-xl md:text-2xl font-bold">Tu carrito</h2>
+                <button onclick="vaciarCarrito()" class="text-red-600 hover:text-red-800 text-sm font-medium px-3 py-2 rounded-lg hover:bg-red-50 transition">
                     <i class="fas fa-trash mr-1"></i>Vaciar
                 </button>
             </div>
@@ -99,64 +117,76 @@
                 </a>
             </div>
 
-            <div id="resumenCarrito" class="bg-sb-cream rounded-xl p-6 border border-gray-200">
-                <div class="flex justify-between text-lg mb-3">
+            <div id="resumenCarrito" class="bg-sb-cream rounded-xl p-4 md:p-6 border border-gray-200">
+                <div class="flex justify-between text-base md:text-lg mb-3">
                     <span class="text-gray-700">Subtotal:</span>
                     <span id="subtotal" class="font-medium">₡0</span>
                 </div>
-                <div id="filaExpress" class="flex justify-between text-lg mb-3 hidden">
+                <div id="filaExpress" class="flex justify-between text-base md:text-lg mb-3 hidden">
                     <span class="text-gray-700">Envío express:</span>
                     <span id="costoExpressDisplay" class="font-medium">₡0</span>
                 </div>
-                <div class="border-t-2 border-gray-300 pt-4 mt-4 flex justify-between text-2xl font-bold">
+                <div class="border-t-2 border-gray-300 pt-4 mt-4 flex justify-between text-xl md:text-2xl font-bold">
                     <span>Total:</span>
                     <span id="totalFinal" class="text-sb-green">₡0</span>
                 </div>
             </div>
 
-            <button onclick="goToStep(2)" id="btnContinuar" class="w-full mt-8 bg-sb-green text-white py-4 rounded-xl font-bold text-lg hover:bg-sb-green-light transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+            <button onclick="goToStep(2)" id="btnContinuar" class="w-full mt-6 md:mt-8 bg-sb-green text-white py-4 rounded-xl font-bold text-lg hover:bg-sb-green-light transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
                 Continuar <i class="fas fa-arrow-right"></i>
             </button>
         </div>
 
         <!-- Paso 2: Datos y entrega -->
-        <div id="stepContent2" class="hidden bg-white rounded-2xl shadow-lg p-6 md:p-8 mb-6 animate-fade-in border border-gray-100">
-            <h2 class="font-serif text-2xl font-bold mb-6">Datos de entrega</h2>
+        <div id="stepContent2" class="hidden bg-white rounded-2xl shadow-lg p-4 md:p-8 mb-6 animate-fade-in border border-gray-100">
+            <h2 class="font-serif text-xl md:text-2xl font-bold mb-6">Datos de entrega</h2>
 
             <div class="space-y-5">
                 <!-- Quién compra -->
                 <div class="bg-blue-50 p-4 rounded-xl border border-blue-200">
-                    <h3 class="font-semibold text-blue-900 mb-3"><i class="fas fa-user mr-2"></i>Datos de quien compra</h3>
+                    <h3 class="font-semibold text-blue-900 mb-3 flex items-center gap-2">
+                        <i class="fas fa-user"></i>Datos de quien compra
+                    </h3>
                     <div class="grid md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Tu nombre completo *</label>
-                            <input type="text" id="nombreComprador" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors" placeholder="Ej: María Fernández">
+                            <input type="text" id="nombreComprador" required 
+                                class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors bg-white"
+                                placeholder="Ej: María Fernández">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Tu teléfono *</label>
-                            <input type="tel" id="telefonoComprador" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors" placeholder="8888-8888">
+                            <input type="tel" id="telefonoComprador" required 
+                                class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors bg-white"
+                                placeholder="8888-8888" pattern="[0-9]{4}-[0-9]{4}">
                         </div>
                     </div>
                 </div>
 
                 <!-- Quién recibe -->
                 <div class="bg-purple-50 p-4 rounded-xl border border-purple-200">
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="font-semibold text-purple-900"><i class="fas fa-gift mr-2"></i>Datos de quien recibe</h3>
-                        <label class="flex items-center gap-2 cursor-pointer text-sm">
-                            <input type="checkbox" id="mismoReceptor" onchange="toggleReceptor()" class="rounded text-sb-green focus:ring-sb-green">
+                    <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+                        <h3 class="font-semibold text-purple-900 flex items-center gap-2">
+                            <i class="fas fa-gift"></i>Datos de quien recibe
+                        </h3>
+                        <label class="flex items-center gap-2 cursor-pointer text-sm bg-white px-3 py-2 rounded-lg border border-purple-200">
+                            <input type="checkbox" id="mismoReceptor" onchange="toggleReceptor()" class="rounded text-sb-green focus:ring-sb-green w-4 h-4">
                             <span>Es la misma persona</span>
                         </label>
                     </div>
                     
-                    <div id="datosReceptor" class="grid md:grid-cols-2 gap-4">
+                    <div id="datosReceptor" class="grid md:grid-cols-2 gap-4 transition-opacity duration-300">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Nombre de quien recibe *</label>
-                            <input type="text" id="nombreReceptor" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors" placeholder="Ej: Ana López">
+                            <input type="text" id="nombreReceptor" required 
+                                class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors bg-white"
+                                placeholder="Ej: Ana López">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono de quien recibe *</label>
-                            <input type="tel" id="telefonoReceptor" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors" placeholder="7777-7777">
+                            <input type="tel" id="telefonoReceptor" required 
+                                class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors bg-white"
+                                placeholder="7777-7777" pattern="[0-9]{4}-[0-9]{4}">
                         </div>
                     </div>
                 </div>
@@ -164,7 +194,8 @@
                 <div class="grid md:grid-cols-2 gap-5">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de entrega *</label>
-                        <input type="date" id="fecha" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors">
+                        <input type="date" id="fecha" required 
+                            class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors bg-white">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Horario preferido</label>
@@ -179,34 +210,38 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Mensaje para la tarjeta (opcional)</label>
-                    <textarea id="mensajeTarjeta" rows="2" maxlength="200" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors resize-none" placeholder="Ej: Feliz cumpleaños, te quiero mucho..."></textarea>
-                    <p class="text-xs text-gray-500 mt-1">Máximo 200 caracteres</p>
+                    <textarea id="mensajeTarjeta" rows="2" maxlength="200" 
+                        class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors resize-none bg-white"
+                        placeholder="Ej: Feliz cumpleaños, te quiero mucho..."></textarea>
+                    <p class="text-xs text-gray-500 mt-1 text-right"><span id="charCount">0</span>/200</p>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Observaciones / Instrucciones especiales</label>
-                    <textarea id="observaciones" rows="2" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors resize-none" placeholder="Ej: Tocar timbre, dejar en portería, llamar antes..."></textarea>
+                    <textarea id="observaciones" rows="2" 
+                        class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors resize-none bg-white"
+                        placeholder="Ej: Tocar timbre, dejar en portería, llamar antes..."></textarea>
                 </div>
 
                 <!-- Tipo de entrega -->
                 <div class="pt-4">
                     <h3 class="text-lg font-semibold mb-4">Tipo de entrega</h3>
                     <div class="grid md:grid-cols-2 gap-4">
-                        <label class="cursor-pointer relative">
+                        <label class="cursor-pointer relative group">
                             <input type="radio" name="tipoEntrega" value="recogida" class="hidden peer" onchange="toggleEntrega()">
-                            <div class="p-5 rounded-xl border-2 border-gray-200 peer-checked:border-sb-green peer-checked:bg-sb-green/5 hover:border-gray-300 transition-all text-center h-full">
+                            <div class="p-5 rounded-xl border-2 border-gray-200 peer-checked:border-sb-green peer-checked:bg-sb-green/5 hover:border-gray-300 transition-all text-center h-full group-hover:shadow-md">
                                 <i class="fas fa-store text-3xl text-sb-green mb-3"></i>
                                 <h4 class="font-semibold text-gray-800">Recoger en tienda</h4>
                                 <p class="text-sm text-gray-600 mt-1">Sin costo adicional</p>
                             </div>
-                            <div class="absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-gray-300 peer-checked:border-sb-green peer-checked:bg-sb-green flex items-center justify-center">
+                            <div class="absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-gray-300 peer-checked:border-sb-green peer-checked:bg-sb-green flex items-center justify-center transition-all">
                                 <i class="fas fa-check text-white text-xs opacity-0 peer-checked:opacity-100"></i>
                             </div>
                         </label>
                         
-                        <label class="cursor-pointer relative">
+                        <label class="cursor-pointer relative group">
                             <input type="radio" name="tipoEntrega" value="express" class="hidden peer" checked onchange="toggleEntrega()">
-                            <div class="p-5 rounded-xl border-2 border-sb-green bg-sb-green/5 hover:bg-sb-green/10 transition-all text-center h-full">
+                            <div class="p-5 rounded-xl border-2 border-sb-green bg-sb-green/5 hover:bg-sb-green/10 transition-all text-center h-full shadow-sm group-hover:shadow-md">
                                 <i class="fas fa-truck text-3xl text-sb-green mb-3"></i>
                                 <h4 class="font-semibold text-gray-800">Express a domicilio</h4>
                                 <p class="text-sm text-gray-600 mt-1">₡650 por km</p>
@@ -218,13 +253,58 @@
                     </div>
                 </div>
 
-                <!-- Sección Express -->
-                <div id="seccionExpress" class="mt-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Ubicación en el mapa *</label>
-                    <p class="text-sm text-gray-500 mb-3">Toca en el mapa para marcar la dirección de entrega</p>
-                    <div id="map" class="shadow-lg border-2 border-gray-200 rounded-xl"></div>
+                <!-- Sección Express Mejorada -->
+                <div id="seccionExpress" class="mt-6 space-y-4">
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-info-circle text-yellow-600 mt-1"></i>
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-yellow-800 text-sm mb-1">Selecciona tu ubicación</h4>
+                                <p class="text-xs text-yellow-700 mb-3">Toca en el mapa o ingresa la dirección manualmente como respaldo</p>
+                                
+                                <!-- Fallback de dirección textual -->
+                                <div class="space-y-2">
+                                    <input type="text" id="direccionTexto" 
+                                        class="w-full px-3 py-2 rounded-lg border border-yellow-300 text-sm focus:border-sb-green focus:outline-none"
+                                        placeholder="Ej: De la iglesia de Santa Bárbara 200m sur, casa color verde...">
+                                    <button onclick="usarDireccionTexto()" 
+                                        class="w-full bg-yellow-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-yellow-700 transition">
+                                        <i class="fas fa-map-pin mr-2"></i>Usar esta dirección (sin mapa)
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="relative">
+                        <div id="mapLoading" class="absolute inset-0 bg-gray-100 rounded-xl flex items-center justify-center z-10">
+                            <div class="text-center">
+                                <i class="fas fa-spinner fa-spin text-3xl text-sb-green mb-2"></i>
+                                <p class="text-sm text-gray-600">Cargando mapa...</p>
+                            </div>
+                        </div>
+                        <div id="map" class="shadow-lg border-2 border-gray-200 rounded-xl"></div>
+                        
+                        <!-- Botón de recargar mapa -->
+                        <button onclick="recargarMapa()" 
+                            class="absolute bottom-4 right-4 bg-white p-2 rounded-lg shadow-md hover:shadow-lg transition z-[400] text-sb-green"
+                            title="Recargar mapa">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
                     
-                    <div id="infoExpress" class="hidden mt-4 bg-sb-cream p-4 rounded-xl border border-gray-200">
+                    <!-- Alerta de error de mapa -->
+                    <div id="mapError" class="hidden bg-red-50 border border-red-200 rounded-xl p-4">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-exclamation-triangle text-red-500"></i>
+                            <div>
+                                <h4 class="font-semibold text-red-800 text-sm">Error al cargar el mapa</h4>
+                                <p class="text-xs text-red-600">Usa el campo de dirección arriba o intenta recargar</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="infoExpress" class="hidden bg-sb-cream p-4 rounded-xl border border-gray-200">
                         <div class="flex justify-between items-center mb-2">
                             <span class="text-gray-700">Distancia:</span>
                             <span id="distanciaTexto" class="font-bold text-lg">0 km</span>
@@ -233,11 +313,14 @@
                             <span>Costo envío:</span>
                             <span id="costoExpress">₡0</span>
                         </div>
+                        <p class="text-xs text-gray-500 mt-2">* Distancia estimada en línea recta. El costo final puede variar.</p>
                     </div>
 
-                    <div class="mt-4">
+                    <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Referencias de dirección exacta *</label>
-                        <textarea id="referencias" rows="3" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors resize-none" placeholder="Ej: Condominio Las Flores, torre 3, apartamento 502. Portón negro, timbre 502."></textarea>
+                        <textarea id="referencias" rows="3" required 
+                            class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors resize-none bg-white"
+                            placeholder="Ej: Condominio Las Flores, torre 3, apartamento 502. Portón negro, timbre 502."></textarea>
                     </div>
                 </div>
 
@@ -245,30 +328,39 @@
                 <div id="seccionRecogida" class="hidden mt-6 bg-sb-cream p-6 rounded-xl border border-gray-200 text-center">
                     <i class="fas fa-map-marker-alt text-4xl text-sb-green mb-3"></i>
                     <h3 class="text-lg font-semibold mb-2">Recogida en tienda</h3>
-                    <p class="text-gray-600 text-sm mb-4">Santa Bárbara, Heredia, Costa Rica<br>Del parque 200 metros al sur<br>La dirección exacta se confirmará por WhatsApp</p>
-                    <a href="https://maps.google.com/?q=10.0369,-84.1594" target="_blank" class="text-sb-green underline font-medium text-sm hover:text-sb-green-light">
-                        Ver ubicación aproximada en Google Maps
+                    <p class="text-gray-600 text-sm mb-4">
+                        Santa Bárbara, Heredia, Costa Rica<br>
+                        Del parque 200 metros al sur<br>
+                        <span class="text-xs text-gray-500">Horario: Lunes a Sábado 8am - 6pm</span>
+                    </p>
+                    <a href="https://maps.google.com/?q=10.0369,-84.1594" target="_blank" 
+                        class="inline-flex items-center gap-2 text-sb-green underline font-medium text-sm hover:text-sb-green-light bg-white px-4 py-2 rounded-lg">
+                        <i class="fas fa-external-link-alt"></i> Ver en Google Maps
                     </a>
                 </div>
             </div>
 
             <div class="flex flex-col sm:flex-row gap-3 mt-8">
-                <button onclick="goToStep(1)" class="flex-1 py-4 rounded-xl border-2 border-gray-300 text-gray-700 font-bold hover:bg-gray-50 transition-all duration-200">
-                    <i class="fas fa-arrow-left mr-2"></i>Volver
+                <button onclick="goToStep(1)" 
+                    class="flex-1 py-4 rounded-xl border-2 border-gray-300 text-gray-700 font-bold hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-2">
+                    <i class="fas fa-arrow-left"></i>Volver
                 </button>
-                <button onclick="goToStep(3)" class="flex-1 bg-sb-green text-white py-4 rounded-xl font-bold hover:bg-sb-green-light transition-all duration-200 shadow-md hover:shadow-lg">
-                    Revisar pedido <i class="fas fa-arrow-right ml-2"></i>
+                <button onclick="goToStep(3)" 
+                    class="flex-1 bg-sb-green text-white py-4 rounded-xl font-bold hover:bg-sb-green-light transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                    Revisar pedido <i class="fas fa-arrow-right"></i>
                 </button>
             </div>
         </div>
 
         <!-- Paso 3: Confirmación -->
-        <div id="stepContent3" class="hidden bg-white rounded-2xl shadow-lg p-6 md:p-8 animate-fade-in border border-gray-100">
-            <h2 class="font-serif text-2xl font-bold mb-6 text-center">Confirma tu pedido</h2>
+        <div id="stepContent3" class="hidden bg-white rounded-2xl shadow-lg p-4 md:p-8 animate-fade-in border border-gray-100">
+            <h2 class="font-serif text-xl md:text-2xl font-bold mb-6 text-center">Confirma tu pedido</h2>
 
             <!-- Resumen de productos -->
-            <div class="bg-sb-cream rounded-xl p-6 mb-6 border border-gray-200">
-                <h3 class="text-lg font-semibold mb-4 text-gray-800">Productos</h3>
+            <div class="bg-sb-cream rounded-xl p-4 md:p-6 mb-6 border border-gray-200">
+                <h3 class="text-lg font-semibold mb-4 text-gray-800 flex items-center gap-2">
+                    <i class="fas fa-shopping-bag text-sb-green"></i> Productos
+                </h3>
                 <div id="resumenProductos" class="space-y-3 mb-6 max-h-60 overflow-y-auto"></div>
 
                 <div class="space-y-2 text-base border-t border-gray-300 pt-4">
@@ -280,7 +372,7 @@
                         <span class="text-gray-700">Envío (<span id="resumenDistancia">0</span> km):</span>
                         <span id="resumenExpress" class="font-medium">₡0</span>
                     </div>
-                    <div class="border-t-2 border-gray-300 pt-3 mt-3 flex justify-between text-2xl font-bold text-sb-green">
+                    <div class="border-t-2 border-gray-300 pt-3 mt-3 flex justify-between text-xl md:text-2xl font-bold text-sb-green">
                         <span>Total a pagar:</span>
                         <span id="resumenTotal">₡0</span>
                     </div>
@@ -288,9 +380,11 @@
             </div>
 
             <!-- Datos de entrega resumen -->
-            <div class="bg-gray-50 rounded-xl p-6 mb-6 border border-gray-200">
-                <h3 class="text-lg font-semibold mb-4 text-gray-800">Datos de entrega</h3>
-                <div id="resumenEntrega" class="space-y-2 text-sm text-gray-700">
+            <div class="bg-gray-50 rounded-xl p-4 md:p-6 mb-6 border border-gray-200">
+                <h3 class="text-lg font-semibold mb-4 text-gray-800 flex items-center gap-2">
+                    <i class="fas fa-truck text-sb-green"></i> Datos de entrega
+                </h3>
+                <div id="resumenEntrega" class="space-y-2 text-sm text-gray-700 bg-white p-4 rounded-lg border border-gray-200">
                     <!-- Se llena con JavaScript -->
                 </div>
             </div>
@@ -298,16 +392,16 @@
             <div class="mb-6">
                 <h3 class="text-lg font-semibold mb-4 text-gray-800">Método de pago</h3>
                 <div class="space-y-3">
-                    <label class="flex items-center gap-4 p-4 rounded-xl border-2 border-sb-green bg-sb-green/5 cursor-pointer transition-all">
+                    <label class="flex items-center gap-4 p-4 rounded-xl border-2 border-sb-green bg-sb-green/5 cursor-pointer transition-all hover:shadow-md">
                         <input type="radio" name="pago" value="sinpe" checked class="w-5 h-5 text-sb-green accent-sb-green">
                         <div class="flex-1">
                             <span class="font-bold text-gray-800 block">SINPE Móvil</span>
-                            <p class="text-sm text-gray-600">Transferencia al número de la floristería</p>
+                            <p class="text-sm text-gray-600">Transferencia al <span id="telefonoSinpe" class="font-mono bg-white px-2 py-1 rounded text-sb-green">8605-3613</span></p>
                         </div>
                         <i class="fas fa-mobile-alt text-2xl text-sb-green"></i>
                     </label>
                     
-                    <label class="flex items-center gap-4 p-4 rounded-xl border-2 border-gray-200 cursor-pointer hover:border-gray-300 transition-all">
+                    <label class="flex items-center gap-4 p-4 rounded-xl border-2 border-gray-200 cursor-pointer hover:border-gray-300 transition-all hover:shadow-md" id="opcionEfectivo">
                         <input type="radio" name="pago" value="efectivo" class="w-5 h-5 text-sb-green accent-sb-green">
                         <div class="flex-1">
                             <span class="font-bold text-gray-800 block">Efectivo</span>
@@ -322,35 +416,95 @@
             <div class="mb-6 bg-yellow-50 p-4 rounded-xl border border-yellow-200">
                 <label class="flex items-start gap-3 cursor-pointer">
                     <input type="checkbox" id="enviarCopiaEmail" class="mt-1 w-5 h-5 text-sb-green rounded border-gray-300 accent-sb-green">
-                    <div>
+                    <div class="flex-1">
                         <span class="font-medium text-gray-800 block">Enviar copia del pedido por email</span>
                         <p class="text-sm text-gray-600 mb-2">Recibe una copia en tu correo electrónico</p>
-                        <input type="email" id="emailCopia" placeholder="tu@email.com" class="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:border-sb-green focus:outline-none">
+                        <input type="email" id="emailCopia" placeholder="tu@email.com" 
+                            class="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:border-sb-green focus:outline-none bg-white">
                     </div>
                 </label>
             </div>
 
-            <label class="flex items-start gap-3 mb-6 cursor-pointer">
+            <label class="flex items-start gap-3 mb-6 cursor-pointer p-4 rounded-xl border-2 border-gray-200 hover:border-sb-green transition-colors">
                 <input type="checkbox" id="terminos" required class="mt-1 w-5 h-5 text-sb-green rounded border-gray-300 accent-sb-green">
                 <span class="text-sm text-gray-600 leading-relaxed">
-                    Confirmo que los datos son correctos. Entiendo que el pedido se procesará por WhatsApp y debo confirmar el pago para que sea válido.
+                    Confirmo que los datos son correctos. Entiendo que el pedido se procesará por WhatsApp y debo confirmar el pago para que sea válido. 
+                    <span class="text-sb-green font-medium">Acepto los términos y condiciones.</span>
                 </span>
             </label>
 
-            <button onclick="enviarPedido()" class="w-full bg-green-600 hover:bg-green-700 text-white py-5 rounded-xl font-bold text-xl transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 animate-pulse-soft">
-                <i class="fab fa-whatsapp text-3xl"></i>
-                Enviar pedido por WhatsApp
+            <button onclick="enviarPedido()" id="btnEnviar" 
+                class="w-full bg-green-600 hover:bg-green-700 text-white py-4 md:py-5 rounded-xl font-bold text-lg md:text-xl transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 animate-pulse-soft disabled:opacity-50 disabled:cursor-not-allowed">
+                <i class="fab fa-whatsapp text-2xl md:text-3xl"></i>
+                <span>Enviar pedido por WhatsApp</span>
             </button>
 
-            <p class="text-center text-sm text-gray-500 mt-4">
-                <i class="fas fa-lock mr-1"></i>Serás redirigido a WhatsApp con todos los detalles
+            <p class="text-center text-xs md:text-sm text-gray-500 mt-4 flex items-center justify-center gap-2">
+                <i class="fas fa-lock"></i>
+                Serás redirigido a WhatsApp con todos los detalles
             </p>
 
-            <button onclick="goToStep(2)" class="w-full mt-4 py-3 text-gray-500 hover:text-gray-700 font-medium transition-colors">
-                ← Volver a datos de entrega
+            <button onclick="goToStep(2)" class="w-full mt-4 py-3 text-gray-500 hover:text-gray-700 font-medium transition-colors flex items-center justify-center gap-2">
+                <i class="fas fa-arrow-left"></i> Volver a datos de entrega
             </button>
         </div>
     </main>
+
+    <!-- Modal de Fallback para WhatsApp -->
+    <div id="whatsappModal" class="fixed inset-0 z-[100] hidden">
+        <div class="modal-backdrop absolute inset-0" onclick="cerrarWhatsAppModal()"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative animate-fade-in">
+                <button onclick="cerrarWhatsAppModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+                
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fab fa-whatsapp text-3xl text-green-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Enviar pedido por WhatsApp</h3>
+                    <p class="text-sm text-gray-600">Elige cómo quieres enviar tu pedido:</p>
+                </div>
+
+                <div class="space-y-3">
+                    <button onclick="abrirWhatsAppApp()" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition">
+                        <i class="fab fa-whatsapp text-xl"></i>
+                        Abrir app de WhatsApp
+                    </button>
+                    
+                    <button onclick="abrirWhatsAppWeb()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition">
+                        <i class="fas fa-desktop"></i>
+                        WhatsApp Web
+                    </button>
+                    
+                    <div class="relative">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-2 bg-white text-gray-500">o</span>
+                        </div>
+                    </div>
+                    
+                    <button onclick="copiarPedido()" class="w-full border-2 border-sb-green text-sb-green hover:bg-sb-green hover:text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition">
+                        <i class="fas fa-copy"></i>
+                        Copiar texto del pedido
+                    </button>
+                </div>
+                
+                <p class="text-xs text-gray-500 text-center mt-4">
+                    Si ninguna opción funciona, copia el texto y pégalo manualmente en WhatsApp
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast de notificación -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-gray-800 text-white px-6 py-3 rounded-xl shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-[100] flex items-center gap-2">
+        <i class="fas fa-check-circle text-green-400"></i>
+        <span id="toastMessage">Mensaje</span>
+    </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
@@ -365,8 +519,10 @@
         let paso = 1;
         let costoExpress = 0;
         let distanciaKm = 0;
+        let textoPedidoGlobal = '';
+        let usarDireccionManual = false;
 
-        // COORDENADAS CORREGIDAS: Santa Bárbara, Heredia (del parque 200m sur)
+        // COORDENADAS: Santa Bárbara, Heredia
         const FLORISTERIA = { lat: 10.0369, lng: -84.1594 };
 
         function cargarDatos() {
@@ -378,25 +534,33 @@
             
             cargarCarrito();
             
+            // Configurar fecha mínima (mañana)
             const manana = new Date();
             manana.setDate(manana.getDate() + 1);
             const fechaStr = manana.toISOString().split('T')[0];
             document.getElementById('fecha').min = fechaStr;
             document.getElementById('fecha').value = fechaStr;
+            
+            // Event listener para contador de caracteres
+            document.getElementById('mensajeTarjeta')?.addEventListener('input', function() {
+                document.getElementById('charCount').textContent = this.value.length;
+            });
         }
 
         function toggleReceptor() {
             const esMismo = document.getElementById('mismoReceptor').checked;
             const datosReceptor = document.getElementById('datosReceptor');
+            const inputs = datosReceptor.querySelectorAll('input');
             
             if (esMismo) {
                 datosReceptor.classList.add('opacity-50', 'pointer-events-none');
-                document.getElementById('nombreReceptor').required = false;
-                document.getElementById('telefonoReceptor').required = false;
+                inputs.forEach(input => {
+                    input.required = false;
+                    input.value = '';
+                });
             } else {
                 datosReceptor.classList.remove('opacity-50', 'pointer-events-none');
-                document.getElementById('nombreReceptor').required = true;
-                document.getElementById('telefonoReceptor').required = true;
+                inputs.forEach(input => input.required = true);
             }
         }
 
@@ -420,21 +584,22 @@
             btnContinuar.disabled = false;
 
             container.innerHTML = carrito.map((item, i) => `
-                <div class="flex gap-4 items-center bg-gray-50 p-4 rounded-xl border border-gray-100">
-                    <img src="${item.imagen}" class="w-20 h-20 object-cover rounded-lg border border-gray-200" onerror="this.src='https://via.placeholder.com/80?text=Producto'">
+                <div class="flex gap-3 md:gap-4 items-center bg-gray-50 p-3 md:p-4 rounded-xl border border-gray-100 hover:shadow-md transition-shadow">
+                    <img src="${item.imagen}" class="w-16 h-16 md:w-20 md:h-20 object-cover rounded-lg border border-gray-200 flex-shrink-0" 
+                        onerror="this.src='https://via.placeholder.com/80?text=Producto'" alt="${item.nombre}">
                     <div class="flex-1 min-w-0">
-                        <h3 class="font-medium text-gray-900 truncate">${item.nombre}</h3>
-                        <p class="text-sb-green font-bold">₡${item.precioUnitario.toLocaleString()}</p>
-                        <div class="flex items-center gap-3 mt-2">
+                        <h3 class="font-medium text-gray-900 text-sm md:text-base truncate">${item.nombre}</h3>
+                        <p class="text-sb-green font-bold text-sm md:text-base">₡${item.precioUnitario.toLocaleString()}</p>
+                        <div class="flex items-center gap-2 md:gap-3 mt-2">
                             <div class="flex border border-gray-300 rounded-lg overflow-hidden bg-white">
-                                <button onclick="cambiarCantidad(${i}, -1)" class="px-3 py-1 hover:bg-gray-100 transition-colors">-</button>
-                                <span class="px-3 py-1 font-medium min-w-[2rem] text-center">${item.cantidad}</span>
-                                <button onclick="cambiarCantidad(${i}, 1)" class="px-3 py-1 hover:bg-gray-100 transition-colors">+</button>
+                                <button onclick="cambiarCantidad(${i}, -1)" class="px-2 md:px-3 py-1 hover:bg-gray-100 transition-colors text-sm md:text-base">-</button>
+                                <span class="px-2 md:px-3 py-1 font-medium min-w-[1.5rem] md:min-w-[2rem] text-center text-sm md:text-base">${item.cantidad}</span>
+                                <button onclick="cambiarCantidad(${i}, 1)" class="px-2 md:px-3 py-1 hover:bg-gray-100 transition-colors text-sm md:text-base">+</button>
                             </div>
-                            <span class="font-bold text-gray-700">₡${item.subtotal.toLocaleString()}</span>
+                            <span class="font-bold text-gray-700 text-sm md:text-base">₡${item.subtotal.toLocaleString()}</span>
                         </div>
                     </div>
-                    <button onclick="eliminarItem(${i})" class="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-colors" title="Eliminar">
+                    <button onclick="eliminarItem(${i})" class="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0" title="Eliminar">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -454,15 +619,19 @@
         }
 
         function eliminarItem(index) {
-            carrito.splice(index, 1);
-            localStorage.setItem(CART_KEY, JSON.stringify(carrito));
-            cargarCarrito();
+            if (confirm('¿Eliminar este producto del carrito?')) {
+                carrito.splice(index, 1);
+                localStorage.setItem(CART_KEY, JSON.stringify(carrito));
+                cargarCarrito();
+                mostrarToast('Producto eliminado');
+            }
         }
 
         function vaciarCarrito() {
             if (confirm('¿Vaciar todo el carrito?')) {
                 localStorage.removeItem(CART_KEY);
                 cargarCarrito();
+                mostrarToast('Carrito vaciado');
             }
         }
 
@@ -476,8 +645,10 @@
             const tipo = document.querySelector('input[name="tipoEntrega"]:checked')?.value;
             costoExpress = 0;
             
-            if (tipo === 'express' && distanciaKm > 0) {
-                costoExpress = Math.round(distanciaKm * config.tarifaExpress);
+            if (tipo === 'express' && (distanciaKm > 0 || usarDireccionManual)) {
+                // Si usa dirección manual, estimamos 5km como default o usamos cálculo previo
+                const km = distanciaKm > 0 ? distanciaKm : 5;
+                costoExpress = Math.round(km * config.tarifaExpress);
                 document.getElementById('filaExpress').classList.remove('hidden');
                 document.getElementById('costoExpressDisplay').textContent = '₡' + costoExpress.toLocaleString();
             } else {
@@ -490,7 +661,7 @@
 
         function goToStep(nuevoPaso) {
             if (nuevoPaso === 2 && carrito.length === 0) {
-                alert('Tu carrito está vacío');
+                mostrarToast('Tu carrito está vacío', 'error');
                 return;
             }
             
@@ -498,16 +669,19 @@
                 return;
             }
 
+            // Ocultar paso actual
             document.getElementById(`stepContent${paso}`).classList.add('hidden');
+            // Mostrar nuevo paso
             document.getElementById(`stepContent${nuevoPaso}`).classList.remove('hidden');
             
+            // Actualizar indicadores de paso
             for (let i = 1; i <= 3; i++) {
                 const stepEl = document.getElementById(`step${i}`);
                 stepEl.classList.remove('step-active', 'step-completed', 'step-pending');
                 
                 if (i < nuevoPaso) {
                     stepEl.classList.add('step-completed');
-                    stepEl.innerHTML = '<i class="fas fa-check"></i>';
+                    stepEl.innerHTML = '<i class="fas fa-check text-xs md:text-sm"></i>';
                 } else if (i === nuevoPaso) {
                     stepEl.classList.add('step-active');
                     stepEl.textContent = i;
@@ -533,7 +707,16 @@
             const esMismoReceptor = document.getElementById('mismoReceptor').checked;
 
             if (!nombreComprador || !telefonoComprador || !fecha) {
-                alert('Por favor completa los datos de quien compra');
+                mostrarToast('Completa los datos de quien compra', 'error');
+                document.getElementById('nombreComprador').focus();
+                return false;
+            }
+
+            // Validar formato de teléfono
+            const telRegex = /^[0-9]{4}-?[0-9]{4}$/;
+            if (!telRegex.test(telefonoComprador.replace(/\s/g, ''))) {
+                mostrarToast('Teléfono inválido. Usa formato: 8888-8888', 'error');
+                document.getElementById('telefonoComprador').focus();
                 return false;
             }
 
@@ -541,7 +724,11 @@
                 const nombreReceptor = document.getElementById('nombreReceptor').value.trim();
                 const telefonoReceptor = document.getElementById('telefonoReceptor').value.trim();
                 if (!nombreReceptor || !telefonoReceptor) {
-                    alert('Por favor completa los datos de quien recibe, o marca "Es la misma persona"');
+                    mostrarToast('Completa los datos de quien recibe', 'error');
+                    return false;
+                }
+                if (!telRegex.test(telefonoReceptor.replace(/\s/g, ''))) {
+                    mostrarToast('Teléfono del receptor inválido', 'error');
                     return false;
                 }
             }
@@ -549,11 +736,13 @@
             if (tipo === 'express') {
                 const referencias = document.getElementById('referencias').value.trim();
                 if (!referencias) {
-                    alert('Por favor ingresa las referencias de dirección');
+                    mostrarToast('Ingresa referencias de dirección', 'error');
+                    document.getElementById('referencias').focus();
                     return false;
                 }
-                if (!marker) {
-                    alert('Por favor marca la ubicación en el mapa');
+                // Permitir continuar sin marcador si ingresó dirección manual
+                if (!marker && !usarDireccionManual) {
+                    mostrarToast('Marca la ubicación en el mapa o usa dirección manual', 'error');
                     return false;
                 }
             }
@@ -565,6 +754,19 @@
             const tipo = document.querySelector('input[name="tipoEntrega"]:checked').value;
             document.getElementById('seccionExpress').classList.toggle('hidden', tipo !== 'express');
             document.getElementById('seccionRecogida').classList.toggle('hidden', tipo !== 'recogida');
+            
+            // Actualizar opción de efectivo
+            const opcionEfectivo = document.getElementById('opcionEfectivo');
+            const inputEfectivo = opcionEfectivo.querySelector('input');
+            
+            if (tipo === 'express') {
+                opcionEfectivo.classList.add('opacity-50', 'pointer-events-none');
+                if (inputEfectivo.checked) {
+                    document.querySelector('input[name="pago"][value="sinpe"]').checked = true;
+                }
+            } else {
+                opcionEfectivo.classList.remove('opacity-50', 'pointer-events-none');
+            }
             
             if (tipo === 'express') {
                 setTimeout(() => {
@@ -581,45 +783,124 @@
 
         function inicializarMapa() {
             const mapContainer = document.getElementById('map');
-            mapContainer.style.display = 'block';
+            const loadingEl = document.getElementById('mapLoading');
+            const errorEl = document.getElementById('mapError');
             
-            map = L.map('map').setView([FLORISTERIA.lat, FLORISTERIA.lng], 13);
-            
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap',
-                maxZoom: 19
-            }).addTo(map);
-
-            L.marker([FLORISTERIA.lat, FLORISTERIA.lng])
-                .addTo(map)
-                .bindPopup('Floristería Santa Bárbara')
-                .openPopup();
-
-            L.circle([FLORISTERIA.lat, FLORISTERIA.lng], {
-                color: '#2D5A3D',
-                fillColor: '#2D5A3D',
-                fillOpacity: 0.1,
-                radius: 10000
-            }).addTo(map);
-
-            map.on('click', function(e) {
-                if (marker) map.removeLayer(marker);
-                
-                marker = L.marker(e.latlng, { draggable: true }).addTo(map)
-                    .bindPopup('Dirección de entrega')
-                    .openPopup();
-                
-                calcularDistancia(e.latlng.lat, e.latlng.lng);
-                
-                marker.on('dragend', function(e) {
-                    const pos = e.target.getLatLng();
-                    calcularDistancia(pos.lat, pos.lng);
+            try {
+                map = L.map('map', {
+                    center: [FLORISTERIA.lat, FLORISTERIA.lng],
+                    zoom: 13,
+                    zoomControl: false
                 });
-            });
+                
+                // Añadir control de zoom en posición mejorada para móvil
+                L.control.zoom({ position: 'bottomright' }).addTo(map);
+                
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap',
+                    maxZoom: 19,
+                    crossOrigin: true
+                }).addTo(map);
 
-            setTimeout(() => {
-                map.invalidateSize();
-            }, 100);
+                // Marcador de floristería
+                const floristeriaIcon = L.divIcon({
+                    html: '<div style="background:#2D5A3D; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; border:3px solid white; box-shadow:0 2px 5px rgba(0,0,0,0.3);">🌸</div>',
+                    className: 'custom-div-icon',
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 15]
+                });
+
+                L.marker([FLORISTERIA.lat, FLORISTERIA.lng], { icon: floristeriaIcon })
+                    .addTo(map)
+                    .bindPopup('<b>Floristería Santa Bárbara</b><br>Punto de referencia')
+                    .openPopup();
+
+                // Círculo de cobertura aproximado
+                L.circle([FLORISTERIA.lat, FLORISTERIA.lng], {
+                    color: '#2D5A3D',
+                    fillColor: '#2D5A3D',
+                    fillOpacity: 0.1,
+                    radius: 15000,
+                    weight: 1
+                }).addTo(map);
+
+                // Evento de click en mapa
+                map.on('click', function(e) {
+                    usarDireccionManual = false;
+                    if (marker) map.removeLayer(marker);
+                    
+                    const customIcon = L.divIcon({
+                        html: '<div style="background:#C41E3A; width:25px; height:25px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; border:3px solid white; box-shadow:0 2px 5px rgba(0,0,0,0.3); animation:bounce 0.5s;">📍</div>',
+                        className: 'custom-div-icon',
+                        iconSize: [25, 25],
+                        iconAnchor: [12, 12]
+                    });
+                    
+                    marker = L.marker(e.latlng, { icon: customIcon, draggable: true }).addTo(map)
+                        .bindPopup('Tu ubicación de entrega')
+                        .openPopup();
+                    
+                    calcularDistancia(e.latlng.lat, e.latlng.lng);
+                    
+                    marker.on('dragend', function(e) {
+                        const pos = e.target.getLatLng();
+                        calcularDistancia(pos.lat, pos.lng);
+                    });
+                });
+
+                // Ocultar loading
+                loadingEl.classList.add('hidden');
+                errorEl.classList.add('hidden');
+                
+                // Forzar resize después de un momento
+                setTimeout(() => {
+                    map.invalidateSize();
+                }, 300);
+
+            } catch (error) {
+                console.error('Error cargando mapa:', error);
+                loadingEl.classList.add('hidden');
+                errorEl.classList.remove('hidden');
+                mostrarToast('Error al cargar el mapa. Usa dirección manual.', 'error');
+            }
+        }
+
+        function recargarMapa() {
+            if (map) {
+                map.remove();
+                map = null;
+            }
+            document.getElementById('mapLoading').classList.remove('hidden');
+            document.getElementById('mapError').classList.add('hidden');
+            setTimeout(inicializarMapa, 500);
+        }
+
+        function usarDireccionTexto() {
+            const direccion = document.getElementById('direccionTexto').value.trim();
+            if (!direccion) {
+                mostrarToast('Ingresa una dirección', 'error');
+                return;
+            }
+            
+            usarDireccionManual = true;
+            // Estimamos 5km como distancia promedio si no hay marcador
+            if (!distanciaKm) {
+                distanciaKm = 5;
+                costoExpress = Math.round(5 * config.tarifaExpress);
+            }
+            
+            document.getElementById('infoExpress').classList.remove('hidden');
+            document.getElementById('distanciaTexto').textContent = '~' + distanciaKm + ' km (est.)';
+            document.getElementById('costoExpress').textContent = '₡' + costoExpress.toLocaleString();
+            
+            calcularTotales(carrito.reduce((sum, item) => sum + item.subtotal, 0));
+            mostrarToast('Dirección manual guardada. El costo es estimado.');
+            
+            // Copiar a referencias si están vacías
+            const refs = document.getElementById('referencias');
+            if (!refs.value) {
+                refs.value = direccion;
+            }
         }
 
         function calcularDistancia(lat, lng) {
@@ -646,10 +927,10 @@
             container.innerHTML = carrito.map(item => `
                 <div class="flex justify-between items-center py-2 border-b border-gray-200 last:border-0">
                     <div class="flex items-center gap-3">
-                        <span class="bg-sb-green text-white text-xs px-2 py-1 rounded-full">${item.cantidad}x</span>
-                        <span class="text-gray-700">${item.nombre}</span>
+                        <span class="bg-sb-green text-white text-xs px-2 py-1 rounded-full font-bold">${item.cantidad}x</span>
+                        <span class="text-gray-700 text-sm md:text-base">${item.nombre}</span>
                     </div>
-                    <span class="font-medium">₡${item.subtotal.toLocaleString()}</span>
+                    <span class="font-medium text-sm md:text-base">₡${item.subtotal.toLocaleString()}</span>
                 </div>
             `).join('');
 
@@ -657,9 +938,9 @@
             document.getElementById('resumenSubtotal').textContent = '₡' + subtotal.toLocaleString();
             
             const tipo = document.querySelector('input[name="tipoEntrega"]:checked').value;
-            if (tipo === 'express' && distanciaKm > 0) {
+            if (tipo === 'express' && (distanciaKm > 0 || usarDireccionManual)) {
                 document.getElementById('filaExpressResumen').classList.remove('hidden');
-                document.getElementById('resumenDistancia').textContent = distanciaKm.toFixed(1);
+                document.getElementById('resumenDistancia').textContent = distanciaKm > 0 ? distanciaKm.toFixed(1) : '5 (est.)';
                 document.getElementById('resumenExpress').textContent = '₡' + costoExpress.toLocaleString();
             } else {
                 document.getElementById('filaExpressResumen').classList.add('hidden');
@@ -675,26 +956,53 @@
             const fecha = document.getElementById('fecha').value;
             const horario = document.getElementById('horario').value;
             const tipoEntrega = document.querySelector('input[name="tipoEntrega"]:checked').value;
+            const mensajeTarjeta = document.getElementById('mensajeTarjeta').value;
+            const observaciones = document.getElementById('observaciones').value;
             
             let html = `
-                <p><strong>Compra:</strong> ${nombreComprador} (${telefonoComprador})</p>
-                <p><strong>Recibe:</strong> ${nombreReceptor} (${telefonoReceptor}) ${esMismoReceptor ? '<span class="text-gray-500">(misma persona)</span>' : ''}</p>
-                <p><strong>Fecha:</strong> ${fecha} - ${horario}</p>
-                <p><strong>Entrega:</strong> ${tipoEntrega === 'express' ? 'Express a domicilio' : 'Recogida en tienda'}</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <p><span class="text-gray-500">Compra:</span> <strong>${nombreComprador}</strong><br>
+                    <span class="text-xs text-gray-500">${telefonoComprador}</span></p>
+                    <p><span class="text-gray-500">Recibe:</span> <strong>${nombreReceptor}</strong> ${esMismoReceptor ? '<span class="text-xs bg-gray-200 px-2 py-1 rounded">misma persona</span>' : ''}<br>
+                    <span class="text-xs text-gray-500">${telefonoReceptor}</span></p>
+                </div>
+                <div class="border-t border-gray-200 pt-2 mt-2">
+                    <p><span class="text-gray-500">Fecha:</span> <strong>${fecha}</strong> (${horario})</p>
+                    <p><span class="text-gray-500">Entrega:</span> <strong>${tipoEntrega === 'express' ? 'Express a domicilio 🚚' : 'Recogida en tienda 🏪'}</strong></p>
             `;
             
             if (tipoEntrega === 'express') {
-                html += `<p><strong>Dirección:</strong> ${distanciaKm.toFixed(1)} km desde la tienda</p>`;
+                const direccionTexto = document.getElementById('direccionTexto').value;
+                const referencias = document.getElementById('referencias').value;
+                html += `<p><span class="text-gray-500">Distancia:</span> <strong>${distanciaKm > 0 ? distanciaKm.toFixed(1) + ' km' : '~5 km (est.)'}</strong></p>`;
+                if (direccionTexto || referencias) {
+                    html += `<p class="text-xs text-gray-600 mt-1 bg-gray-50 p-2 rounded"><strong>Dir:</strong> ${direccionTexto || referencias}</p>`;
+                }
             }
+            
+            if (mensajeTarjeta) {
+                html += `<p class="mt-2 text-xs italic bg-pink-50 p-2 rounded text-pink-800">"${mensajeTarjeta}"</p>`;
+            }
+            
+            if (observaciones) {
+                html += `<p class="mt-1 text-xs text-gray-600"><strong>Notas:</strong> ${observaciones}</p>`;
+            }
+            
+            html += `</div>`;
             
             document.getElementById('resumenEntrega').innerHTML = html;
         }
 
         function enviarPedido() {
             if (!document.getElementById('terminos').checked) {
-                alert('Debes aceptar los términos para continuar');
+                mostrarToast('Debes aceptar los términos para continuar', 'error');
+                document.getElementById('terminos').focus();
                 return;
             }
+
+            const btn = document.getElementById('btnEnviar');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparando pedido...';
 
             const nombreComprador = document.getElementById('nombreComprador').value.trim();
             const telefonoComprador = document.getElementById('telefonoComprador').value.trim();
@@ -708,6 +1016,7 @@
             const tipoEntrega = document.querySelector('input[name="tipoEntrega"]:checked').value;
             const metodoPago = document.querySelector('input[name="pago"]:checked').value;
             const referencias = document.getElementById('referencias')?.value.trim() || '';
+            const direccionTexto = document.getElementById('direccionTexto')?.value.trim() || '';
             const emailCopia = document.getElementById('emailCopia').value.trim();
             const enviarCopia = document.getElementById('enviarCopiaEmail').checked;
 
@@ -715,7 +1024,7 @@
             const total = subtotal + costoExpress;
 
             const pedido = {
-                id: 'PED-' + Date.now(),
+                id: 'PED-' + Date.now().toString().slice(-6),
                 fecha: new Date().toISOString(),
                 cliente: nombreComprador,
                 telefonoCliente: telefonoComprador,
@@ -731,77 +1040,131 @@
                 metodoPago: metodoPago,
                 estado: 'nuevo',
                 mensajeTarjeta: mensajeTarjeta,
-                observaciones: observaciones
+                observaciones: observaciones,
+                direccion: direccionTexto || referencias,
+                coordenadas: marker ? { lat: marker.getLatLng().lat, lng: marker.getLatLng().lng } : null
             };
 
             guardarPedidoEnHistorial(pedido);
 
             let texto = `¡Hola! Nuevo pedido en *Floristería Santa Bárbara* 🌸\n\n`;
-            texto += `*PEDIDO:* ${pedido.id}\n`;
+            texto += `*PEDIDO:* #${pedido.id}\n`;
             texto += `━━━━━━━━━━━━━━━━━━━━\n\n`;
             
-            texto += `*QUIEN COMPRA:*\n`;
+            texto += `*👤 QUIEN COMPRA:*\n`;
             texto += `Nombre: ${nombreComprador}\n`;
             texto += `Teléfono: ${telefonoComprador}\n\n`;
             
-            texto += `*QUIEN RECIBE:*\n`;
+            texto += `*🎁 QUIEN RECIBE:*\n`;
             texto += `Nombre: ${nombreReceptor}\n`;
             texto += `Teléfono: ${telefonoReceptor}\n`;
-            if (esMismoReceptor) texto += `(Misma persona que compra)\n`;
+            if (esMismoReceptor) texto += `_(Misma persona que compra)_\n`;
             texto += `\n`;
             
-            texto += `*ENTREGA:*\n`;
+            texto += `*🚚 ENTREGA:*\n`;
             texto += `Fecha: ${fecha}\n`;
             texto += `Horario: ${horario}\n`;
-            texto += `Tipo: ${tipoEntrega === 'express' ? 'Express a domicilio' : 'Recogida en tienda'}\n`;
+            texto += `Tipo: ${tipoEntrega === 'express' ? 'Express a domicilio 🚚' : 'Recogida en tienda 🏪'}\n`;
             
             if (tipoEntrega === 'express') {
-                texto += `Distancia: ${distanciaKm.toFixed(1)} km\n`;
+                texto += `Distancia: ${distanciaKm > 0 ? distanciaKm.toFixed(1) + ' km' : '~5 km (estimado)'}\n`;
                 texto += `Costo envío: ₡${costoExpress.toLocaleString()}\n`;
-                texto += `Referencias: ${referencias}\n`;
+                if (direccionTexto || referencias) {
+                    texto += `Dirección: ${direccionTexto || referencias}\n`;
+                }
+                if (pedido.coordenadas) {
+                    texto += `Maps: https://maps.google.com/?q=${pedido.coordenadas.lat},${pedido.coordenadas.lng}\n`;
+                }
             }
             texto += `\n`;
             
-            texto += `*PRODUCTOS:*\n`;
+            texto += `*🛍️ PRODUCTOS:*\n`;
             carrito.forEach(item => {
                 texto += `• ${item.nombre} x${item.cantidad} = ₡${item.subtotal.toLocaleString()}\n`;
             });
             texto += `\n`;
             
             if (mensajeTarjeta) {
-                texto += `*MENSAJE TARJETA:*\n${mensajeTarjeta}\n\n`;
+                texto += `*💌 MENSAJE TARJETA:*\n_"${mensajeTarjeta}"_\n\n`;
             }
             
             if (observaciones) {
-                texto += `*OBSERVACIONES:*\n${observaciones}\n\n`;
+                texto += `*📝 OBSERVACIONES:*\n${observaciones}\n\n`;
             }
             
-            texto += `*PAGO:*\n`;
+            texto += `*💳 PAGO:*\n`;
             texto += `Método: ${metodoPago === 'sinpe' ? 'SINPE Móvil' : 'Efectivo'}\n`;
+            if (metodoPago === 'sinpe') {
+                texto += `Enviar comprobado al: ${config.whatsapp.replace('506', '')}\n`;
+            }
             texto += `Subtotal: ₡${subtotal.toLocaleString()}\n`;
             if (tipoEntrega === 'express') texto += `Envío: ₡${costoExpress.toLocaleString()}\n`;
-            texto += `*TOTAL: ₡${total.toLocaleString()}*\n\n`;
+            texto += `*💰 TOTAL: ₡${total.toLocaleString()}*\n\n`;
             
             texto += `Por favor confirmar disponibilidad. ¡Gracias! 🌺`;
+
+            textoPedidoGlobal = texto;
 
             if (enviarCopia && emailCopia) {
                 enviarEmailCopia(emailCopia, pedido, texto);
             }
 
-            const url = `https://wa.me/${config.whatsapp}?text=${encodeURIComponent(texto)}`;
+            // Mostrar modal de opciones de WhatsApp en lugar de abrir directo
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fab fa-whatsapp text-2xl md:text-3xl"></i><span>Enviar pedido por WhatsApp</span>';
+                mostrarWhatsAppModal();
+                limpiarFormularioGuardado();
+            }, 500);
+        }
+
+        function mostrarWhatsAppModal() {
+            document.getElementById('whatsappModal').classList.remove('hidden');
+        }
+
+        function cerrarWhatsAppModal() {
+            document.getElementById('whatsappModal').classList.add('hidden');
+        }
+
+        function abrirWhatsAppApp() {
+            const url = `https://wa.me/${config.whatsapp}?text=${encodeURIComponent(textoPedidoGlobal)}`;
+            window.location.href = url;
+            
+            // Fallback si no abre en 2 segundos
+            setTimeout(() => {
+                if (!document.hidden) {
+                    mostrarToast('Si no se abrió WhatsApp, usa WhatsApp Web o copia el texto', 'error');
+                }
+            }, 2000);
+        }
+
+        function abrirWhatsAppWeb() {
+            const url = `https://web.whatsapp.com/send?phone=${config.whatsapp}&text=${encodeURIComponent(textoPedidoGlobal)}`;
             window.open(url, '_blank');
-            
-            reproducirSonidoConfirmacion();
-            
-            if (confirm('¿Pedido enviado! ¿Deseas vaciar el carrito?')) {
-                localStorage.removeItem(CART_KEY);
-                window.location.href = 'index.html';
-            }
+            cerrarWhatsAppModal();
+        }
+
+        function copiarPedido() {
+            navigator.clipboard.writeText(textoPedidoGlobal).then(() => {
+                mostrarToast('¡Texto copiado! Pégalo en WhatsApp');
+                cerrarWhatsAppModal();
+            }).catch(() => {
+                // Fallback para navegadores antiguos
+                const textarea = document.createElement('textarea');
+                textarea.value = textoPedidoGlobal;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                mostrarToast('¡Texto copiado! Pégalo en WhatsApp');
+                cerrarWhatsAppModal();
+            });
         }
 
         function guardarPedidoEnHistorial(pedido) {
             let pedidos = JSON.parse(localStorage.getItem(PEDIDOS_KEY) || '[]');
             pedidos.unshift(pedido);
+            if (pedidos.length > 50) pedidos = pedidos.slice(0, 50); // Mantener últimos 50
             localStorage.setItem(PEDIDOS_KEY, JSON.stringify(pedidos));
             
             const datos = JSON.parse(localStorage.getItem(DATA_KEY) || '{}');
@@ -811,45 +1174,146 @@
         }
 
         function enviarEmailCopia(email, pedido, mensajeWhatsApp) {
-            const asunto = `Copia de tu pedido ${pedido.id} - Floristería Santa Bárbara`;
-            const cuerpo = `Hola ${pedido.cliente},\n\n`;
-            const urlEmail = `mailto:${email}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo + mensajeWhatsApp)}`;
+            const asunto = `Copia de tu pedido #${pedido.id} - Floristería Santa Bárbara`;
+            const cuerpo = `Hola ${pedido.cliente},\n\nGracias por tu pedido. Aquí está el resumen:\n\n${mensajeWhatsApp}\n\n---\nFloristería Santa Bárbara\nSanta Bárbara, Heredia\nTel: 8605-3613`;
+            const urlEmail = `mailto:${email}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
             
             setTimeout(() => {
                 window.open(urlEmail, '_blank');
             }, 1000);
         }
 
-        function reproducirSonidoConfirmacion() {
-            try {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                
-                oscillator.frequency.value = 800;
-                oscillator.type = 'sine';
-                
-                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-                
-                oscillator.start(audioContext.currentTime);
-                oscillator.stop(audioContext.currentTime + 0.5);
-            } catch (e) {
-                console.log('Audio no soportado');
+        function mostrarToast(mensaje, tipo = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toastMessage.textContent = mensaje;
+            
+            if (tipo === 'error') {
+                toast.querySelector('i').className = 'fas fa-exclamation-circle text-red-400';
+            } else {
+                toast.querySelector('i').className = 'fas fa-check-circle text-green-400';
             }
+            
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
         }
 
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('whatsappModal')?.addEventListener('click', function(e) {
+            if (e.target === this) cerrarWhatsAppModal();
+        });
+
+        // Validación en tiempo real de teléfonos
+        document.getElementById('telefonoComprador')?.addEventListener('input', function(e) {
+            let valor = e.target.value.replace(/\D/g, '');
+            if (valor.length >= 4) {
+                valor = valor.slice(0, 4) + '-' + valor.slice(4, 8);
+            }
+            e.target.value = valor;
+        });
+
+        document.getElementById('telefonoReceptor')?.addEventListener('input', function(e) {
+            let valor = e.target.value.replace(/\D/g, '');
+            if (valor.length >= 4) {
+                valor = valor.slice(0, 4) + '-' + valor.slice(4, 8);
+            }
+            e.target.value = valor;
+        });
+
+        // Prevenir envío accidental con Enter en formularios
+        document.querySelectorAll('input, textarea, select').forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && this.tagName !== 'TEXTAREA') {
+                    e.preventDefault();
+                }
+            });
+        });
+
+        // Detección de conexión para el mapa
+        window.addEventListener('online', () => {
+            mostrarToast('Conexión restaurada');
+            if (map && document.getElementById('seccionExpress')?.classList.contains('hidden') === false) {
+                recargarMapa();
+            }
+        });
+
+        window.addEventListener('offline', () => {
+            mostrarToast('Sin conexión. Usa dirección manual.', 'error');
+        });
+
+        // Guardar progreso del formulario en localStorage (recuperación ante accidentes)
+        const formInputs = ['nombreComprador', 'telefonoComprador', 'nombreReceptor', 'telefonoReceptor', 'fecha', 'horario', 'mensajeTarjeta', 'observaciones', 'referencias', 'direccionTexto', 'emailCopia'];
+        
+        formInputs.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                // Restaurar valor guardado
+                const guardado = localStorage.getItem('form_' + id);
+                if (guardado) el.value = guardado;
+                
+                // Guardar al cambiar
+                el.addEventListener('input', () => {
+                    localStorage.setItem('form_' + id, el.value);
+                });
+            }
+        });
+
+        // Limpiar formulario guardado (FUNCIÓN QUE FALTABA)
+        function limpiarFormularioGuardado() {
+            formInputs.forEach(id => {
+                localStorage.removeItem('form_' + id);
+            });
+        }
+
+        // Animación de entrada suave para elementos
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.bg-white.rounded-2xl').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            observer.observe(el);
+        });
+
+            // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
             cargarDatos();
             toggleReceptor();
             
-            // INICIALIZAR MAPA SI EXPRESS ESTÁ SELECCIONADO POR DEFECTO
+            // Inicializar mapa solo si express está seleccionado
             setTimeout(() => {
-                if (!map) inicializarMapa();
-            }, 300);
+                const tipoEntrega = document.querySelector('input[name="tipoEntrega"]:checked')?.value;
+                if (tipoEntrega === 'express' && !map) {
+                    inicializarMapa();
+                }
+            }, 500);
+        });
+
+        // Prevenir pérdida de datos al salir de la página
+        window.addEventListener('beforeunload', (e) => {
+            const hayDatos = formInputs.some(id => document.getElementById(id)?.value);
+            const carritoLleno = carrito.length > 0;
+            
+            if (hayDatos && carritoLleno && paso < 3) {
+                e.preventDefault();
+                e.returnValue = 'Tienes un pedido en progreso. ¿Seguro que quieres salir?';
+            }
         });
     </script>
 </body>
