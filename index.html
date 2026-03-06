@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Floristería Santa Bárbara | Flores frescas en Costa Rica</title>
     <meta name="description" content="Arreglos florales frescos, rosas premium, plantas y entrega express en Santa Bárbara, Heredia. Desde 2010 creando momentos especiales.">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -42,6 +42,9 @@
         .product-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        /* Loading spinner */
+        .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #2D5A3D; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="font-sans bg-sb-cream text-sb-dark min-h-screen">
@@ -60,14 +63,14 @@
                 <nav class="hidden md:flex items-center gap-8">
                     <a href="#" class="text-gray-600 hover:text-sb-green font-medium transition-colors">Inicio</a>
                     <a href="#catalogo" class="text-gray-600 hover:text-sb-green font-medium transition-colors">Catálogo</a>
-                    <a href="carrito-checkout.html" class="text-gray-600 hover:text-sb-green font-medium transition-colors">Carrito</a>
+                    <a href="carrito.html" class="text-gray-600 hover:text-sb-green font-medium transition-colors">Carrito</a>
                     <a href="admin.html" class="text-sb-rose hover:text-sb-rose font-medium transition-colors" title="Panel de Administración">
                         <i class="fas fa-lock mr-1"></i>Admin
                     </a>
                 </nav>
 
                 <div class="flex items-center gap-4">
-                    <a href="carrito-checkout.html" class="relative p-2 text-gray-600 hover:text-sb-green transition-colors">
+                    <a href="carrito.html" class="relative p-2 text-gray-600 hover:text-sb-green transition-colors">
                         <i class="fas fa-shopping-bag text-xl"></i>
                         <span id="cartCount" class="absolute -top-1 -right-1 bg-sb-rose text-white text-xs w-5 h-5 rounded-full flex items-center justify-center hidden">0</span>
                     </a>
@@ -87,7 +90,7 @@
             <div class="px-4 py-3 space-y-2">
                 <a href="#" class="block py-2 text-gray-600 hover:text-sb-green">Inicio</a>
                 <a href="#catalogo" class="block py-2 text-gray-600 hover:text-sb-green">Catálogo</a>
-                <a href="carrito-checkout.html" class="block py-2 text-gray-600 hover:text-sb-green">Carrito</a>
+                <a href="carrito.html" class="block py-2 text-gray-600 hover:text-sb-green">Carrito</a>
                 <a href="admin.html" class="block py-2 text-sb-rose font-medium">
                     <i class="fas fa-lock mr-2"></i>Panel Admin
                 </a>
@@ -140,7 +143,13 @@
                 <p class="text-gray-600 max-w-2xl mx-auto">Explora por categoría o todos nuestros arreglos frescos</p>
             </div>
 
-            <div class="flex flex-wrap gap-3 justify-center mb-10 overflow-x-auto pb-4" id="filtros"></div>
+            <!-- Loading -->
+            <div id="loadingCatalogo" class="text-center py-12">
+                <div class="spinner mx-auto mb-4"></div>
+                <p class="text-gray-600">Cargando catálogo...</p>
+            </div>
+
+            <div class="flex flex-wrap gap-3 justify-center mb-10 overflow-x-auto pb-4 hidden" id="filtros"></div>
 
             <div id="productosGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6"></div>
             
@@ -170,7 +179,7 @@
                     <ul class="space-y-2 text-gray-400 text-sm">
                         <li><a href="#" class="hover:text-white transition-colors">Inicio</a></li>
                         <li><a href="#catalogo" class="hover:text-white transition-colors">Catálogo</a></li>
-                        <li><a href="carrito-checkout.html" class="hover:text-white transition-colors">Carrito</a></li>
+                        <li><a href="carrito.html" class="hover:text-white transition-colors">Carrito</a></li>
                         <li><a href="admin.html" class="hover:text-white transition-colors">Admin</a></li>
                     </ul>
                 </div>
@@ -203,113 +212,125 @@
     </a>
 
     <script>
+        // ============================================
+        // CONFIGURACIÓN
+        // ============================================
+        const DB_NAME = 'FloristeriaSB';
+        const DB_VERSION = 2;
+        const CART_KEY = 'sb_carrito';
+        
+        let db = null;
         let productos = [];
         let categorias = [];
-        const CART_KEY = 'sb_carrito';
-        const DATA_KEY = 'floristeria_datos';
 
-        // Datos de ejemplo precargados (se usan solo la primera vez)
-        const datosIniciales = {
-            "productos": [
-                {
-                    "id": "prod-1",
-                    "codigo": "RAM-ROS-12",
-                    "nombre": "Ramo de 12 Rosas Rojas Premium",
-                    "categoria": "ramos-de-rosas",
-                    "descripcion": "Clásico ramo de 12 rosas rojas ecuatorianas de tallo largo, con follaje verde y moño elegante.",
-                    "stock": 18,
-                    "precioRegular": 28000,
-                    "precioTemporada": 24000,
-                    "precioTemporadaActivo": true,
-                    "imagenes": [
-                        "https://images.unsplash.com/photo-1525310072745-f49212b5ac6d?w=800"
-                    ],
-                    "activo": true,
-                    "destacado": true
-                },
-                {
-                    "id": "prod-2",
-                    "codigo": "RAM-ROS-24",
-                    "nombre": "Ramo de 24 Rosas Rojas",
-                    "categoria": "ramos-de-rosas",
-                    "descripcion": "Ramo grande de 24 rosas rojas importadas, perfecto para declaraciones de amor.",
-                    "stock": 9,
-                    "precioRegular": 48000,
-                    "precioTemporada": null,
-                    "precioTemporadaActivo": false,
-                    "imagenes": [
-                        "https://images.unsplash.com/photo-1563241527-3004b7be0ee9?w=800"
-                    ],
-                    "activo": true,
-                    "destacado": true
-                },
-                {
-                    "id": "prod-3",
-                    "codigo": "RAM-GIR-001",
-                    "nombre": "Ramo de Girasoles Naturales",
-                    "categoria": "ramos-de-girasoles",
-                    "descripcion": "Ramo alegre con 10 girasoles grandes, follaje verde y toque rústico.",
-                    "stock": 15,
-                    "precioRegular": 34000,
-                    "precioTemporada": null,
-                    "precioTemporadaActivo": false,
-                    "imagenes": [
-                        "https://images.unsplash.com/photo-1591893181465-98e2e7c8d7e1?w=800"
-                    ],
-                    "activo": true,
-                    "destacado": true
-                }
-            ],
-            "categorias": [
-                { "id": "ramos-de-rosas", "nombre": "Ramos de Rosas", "icono": "🌹", "orden": 1, "activa": true },
-                { "id": "ramos-de-girasoles", "nombre": "Ramos de Girasoles", "icono": "🌻", "orden": 2, "activa": true },
-                { "id": "arreglos-especiales", "nombre": "Arreglos Especiales", "icono": "💐", "orden": 3, "activa": true }
-            ],
-            "config": {
-                "nombre": "Floristería Santa Bárbara",
-                "whatsapp": "50686053613",
-                "tarifaExpress": 650
-            }
-        };
-
-        function inicializarDatos() {
-            const datosGuardados = localStorage.getItem(DATA_KEY);
-            
-            if (!datosGuardados) {
-                localStorage.setItem(DATA_KEY, JSON.stringify(datosIniciales));
-                console.log('Datos iniciales cargados');
-                return datosIniciales;
-            } else {
-                return JSON.parse(datosGuardados);
-            }
+        // ============================================
+        // CONEXIÓN A INDEXEDDB (misma que usa el admin)
+        // ============================================
+        async function conectarDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                
+                request.onsuccess = (event) => {
+                    db = event.target.result;
+                    console.log('✅ Conectado a IndexedDB');
+                    resolve(db);
+                };
+                
+                request.onerror = (event) => {
+                    console.error('❌ Error conectando a DB:', event.target.error);
+                    reject(event.target.error);
+                };
+            });
         }
 
-        function cargarDatos() {
+        // ============================================
+        // CARGAR DATOS DESDE INDEXEDDB
+        // ============================================
+        async function cargarDatos() {
+            document.getElementById('loadingCatalogo').classList.remove('hidden');
+            
             try {
-                const data = inicializarDatos();
+                await conectarDB();
                 
-                productos = data.productos?.filter(p => p.activo !== false) || [];
-                categorias = data.categorias?.filter(c => c.activa !== false) || [];
+                // Cargar categorías activas
+                categorias = await new Promise((resolve, reject) => {
+                    const tx = db.transaction('categorias', 'readonly');
+                    const store = tx.objectStore('categorias');
+                    const request = store.getAll();
+                    
+                    request.onsuccess = () => {
+                        const todas = request.result || [];
+                        const activas = todas.filter(c => c.activa !== false);
+                        resolve(activas);
+                    };
+                    request.onerror = () => reject(request.error);
+                });
+
+                // Cargar productos activos
+                productos = await new Promise((resolve, reject) => {
+                    const tx = db.transaction('productos', 'readonly');
+                    const store = tx.objectStore('productos');
+                    const request = store.getAll();
+                    
+                    request.onsuccess = async () => {
+                        const todos = request.result || [];
+                        const activos = todos.filter(p => p.activo !== false);
+                        
+                        // Cargar imágenes para cada producto
+                        for (const producto of activos) {
+                            const imagenes = await cargarImagenesProducto(producto.id);
+                            producto.imagenes = imagenes;
+                        }
+                        
+                        resolve(activos);
+                    };
+                    request.onerror = () => reject(request.error);
+                });
+
+                document.getElementById('loadingCatalogo').classList.add('hidden');
                 
                 if (productos.length === 0) {
                     document.getElementById('mensajeVacio').classList.remove('hidden');
-                    document.getElementById('filtros').style.display = 'none';
+                    document.getElementById('filtros').classList.add('hidden');
                 } else {
                     document.getElementById('mensajeVacio').classList.add('hidden');
-                    document.getElementById('filtros').style.display = 'flex';
+                    document.getElementById('filtros').classList.remove('hidden');
                     renderizarFiltros();
                     filtrar('todos');
                 }
                 
                 actualizarContadorCarrito();
                 
-            } catch (err) {
-                console.error('Error cargando datos:', err);
+            } catch (error) {
+                console.error('Error cargando datos:', error);
+                document.getElementById('loadingCatalogo').classList.add('hidden');
                 document.getElementById('productosGrid').innerHTML = 
                     '<p class="col-span-full text-center py-12 text-gray-600">Error al cargar el catálogo. Por favor recarga la página.</p>';
             }
         }
 
+        // Cargar imágenes de un producto específico
+        async function cargarImagenesProducto(productoId) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction('imagenes', 'readonly');
+                const store = tx.objectStore('imagenes');
+                const index = store.index('productoId');
+                const request = index.getAll(productoId);
+                
+                request.onsuccess = () => {
+                    const imagenes = request.result
+                        .sort((a, b) => a.indice - b.indice)
+                        .map(img => img.data);
+                    resolve(imagenes);
+                };
+                
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // ============================================
+        // RENDERIZADO
+        // ============================================
         function renderizarFiltros() {
             const container = document.getElementById('filtros');
             container.innerHTML = `
@@ -374,6 +395,9 @@
             }).join('');
         }
 
+        // ============================================
+        // CARRITO
+        // ============================================
         function agregarAlCarrito(id) {
             const producto = productos.find(p => p.id === id);
             if (!producto) return;
@@ -430,6 +454,9 @@
             menu.classList.toggle('hidden');
         }
 
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
         document.addEventListener('DOMContentLoaded', () => {
             cargarDatos();
         });
