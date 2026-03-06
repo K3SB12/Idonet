@@ -584,7 +584,7 @@
                         
                         // ESTO ES LO QUE CAMBIA - AHORA 200px y calidad 0.3
                         let width = img.width, height = img.height;
-                        const maxSize = 200;  // CAMBIADO DE 400 a 200
+                        const maxSize = 250;  // CAMBIADO DE 400 a 200
                         
                         if (width > height && width > maxSize) { 
                             height *= maxSize / width; 
@@ -599,7 +599,7 @@
                         ctx.drawImage(img, 0, 0, width, height);
                         
                         // CAMBIADO DE 0.6 a 0.3
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.3);
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.4);
                         
                         fotosTemp.push(dataUrl);
                         renderizarPreviews();
