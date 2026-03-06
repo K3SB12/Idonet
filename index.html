@@ -42,7 +42,7 @@
     </style>
 </head>
 <body class="font-sans bg-sb-cream text-sb-dark min-h-screen">
-    <!-- Header (igual que tenías) -->
+    <!-- Header (igual) -->
     <header class="fixed w-full top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm transition-all">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16 md:h-20">
@@ -57,46 +57,50 @@
                     <a href="#" class="text-gray-600 hover:text-sb-green font-medium transition-colors">Inicio</a>
                     <a href="#catalogo" class="text-gray-600 hover:text-sb-green font-medium transition-colors">Catálogo</a>
                     <a href="carrito.html" class="text-gray-600 hover:text-sb-green font-medium transition-colors">Carrito</a>
-                    <a href="admin.html" class="text-sb-rose hover:text-sb-rose font-medium transition-colors"><i class="fas fa-lock mr-1"></i>Admin</a>
+                    <a href="admin.html" class="text-sb-rose hover:text-sb-rose font-medium transition-colors" title="Panel de Administración">
+                        <i class="fas fa-lock mr-1"></i>Admin
+                    </a>
                 </nav>
                 <div class="flex items-center gap-4">
-                    <a href="carrito.html" class="relative p-2 text-gray-600 hover:text-sb-green">
+                    <a href="carrito.html" class="relative p-2 text-gray-600 hover:text-sb-green transition-colors">
                         <i class="fas fa-shopping-bag text-xl"></i>
                         <span id="cartCount" class="absolute -top-1 -right-1 bg-sb-rose text-white text-xs w-5 h-5 rounded-full flex items-center justify-center hidden">0</span>
                     </a>
-                    <a href="https://wa.me/50686053613" target="_blank" class="hidden sm:flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full">
-                        <i class="fab fa-whatsapp"></i><span>Pedir</span>
+                    <a href="https://wa.me/50686053613" target="_blank" class="hidden sm:flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full transition-all">
+                        <i class="fab fa-whatsapp"></i>
+                        <span class="text-sm font-medium">Pedir</span>
                     </a>
-                    <button onclick="toggleMenu()" class="md:hidden p-2 text-gray-600"><i class="fas fa-bars text-xl"></i></button>
+                    <button onclick="toggleMenu()" class="md:hidden p-2 text-gray-600 hover:text-sb-green">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
                 </div>
             </div>
         </div>
-        <!-- Menú móvil -->
         <div id="mobileMenu" class="hidden md:hidden bg-white border-t">
             <div class="px-4 py-3 space-y-2">
-                <a href="#" class="block py-2 text-gray-600">Inicio</a>
-                <a href="#catalogo" class="block py-2 text-gray-600">Catálogo</a>
-                <a href="carrito.html" class="block py-2 text-gray-600">Carrito</a>
-                <a href="admin.html" class="block py-2 text-sb-rose"><i class="fas fa-lock mr-2"></i>Admin</a>
-                <a href="https://wa.me/50686053613" class="block py-2 text-green-600"><i class="fab fa-whatsapp mr-2"></i>WhatsApp</a>
+                <a href="#" class="block py-2 text-gray-600 hover:text-sb-green">Inicio</a>
+                <a href="#catalogo" class="block py-2 text-gray-600 hover:text-sb-green">Catálogo</a>
+                <a href="carrito.html" class="block py-2 text-gray-600 hover:text-sb-green">Carrito</a>
+                <a href="admin.html" class="block py-2 text-sb-rose font-medium"><i class="fas fa-lock mr-2"></i>Panel Admin</a>
+                <a href="https://wa.me/50686053613" class="block py-2 text-green-600 font-medium"><i class="fab fa-whatsapp mr-2"></i>WhatsApp</a>
             </div>
         </div>
     </header>
 
-    <!-- Hero (igual) -->
+    <!-- Hero -->
     <section class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
         <div class="absolute inset-0 z-0">
-            <img src="https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=1920" class="w-full h-full object-cover">
+            <img src="https://images.unsplash.com/photo-1561181286-d3fee7d55364?w=1920" alt="Flores de fondo" class="w-full h-full object-cover">
             <div class="absolute inset-0 bg-gradient-to-r from-sb-dark/80 via-sb-dark/50 to-transparent"></div>
         </div>
-        <div class="relative z-10 max-w-7xl mx-auto px-4 text-white text-center">
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white text-center">
             <div class="max-w-3xl mx-auto animate-fade-in">
                 <span class="inline-block px-6 py-2 bg-sb-rose/20 text-sb-rose-soft rounded-full text-sm font-medium mb-6 backdrop-blur-sm">💐 Desde 2010 en Costa Rica</span>
                 <h2 class="font-serif text-4xl md:text-6xl lg:text-7xl leading-tight mb-6">Flores que cuentan<br><span class="italic text-sb-rose-soft">tu historia</span></h2>
-                <p class="text-lg md:text-xl text-gray-200 mb-10 max-w-xl mx-auto">Arreglos frescos, entrega el mismo día en Santa Bárbara, Heredia.</p>
+                <p class="text-lg md:text-xl text-gray-200 mb-10 max-w-xl mx-auto">Arreglos frescos, entrega el mismo día en Santa Bárbara, Heredia. Cada flor seleccionada a mano para tus momentos especiales.</p>
                 <div class="flex flex-wrap justify-center gap-4">
-                    <a href="#catalogo" class="inline-flex items-center gap-2 bg-sb-rose hover:bg-rose-700 text-white px-8 py-4 rounded-full font-semibold">Ver Catálogo <i class="fas fa-arrow-right"></i></a>
-                    <a href="https://wa.me/50686053613" target="_blank" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur text-white border-2 border-white/30 px-8 py-4 rounded-full font-semibold"><i class="fab fa-whatsapp text-green-400"></i> WhatsApp Directo</a>
+                    <a href="#catalogo" class="inline-flex items-center gap-2 bg-sb-rose hover:bg-rose-700 text-white px-8 py-4 rounded-full font-semibold transition-all transform hover:scale-105 shadow-lg">Ver Catálogo <i class="fas fa-arrow-right"></i></a>
+                    <a href="https://wa.me/50686053613" target="_blank" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur text-white border-2 border-white/30 px-8 py-4 rounded-full font-semibold transition-all"><i class="fab fa-whatsapp text-green-400"></i> WhatsApp Directo</a>
                 </div>
             </div>
         </div>
@@ -110,26 +114,27 @@
                 <p class="text-gray-600 max-w-2xl mx-auto">Explora por categoría o todos nuestros arreglos frescos</p>
             </div>
 
-            <!-- Loading -->
+            <!-- Loading (oculto por defecto) -->
             <div id="loadingCatalogo" class="text-center py-12 hidden">
                 <div class="spinner mx-auto mb-4"></div>
                 <p class="text-gray-600">Cargando catálogo...</p>
             </div>
 
             <div class="flex flex-wrap gap-3 justify-center mb-10 overflow-x-auto pb-4 hidden" id="filtros"></div>
+
             <div id="productosGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6"></div>
             
             <!-- Mensaje si no hay productos -->
-            <div id="mensajeVacio" class="hidden text-center py-12">
+            <div id="mensajeVacio" class="text-center py-12">
                 <p class="text-gray-600 text-lg mb-4">No hay productos disponibles en este momento.</p>
                 <a href="admin.html" class="inline-block bg-sb-green text-white px-6 py-3 rounded-xl hover:bg-sb-green-light transition">Ir al Panel Admin</a>
             </div>
         </div>
     </section>
 
-    <!-- Footer (igual) -->
+    <!-- Footer -->
     <footer class="bg-sb-dark text-white pt-16 pb-8">
-        <div class="max-w-7xl mx-auto px-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid md:grid-cols-4 gap-8 mb-12">
                 <div><span class="text-2xl">🌸</span><span class="font-serif text-xl font-bold ml-2">Santa Bárbara</span><p class="text-gray-400 text-sm mt-4">Flores frescas desde 2010.</p></div>
                 <div><h4 class="font-semibold mb-4">Enlaces</h4><ul class="space-y-2 text-gray-400 text-sm"><li><a href="#" class="hover:text-white">Inicio</a></li><li><a href="#catalogo" class="hover:text-white">Catálogo</a></li><li><a href="carrito.html" class="hover:text-white">Carrito</a></li><li><a href="admin.html" class="hover:text-white">Admin</a></li></ul></div>
@@ -145,19 +150,21 @@
 
     <script>
         // ============================================
-        // VARIABLES - USANDO LOCALSTORAGE (no IndexedDB)
+        // VARIABLES - USANDO LOCALSTORAGE
         // ============================================
-        const STORAGE_KEY = 'floristeria_completa'; // MISMA KEY QUE USA EL ADMIN
+        const STORAGE_KEY = 'floristeria_completa';
         const CART_KEY = 'sb_carrito';
         
         let productos = [];
         let categorias = [];
 
         // ============================================
-        // CARGAR DATOS DESDE LOCALSTORAGE
+        // CARGAR DATOS
         // ============================================
         function cargarDatos() {
+            // Mostrar loading
             document.getElementById('loadingCatalogo').classList.remove('hidden');
+            document.getElementById('mensajeVacio').classList.add('hidden');
             
             try {
                 const guardado = localStorage.getItem(STORAGE_KEY);
@@ -170,7 +177,6 @@
                     categorias = datos.categorias?.filter(c => c.activa !== false) || [];
                     
                     console.log('✅ Productos cargados:', productos.length);
-                    console.log('✅ Categorías cargadas:', categorias.length);
                 } else {
                     console.log('📭 No hay datos guardados');
                     productos = [];
@@ -182,6 +188,7 @@
                 if (productos.length === 0) {
                     document.getElementById('mensajeVacio').classList.remove('hidden');
                     document.getElementById('filtros').classList.add('hidden');
+                    document.getElementById('productosGrid').innerHTML = '';
                 } else {
                     document.getElementById('mensajeVacio').classList.add('hidden');
                     document.getElementById('filtros').classList.remove('hidden');
@@ -194,13 +201,10 @@
             } catch (error) {
                 console.error('Error:', error);
                 document.getElementById('loadingCatalogo').classList.add('hidden');
-                document.getElementById('productosGrid').innerHTML = '<p class="col-span-full text-center py-12">Error al cargar el catálogo</p>';
+                document.getElementById('mensajeVacio').classList.remove('hidden');
             }
         }
 
-        // ============================================
-        // RENDERIZADO
-        // ============================================
         function renderizarFiltros() {
             const container = document.getElementById('filtros');
             container.innerHTML = `
@@ -213,7 +217,6 @@
         }
 
         function filtrar(categoria) {
-            // Actualizar botones
             document.querySelectorAll('.filtro-btn').forEach(btn => {
                 if (btn.dataset.cat === categoria) {
                     btn.classList.remove('border-gray-300');
@@ -228,7 +231,7 @@
             const container = document.getElementById('productosGrid');
             
             if (filtrados.length === 0) {
-                container.innerHTML = '<p class="col-span-full text-center py-12">No hay productos en esta categoría</p>';
+                container.innerHTML = '<p class="col-span-full text-center py-12 text-gray-600">No hay productos en esta categoría</p>';
                 return;
             }
 
@@ -260,9 +263,6 @@
             }).join('');
         }
 
-        // ============================================
-        // CARRITO (igual)
-        // ============================================
         function agregarAlCarrito(id) {
             const producto = productos.find(p => p.id === id);
             if (!producto) return;
@@ -316,15 +316,9 @@
             document.getElementById('mobileMenu').classList.toggle('hidden');
         }
 
-        // ============================================
-        // INICIALIZACIÓN
-        // ============================================
-        document.addEventListener('DOMContentLoaded', () => {
-            cargarDatos();
-            
-            // Recargar cada vez que se vuelve a la página (por si cambió en admin)
-            window.addEventListener('focus', cargarDatos);
-        });
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', cargarDatos);
+        window.addEventListener('focus', cargarDatos); // Recarga al volver a la pestaña
     </script>
 </body>
 </html>
