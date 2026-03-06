@@ -325,9 +325,19 @@
             document.getElementById('mobileMenu').classList.toggle('hidden');
         }
 
-        // Inicialización
-        document.addEventListener('DOMContentLoaded', cargarDatos);
-        window.addEventListener('focus', cargarDatos); // Recarga al volver a la pestaña
+        // Inicialización - VERSIÓN CORREGIDA
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Página cargada, iniciando catálogo...');
+            cargarDatos();
+        });
+
+        // Respaldo: si por alguna razón no se ejecutó, intentar de nuevo
+        setTimeout(function() {
+            if (document.getElementById('productosGrid').children.length === 0) {
+                console.log('⚠️ Timeout: recargando datos...');
+                cargarDatos();
+            }
+        }, 1000);
     </script>
 </body>
 </html>
