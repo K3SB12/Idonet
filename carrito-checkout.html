@@ -34,100 +34,144 @@
     </script>
 
     <style>
-        #map { height: 380px; border-radius: 1rem; }
+        #map { height: 380px; border-radius: 1rem; z-index: 1; }
         @media (max-width: 640px) { #map { height: 300px; } }
-        .step-active { @apply bg-sb-green text-white; }
-        .step-completed { @apply bg-sb-green-light text-white; }
-        .step-pending { @apply bg-gray-200 text-gray-600; }
+        .step-active { background-color: #2D5A3D; color: white; }
+        .step-completed { background-color: #4A7C59; color: white; }
+        .step-pending { background-color: #e5e7eb; color: #6b7280; }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-pulse-soft { animation: pulseSoft 2s infinite; }
+        @keyframes pulseSoft { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
     </style>
 </head>
 <body class="font-sans bg-sb-cream text-sb-dark min-h-screen">
     <!-- Header -->
     <header class="fixed w-full top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm">
         <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-            <a href="index.html" class="flex items-center gap-3">
+            <a href="index.html" class="flex items-center gap-3 group">
                 <span class="text-3xl animate-float">🌸</span>
-                <h1 class="font-serif text-xl font-bold text-sb-green">Santa Bárbara</h1>
+                <h1 class="font-serif text-xl font-bold text-sb-green group-hover:text-sb-green-light transition-colors">Santa Bárbara</h1>
             </a>
-            <a href="index.html" class="text-sb-green hover:text-sb-green-light font-medium">
-                ← Seguir comprando
+            <a href="index.html" class="text-sb-green hover:text-sb-green-light font-medium transition-colors flex items-center gap-2">
+                <i class="fas fa-arrow-left"></i> Seguir comprando
             </a>
         </div>
     </header>
 
     <main class="pt-24 max-w-4xl mx-auto px-4 sm:px-6 pb-20">
-        <h1 class="font-serif text-3xl md:text-4xl text-center mb-10">Finalizar tu pedido</h1>
+        <h1 class="font-serif text-3xl md:text-4xl text-center mb-8">Finalizar tu pedido</h1>
 
-        <!-- Progress -->
-        <div class="flex justify-center items-center gap-3 md:gap-6 mb-10 flex-wrap">
+        <!-- Progress Steps -->
+        <div class="flex justify-center items-center gap-2 md:gap-6 mb-10 flex-wrap">
             <div class="flex items-center gap-2">
-                <div id="step1" class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg step-active">1</div>
-                <span class="hidden sm:inline font-medium">Carrito</span>
+                <div id="step1" class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg step-active transition-all">1</div>
+                <span class="hidden sm:inline font-medium text-sm">Carrito</span>
             </div>
-            <div class="hidden sm:block w-16 h-0.5 bg-gray-300"></div>
+            <div class="hidden sm:block w-12 h-0.5 bg-gray-300"></div>
             <div class="flex items-center gap-2">
-                <div id="step2" class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg step-pending">2</div>
-                <span class="hidden sm:inline font-medium">Entrega</span>
+                <div id="step2" class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg step-pending transition-all">2</div>
+                <span class="hidden sm:inline font-medium text-sm text-gray-500">Entrega</span>
             </div>
-            <div class="hidden sm:block w-16 h-0.5 bg-gray-300"></div>
+            <div class="hidden sm:block w-12 h-0.5 bg-gray-300"></div>
             <div class="flex items-center gap-2">
-                <div id="step3" class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg step-pending">3</div>
-                <span class="hidden sm:inline font-medium">Confirmar</span>
+                <div id="step3" class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg step-pending transition-all">3</div>
+                <span class="hidden sm:inline font-medium text-sm text-gray-500">Confirmar</span>
             </div>
         </div>
 
         <!-- Paso 1: Carrito -->
-        <div id="stepContent1" class="bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-10">
-            <h2 class="font-serif text-2xl md:text-3xl mb-6 text-center md:text-left">Tu carrito</h2>
-            <div id="carritoItems" class="space-y-6 mb-8"></div>
+        <div id="stepContent1" class="bg-white rounded-2xl shadow-lg p-6 md:p-8 mb-6 animate-fade-in border border-gray-100">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="font-serif text-2xl font-bold">Tu carrito</h2>
+                <button onclick="vaciarCarrito()" class="text-red-600 hover:text-red-800 text-sm font-medium">
+                    <i class="fas fa-trash mr-1"></i>Vaciar
+                </button>
+            </div>
+            
+            <div id="carritoItems" class="space-y-4 mb-8"></div>
 
-            <div class="bg-sb-cream rounded-xl p-6">
+            <div id="carritoVacio" class="hidden text-center py-12 text-gray-500">
+                <i class="fas fa-shopping-bag text-5xl mb-4 text-gray-300"></i>
+                <p class="text-lg mb-4">Tu carrito está vacío</p>
+                <a href="index.html" class="inline-block bg-sb-green text-white px-6 py-3 rounded-xl hover:bg-sb-green-light transition">
+                    Ver catálogo
+                </a>
+            </div>
+
+            <div id="resumenCarrito" class="bg-sb-cream rounded-xl p-6 border border-gray-200">
                 <div class="flex justify-between text-lg mb-3">
-                    <span class="text-gray-700">Subtotal productos:</span>
-                    <span id="subtotal">₡0</span>
+                    <span class="text-gray-700">Subtotal:</span>
+                    <span id="subtotal" class="font-medium">₡0</span>
                 </div>
-                <div id="filaExpress" class="flex justify-between text-lg hidden">
+                <div id="filaExpress" class="flex justify-between text-lg mb-3 hidden">
                     <span class="text-gray-700">Envío express:</span>
-                    <span id="costoExpress">₡0</span>
+                    <span id="costoExpressDisplay" class="font-medium">₡0</span>
                 </div>
-                <div class="border-t border-gray-300 pt-4 mt-4 flex justify-between text-2xl font-bold">
-                    <span>Total a pagar:</span>
+                <div class="border-t-2 border-gray-300 pt-4 mt-4 flex justify-between text-2xl font-bold">
+                    <span>Total:</span>
                     <span id="totalFinal" class="text-sb-green">₡0</span>
                 </div>
             </div>
 
-            <button onclick="goToStep(2)" class="w-full mt-8 bg-sb-green text-white py-4 rounded-xl font-bold text-lg hover:bg-sb-green-light transition flex items-center justify-center gap-2">
-                Continuar a entrega <i class="fas fa-arrow-right"></i>
+            <button onclick="goToStep(2)" id="btnContinuar" class="w-full mt-8 bg-sb-green text-white py-4 rounded-xl font-bold text-lg hover:bg-sb-green-light transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                Continuar <i class="fas fa-arrow-right"></i>
             </button>
         </div>
 
         <!-- Paso 2: Datos y entrega -->
-        <div id="stepContent2" class="hidden bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-10">
-            <h2 class="font-serif text-2xl md:text-3xl mb-6 text-center md:text-left">Datos de entrega</h2>
+        <div id="stepContent2" class="hidden bg-white rounded-2xl shadow-lg p-6 md:p-8 mb-6 animate-fade-in border border-gray-100">
+            <h2 class="font-serif text-2xl font-bold mb-6">Datos de entrega</h2>
 
-            <div class="space-y-6">
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Nombre completo *</label>
-                        <input type="text" id="nombre" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none" placeholder="Ej: María López">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono *</label>
-                        <input type="tel" id="telefono" required pattern="[0-9]{8}" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none" placeholder="8888-8888">
+            <div class="space-y-5">
+                <!-- Quién compra -->
+                <div class="bg-blue-50 p-4 rounded-xl border border-blue-200">
+                    <h3 class="font-semibold text-blue-900 mb-3"><i class="fas fa-user mr-2"></i>Datos de quien compra</h3>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tu nombre completo *</label>
+                            <input type="text" id="nombreComprador" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors" placeholder="Ej: María Fernández">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tu teléfono *</label>
+                            <input type="tel" id="telefonoComprador" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors" placeholder="8888-8888">
+                        </div>
                     </div>
                 </div>
 
-                <div class="grid md:grid-cols-2 gap-6">
+                <!-- Quién recibe -->
+                <div class="bg-purple-50 p-4 rounded-xl border border-purple-200">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-semibold text-purple-900"><i class="fas fa-gift mr-2"></i>Datos de quien recibe</h3>
+                        <label class="flex items-center gap-2 cursor-pointer text-sm">
+                            <input type="checkbox" id="mismoReceptor" onchange="toggleReceptor()" class="rounded text-sb-green focus:ring-sb-green">
+                            <span>Es la misma persona</span>
+                        </label>
+                    </div>
+                    
+                    <div id="datosReceptor" class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nombre de quien recibe *</label>
+                            <input type="text" id="nombreReceptor" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors" placeholder="Ej: Ana López">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono de quien recibe *</label>
+                            <input type="tel" id="telefonoReceptor" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors" placeholder="7777-7777">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-5">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de entrega *</label>
-                        <input type="date" id="fecha" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none">
+                        <input type="date" id="fecha" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Horario preferido</label>
-                        <select id="horario" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none">
+                        <select id="horario" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors bg-white">
                             <option value="cualquiera">Cualquiera</option>
-                            <option value="manana">Mañana (8am-12pm)</option>
-                            <option value="tarde">Tarde (12pm-6pm)</option>
+                            <option value="manana">Mañana (8am - 12pm)</option>
+                            <option value="tarde">Tarde (12pm - 6pm)</option>
                             <option value="noche">Noche (después 6pm)</option>
                         </select>
                     </div>
@@ -135,172 +179,263 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Mensaje para la tarjeta (opcional)</label>
-                    <textarea id="mensajeTarjeta" rows="3" maxlength="150" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none" placeholder="Ej: Feliz cumpleaños, te quiero mucho. Con amor, Juan."></textarea>
+                    <textarea id="mensajeTarjeta" rows="2" maxlength="200" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors resize-none" placeholder="Ej: Feliz cumpleaños, te quiero mucho..."></textarea>
+                    <p class="text-xs text-gray-500 mt-1">Máximo 200 caracteres</p>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Observaciones / Instrucciones</label>
-                    <textarea id="observaciones" rows="2" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none" placeholder="Ej: Dejar en portería, llamar antes..."></textarea>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Observaciones / Instrucciones especiales</label>
+                    <textarea id="observaciones" rows="2" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors resize-none" placeholder="Ej: Tocar timbre, dejar en portería, llamar antes..."></textarea>
                 </div>
 
-                <div class="mt-8">
-                    <h3 class="text-xl font-semibold mb-4">Tipo de entrega</h3>
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <label class="cursor-pointer">
+                <!-- Tipo de entrega -->
+                <div class="pt-4">
+                    <h3 class="text-lg font-semibold mb-4">Tipo de entrega</h3>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <label class="cursor-pointer relative">
                             <input type="radio" name="tipoEntrega" value="recogida" class="hidden peer" onchange="toggleEntrega()">
-                            <div class="p-6 rounded-xl border-2 border-gray-300 peer-checked:border-sb-green peer-checked:bg-sb-green/10 text-center transition-all">
-                                <i class="fas fa-store text-4xl text-sb-green mb-3"></i>
-                                <h4 class="font-semibold">Recoger en tienda</h4>
-                                <p class="text-sm text-gray-600">Sin costo adicional</p>
+                            <div class="p-5 rounded-xl border-2 border-gray-200 peer-checked:border-sb-green peer-checked:bg-sb-green/5 hover:border-gray-300 transition-all text-center h-full">
+                                <i class="fas fa-store text-3xl text-sb-green mb-3"></i>
+                                <h4 class="font-semibold text-gray-800">Recoger en tienda</h4>
+                                <p class="text-sm text-gray-600 mt-1">Sin costo adicional</p>
+                            </div>
+                            <div class="absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-gray-300 peer-checked:border-sb-green peer-checked:bg-sb-green flex items-center justify-center">
+                                <i class="fas fa-check text-white text-xs opacity-0 peer-checked:opacity-100"></i>
                             </div>
                         </label>
-                        <label class="cursor-pointer">
+                        
+                        <label class="cursor-pointer relative">
                             <input type="radio" name="tipoEntrega" value="express" class="hidden peer" checked onchange="toggleEntrega()">
-                            <div class="p-6 rounded-xl border-2 border-sb-green bg-sb-green/10 text-center transition-all">
-                                <i class="fas fa-truck text-4xl text-sb-green mb-3"></i>
-                                <h4 class="font-semibold">Express a domicilio</h4>
-                                <p class="text-sm text-gray-600">₡650 por km</p>
+                            <div class="p-5 rounded-xl border-2 border-sb-green bg-sb-green/5 hover:bg-sb-green/10 transition-all text-center h-full">
+                                <i class="fas fa-truck text-3xl text-sb-green mb-3"></i>
+                                <h4 class="font-semibold text-gray-800">Express a domicilio</h4>
+                                <p class="text-sm text-gray-600 mt-1">₡650 por km</p>
+                            </div>
+                            <div class="absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-sb-green bg-sb-green flex items-center justify-center">
+                                <i class="fas fa-check text-white text-xs"></i>
                             </div>
                         </label>
                     </div>
                 </div>
 
-                <div id="seccionExpress" class="mt-8">
-                    <p class="text-gray-700 mb-4 font-medium">Toca en el mapa para marcar la ubicación exacta</p>
-                    <div id="map" class="shadow-lg border border-gray-200"></div>
-                    <div id="infoExpress" class="hidden mt-4 bg-sb-cream p-6 rounded-xl">
-                        <div class="flex justify-between text-lg mb-3">
-                            <span>Distancia aproximada:</span>
-                            <span id="distanciaTexto" class="font-bold">0 km</span>
+                <!-- Sección Express -->
+                <div id="seccionExpress" class="mt-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Ubicación en el mapa *</label>
+                    <p class="text-sm text-gray-500 mb-3">Toca en el mapa para marcar la dirección de entrega</p>
+                    <div id="map" class="shadow-lg border-2 border-gray-200 rounded-xl"></div>
+                    
+                    <div id="infoExpress" class="hidden mt-4 bg-sb-cream p-4 rounded-xl border border-gray-200">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-gray-700">Distancia:</span>
+                            <span id="distanciaTexto" class="font-bold text-lg">0 km</span>
                         </div>
-                        <div class="flex justify-between text-2xl font-bold">
+                        <div class="flex justify-between items-center text-xl font-bold text-sb-green">
                             <span>Costo envío:</span>
-                            <span id="costoExpress" class="text-sb-green">₡0</span>
+                            <span id="costoExpress">₡0</span>
                         </div>
                     </div>
-                    <div class="mt-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Referencias de dirección *</label>
-                        <textarea id="referencias" rows="3" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none" placeholder="Ej: Condominio Las Flores, torre 3, apto 502. Tocar timbre 3 veces. Portería 24h."></textarea>
+
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Referencias de dirección exacta *</label>
+                        <textarea id="referencias" rows="3" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors resize-none" placeholder="Ej: Condominio Las Flores, torre 3, apartamento 502. Portón negro, timbre 502."></textarea>
                     </div>
                 </div>
 
-                <div id="seccionRecogida" class="hidden mt-8 bg-sb-cream p-6 rounded-xl text-center">
-                    <i class="fas fa-map-marker-alt text-5xl text-sb-green mb-4"></i>
-                    <h3 class="text-xl font-semibold mb-2">Recogida en tienda</h3>
-                    <p class="text-gray-600 mb-4">San José, Costa Rica<br>Dirección exacta y horario se confirmarán por WhatsApp</p>
-                    <a href="https://maps.google.com/?q=9.9281,-84.0907" target="_blank" class="text-sb-green underline font-medium">Ver ubicación aproximada</a>
+                <!-- Sección Recogida -->
+                <div id="seccionRecogida" class="hidden mt-6 bg-sb-cream p-6 rounded-xl border border-gray-200 text-center">
+                    <i class="fas fa-map-marker-alt text-4xl text-sb-green mb-3"></i>
+                    <h3 class="text-lg font-semibold mb-2">Recogida en tienda</h3>
+                    <p class="text-gray-600 text-sm mb-4">San José, Costa Rica<br>La dirección exacta se confirmará por WhatsApp</p>
+                    <a href="https://maps.google.com/?q=9.9281,-84.0907" target="_blank" class="text-sb-green underline font-medium text-sm hover:text-sb-green-light">
+                        Ver ubicación aproximada en Google Maps
+                    </a>
                 </div>
             </div>
 
-            <div class="flex flex-col sm:flex-row gap-4 mt-10">
-                <button onclick="goToStep(1)" class="flex-1 py-4 rounded-xl border-2 border-gray-300 text-gray-700 font-bold hover:bg-gray-50 transition">
-                    Volver al carrito
+            <div class="flex flex-col sm:flex-row gap-3 mt-8">
+                <button onclick="goToStep(1)" class="flex-1 py-4 rounded-xl border-2 border-gray-300 text-gray-700 font-bold hover:bg-gray-50 transition-all duration-200">
+                    <i class="fas fa-arrow-left mr-2"></i>Volver
                 </button>
-                <button onclick="goToStep(3)" class="flex-1 bg-sb-green text-white py-4 rounded-xl font-bold hover:bg-sb-green-light transition">
-                    Confirmar pedido <i class="fas fa-arrow-right ml-2"></i>
+                <button onclick="goToStep(3)" class="flex-1 bg-sb-green text-white py-4 rounded-xl font-bold hover:bg-sb-green-light transition-all duration-200 shadow-md hover:shadow-lg">
+                    Revisar pedido <i class="fas fa-arrow-right ml-2"></i>
                 </button>
             </div>
         </div>
 
         <!-- Paso 3: Confirmación -->
-        <div id="stepContent3" class="hidden bg-white rounded-2xl shadow-xl p-6 md:p-8">
-            <h2 class="font-serif text-2xl md:text-3xl mb-6 text-center">Confirma tu pedido</h2>
+        <div id="stepContent3" class="hidden bg-white rounded-2xl shadow-lg p-6 md:p-8 animate-fade-in border border-gray-100">
+            <h2 class="font-serif text-2xl font-bold mb-6 text-center">Confirma tu pedido</h2>
 
-            <div class="bg-sb-cream rounded-xl p-6 mb-8">
-                <h3 class="text-xl font-semibold mb-4">Resumen</h3>
-                <div id="resumenProductos" class="space-y-4 mb-6"></div>
+            <!-- Resumen de productos -->
+            <div class="bg-sb-cream rounded-xl p-6 mb-6 border border-gray-200">
+                <h3 class="text-lg font-semibold mb-4 text-gray-800">Productos</h3>
+                <div id="resumenProductos" class="space-y-3 mb-6 max-h-60 overflow-y-auto"></div>
 
-                <div class="space-y-3 text-lg">
+                <div class="space-y-2 text-base border-t border-gray-300 pt-4">
                     <div class="flex justify-between">
-                        <span class="text-gray-700">Subtotal productos:</span>
-                        <span id="resumenSubtotal">₡0</span>
+                        <span class="text-gray-700">Subtotal:</span>
+                        <span id="resumenSubtotal" class="font-medium">₡0</span>
                     </div>
                     <div id="filaExpressResumen" class="flex justify-between hidden">
-                        <span class="text-gray-700">Envío express (<span id="resumenDistancia">0</span> km):</span>
-                        <span id="resumenExpress">₡0</span>
+                        <span class="text-gray-700">Envío (<span id="resumenDistancia">0</span> km):</span>
+                        <span id="resumenExpress" class="font-medium">₡0</span>
                     </div>
-                    <div class="border-t border-gray-300 pt-4 mt-4 flex justify-between text-2xl font-bold">
+                    <div class="border-t-2 border-gray-300 pt-3 mt-3 flex justify-between text-2xl font-bold text-sb-green">
                         <span>Total a pagar:</span>
-                        <span id="resumenTotal" class="text-sb-green">₡0</span>
+                        <span id="resumenTotal">₡0</span>
                     </div>
                 </div>
             </div>
 
-            <div class="mb-8">
-                <h3 class="text-xl font-semibold mb-4">Método de pago</h3>
-                <div class="space-y-4">
-                    <label class="flex items-center gap-3 p-4 rounded-xl border-2 border-sb-green bg-sb-green/5 cursor-pointer">
-                        <input type="radio" name="pago" value="sinpe" checked class="w-5 h-5 text-sb-green">
-                        <div>
-                            <span class="font-bold">SINPE Móvil</span>
-                            <p class="text-sm text-gray-600">Transferencia al 8605-3613</p>
+            <!-- Datos de entrega resumen -->
+            <div class="bg-gray-50 rounded-xl p-6 mb-6 border border-gray-200">
+                <h3 class="text-lg font-semibold mb-4 text-gray-800">Datos de entrega</h3>
+                <div id="resumenEntrega" class="space-y-2 text-sm text-gray-700">
+                    <!-- Se llena con JavaScript -->
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold mb-4 text-gray-800">Método de pago</h3>
+                <div class="space-y-3">
+                    <label class="flex items-center gap-4 p-4 rounded-xl border-2 border-sb-green bg-sb-green/5 cursor-pointer transition-all">
+                        <input type="radio" name="pago" value="sinpe" checked class="w-5 h-5 text-sb-green accent-sb-green">
+                        <div class="flex-1">
+                            <span class="font-bold text-gray-800 block">SINPE Móvil</span>
+                            <p class="text-sm text-gray-600">Transferencia al número de la floristería</p>
                         </div>
+                        <i class="fas fa-mobile-alt text-2xl text-sb-green"></i>
                     </label>
-                    <label class="flex items-center gap-3 p-4 rounded-xl border-2 border-gray-300 cursor-pointer">
-                        <input type="radio" name="pago" value="efectivo" class="w-5 h-5 text-sb-green">
-                        <div>
-                            <span class="font-bold">Efectivo contra entrega</span>
-                            <p class="text-sm text-gray-600">Solo para recogida en tienda</p>
+                    
+                    <label class="flex items-center gap-4 p-4 rounded-xl border-2 border-gray-200 cursor-pointer hover:border-gray-300 transition-all">
+                        <input type="radio" name="pago" value="efectivo" class="w-5 h-5 text-sb-green accent-sb-green">
+                        <div class="flex-1">
+                            <span class="font-bold text-gray-800 block">Efectivo</span>
+                            <p class="text-sm text-gray-600">Solo disponible para recogida en tienda</p>
                         </div>
+                        <i class="fas fa-money-bill-wave text-2xl text-gray-400"></i>
                     </label>
                 </div>
             </div>
 
-            <label class="flex items-start gap-3 mb-6">
-                <input type="checkbox" id="terminos" required class="mt-1 w-5 h-5 text-sb-green rounded">
-                <span class="text-sm text-gray-600">Confirmo que los datos son correctos y acepto que el pedido se procesará por WhatsApp. No hay reserva hasta confirmar pago.</span>
+            <!-- Email para copia (opcional) -->
+            <div class="mb-6 bg-yellow-50 p-4 rounded-xl border border-yellow-200">
+                <label class="flex items-start gap-3 cursor-pointer">
+                    <input type="checkbox" id="enviarCopiaEmail" class="mt-1 w-5 h-5 text-sb-green rounded border-gray-300 accent-sb-green">
+                    <div>
+                        <span class="font-medium text-gray-800 block">Enviar copia del pedido por email</span>
+                        <p class="text-sm text-gray-600 mb-2">Recibe una copia en tu correo electrónico</p>
+                        <input type="email" id="emailCopia" placeholder="tu@email.com" class="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:border-sb-green focus:outline-none">
+                    </div>
+                </label>
+            </div>
+
+            <label class="flex items-start gap-3 mb-6 cursor-pointer">
+                <input type="checkbox" id="terminos" required class="mt-1 w-5 h-5 text-sb-green rounded border-gray-300 accent-sb-green">
+                <span class="text-sm text-gray-600 leading-relaxed">
+                    Confirmo que los datos son correctos. Entiendo que el pedido se procesará por WhatsApp y debo confirmar el pago para que sea válido.
+                </span>
             </label>
 
-            <button onclick="enviarPedido()" class="w-full bg-green-600 hover:bg-green-700 text-white py-5 rounded-xl font-bold text-xl transition flex items-center justify-center gap-3 shadow-lg">
-                <i class="fab fa-whatsapp text-2xl"></i>
+            <button onclick="enviarPedido()" class="w-full bg-green-600 hover:bg-green-700 text-white py-5 rounded-xl font-bold text-xl transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 animate-pulse-soft">
+                <i class="fab fa-whatsapp text-3xl"></i>
                 Enviar pedido por WhatsApp
             </button>
 
-            <p class="text-center text-sm text-gray-500 mt-6">
-                <i class="fas fa-lock mr-1"></i>Serás redirigido a WhatsApp con todos los detalles del pedido
+            <p class="text-center text-sm text-gray-500 mt-4">
+                <i class="fas fa-lock mr-1"></i>Serás redirigido a WhatsApp con todos los detalles
             </p>
+
+            <button onclick="goToStep(2)" class="w-full mt-4 py-3 text-gray-500 hover:text-gray-700 font-medium transition-colors">
+                ← Volver a datos de entrega
+            </button>
         </div>
     </main>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         const CART_KEY = 'sb_carrito';
-        const CONFIG = {
-            whatsapp: '50686053613',
-            tarifaExpress: 650,
-            floristeria: { lat: 9.9281, lng: -84.0907 }
-        };
-
+        const DATA_KEY = 'floristeria_datos';
+        const PEDIDOS_KEY = 'sb_pedidos_historial'; // Para guardar en admin
+        
         let carrito = [];
+        let config = { whatsapp: '50686053613', tarifaExpress: 650, email: '' };
         let map = null;
         let marker = null;
         let paso = 1;
+        let costoExpress = 0;
+        let distanciaKm = 0;
+
+        const FLORISTERIA = { lat: 9.9281, lng: -84.0907 };
+
+        function cargarDatos() {
+            const datosGuardados = localStorage.getItem(DATA_KEY);
+            if (datosGuardados) {
+                const datos = JSON.parse(datosGuardados);
+                config = { ...config, ...datos.config };
+            }
+            
+            cargarCarrito();
+            
+            const manana = new Date();
+            manana.setDate(manana.getDate() + 1);
+            const fechaStr = manana.toISOString().split('T')[0];
+            document.getElementById('fecha').min = fechaStr;
+            document.getElementById('fecha').value = fechaStr;
+        }
+
+        function toggleReceptor() {
+            const esMismo = document.getElementById('mismoReceptor').checked;
+            const datosReceptor = document.getElementById('datosReceptor');
+            
+            if (esMismo) {
+                datosReceptor.classList.add('opacity-50', 'pointer-events-none');
+                document.getElementById('nombreReceptor').required = false;
+                document.getElementById('telefonoReceptor').required = false;
+            } else {
+                datosReceptor.classList.remove('opacity-50', 'pointer-events-none');
+                document.getElementById('nombreReceptor').required = true;
+                document.getElementById('telefonoReceptor').required = true;
+            }
+        }
 
         function cargarCarrito() {
             carrito = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+            const container = document.getElementById('carritoItems');
+            const vacio = document.getElementById('carritoVacio');
+            const resumen = document.getElementById('resumenCarrito');
+            const btnContinuar = document.getElementById('btnContinuar');
+
             if (carrito.length === 0) {
-                document.getElementById('carritoItems').innerHTML = '<p class="text-center text-gray-600 py-12 text-lg">Tu carrito está vacío. <a href="index.html" class="text-sb-green underline">Ver catálogo</a></p>';
+                container.innerHTML = '';
+                vacio.classList.remove('hidden');
+                resumen.classList.add('hidden');
+                btnContinuar.disabled = true;
                 return;
             }
 
-            document.getElementById('carritoItems').innerHTML = carrito.map((item, i) => `
-                <div class="flex flex-col sm:flex-row gap-4 items-center bg-white p-4 rounded-xl shadow-sm">
-                    <img src="${item.imagen}" class="w-24 h-24 object-cover rounded-lg" alt="${item.nombre}">
-                    <div class="flex-1">
-                        <h3 class="font-medium text-lg">${item.nombre}</h3>
-                        <p class="text-sb-green">₡${item.precioUnitario.toLocaleString()} c/u</p>
-                        <div class="flex items-center gap-4 mt-3 flex-wrap">
-                            <div class="flex border rounded-lg overflow-hidden">
-                                <button onclick="cambiarCantidad(${i}, -1)" class="px-4 py-2 bg-gray-100 hover:bg-gray-200">-</button>
-                                <span class="px-6 py-2 font-medium">${item.cantidad}</span>
-                                <button onclick="cambiarCantidad(${i}, 1)" class="px-4 py-2 bg-gray-100 hover:bg-gray-200">+</button>
+            vacio.classList.add('hidden');
+            resumen.classList.remove('hidden');
+            btnContinuar.disabled = false;
+
+            container.innerHTML = carrito.map((item, i) => `
+                <div class="flex gap-4 items-center bg-gray-50 p-4 rounded-xl border border-gray-100">
+                    <img src="${item.imagen}" class="w-20 h-20 object-cover rounded-lg border border-gray-200" onerror="this.src='https://via.placeholder.com/80?text=Producto'">
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-medium text-gray-900 truncate">${item.nombre}</h3>
+                        <p class="text-sb-green font-bold">₡${item.precioUnitario.toLocaleString()}</p>
+                        <div class="flex items-center gap-3 mt-2">
+                            <div class="flex border border-gray-300 rounded-lg overflow-hidden bg-white">
+                                <button onclick="cambiarCantidad(${i}, -1)" class="px-3 py-1 hover:bg-gray-100 transition-colors">-</button>
+                                <span class="px-3 py-1 font-medium min-w-[2rem] text-center">${item.cantidad}</span>
+                                <button onclick="cambiarCantidad(${i}, 1)" class="px-3 py-1 hover:bg-gray-100 transition-colors">+</button>
                             </div>
-                            <span class="font-bold text-lg">₡${item.subtotal.toLocaleString()}</span>
-                            <button onclick="eliminarItem(${i})" class="text-red-500 hover:text-red-700 ml-auto text-xl">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                            <span class="font-bold text-gray-700">₡${item.subtotal.toLocaleString()}</span>
                         </div>
                     </div>
+                    <button onclick="eliminarItem(${i})" class="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-colors" title="Eliminar">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </div>
             `).join('');
 
@@ -308,16 +443,24 @@
         }
 
         function cambiarCantidad(index, delta) {
-            carrito[index].cantidad = Math.max(1, carrito[index].cantidad + delta);
-            carrito[index].subtotal = carrito[index].cantidad * carrito[index].precioUnitario;
+            const nuevaCantidad = carrito[index].cantidad + delta;
+            if (nuevaCantidad < 1) return;
+            
+            carrito[index].cantidad = nuevaCantidad;
+            carrito[index].subtotal = nuevaCantidad * carrito[index].precioUnitario;
             localStorage.setItem(CART_KEY, JSON.stringify(carrito));
             cargarCarrito();
         }
 
         function eliminarItem(index) {
-            if (confirm('¿Eliminar este producto?')) {
-                carrito.splice(index, 1);
-                localStorage.setItem(CART_KEY, JSON.stringify(carrito));
+            carrito.splice(index, 1);
+            localStorage.setItem(CART_KEY, JSON.stringify(carrito));
+            cargarCarrito();
+        }
+
+        function vaciarCarrito() {
+            if (confirm('¿Vaciar todo el carrito?')) {
+                localStorage.removeItem(CART_KEY);
                 cargarCarrito();
             }
         }
@@ -325,33 +468,95 @@
         function calcularTotales() {
             const subtotal = carrito.reduce((sum, item) => sum + item.subtotal, 0);
             document.getElementById('subtotal').textContent = '₡' + subtotal.toLocaleString();
-            actualizarTotalFinal(subtotal, 0);
+            actualizarTotal(subtotal);
         }
 
-        function actualizarTotalFinal(subtotal, express) {
-            const total = subtotal + express;
+        function actualizarTotal(subtotal) {
+            const tipo = document.querySelector('input[name="tipoEntrega"]:checked')?.value;
+            costoExpress = 0;
+            
+            if (tipo === 'express' && distanciaKm > 0) {
+                costoExpress = Math.round(distanciaKm * config.tarifaExpress);
+                document.getElementById('filaExpress').classList.remove('hidden');
+                document.getElementById('costoExpressDisplay').textContent = '₡' + costoExpress.toLocaleString();
+            } else {
+                document.getElementById('filaExpress').classList.add('hidden');
+            }
+            
+            const total = subtotal + costoExpress;
             document.getElementById('totalFinal').textContent = '₡' + total.toLocaleString();
         }
 
         function goToStep(nuevoPaso) {
-            if (nuevoPaso === 2 && !validarCarrito()) return;
-            if (nuevoPaso === 3 && !validarPaso2()) return;
+            if (nuevoPaso === 2 && carrito.length === 0) {
+                alert('Tu carrito está vacío');
+                return;
+            }
+            
+            if (nuevoPaso === 3 && !validarPaso2()) {
+                return;
+            }
 
             document.getElementById(`stepContent${paso}`).classList.add('hidden');
             document.getElementById(`stepContent${nuevoPaso}`).classList.remove('hidden');
-
-            document.getElementById(`step${paso}`).classList.replace('step-active', 'step-completed');
-            document.getElementById(`step${nuevoPaso}`).classList.replace('step-pending', 'step-active');
+            
+            for (let i = 1; i <= 3; i++) {
+                const stepEl = document.getElementById(`step${i}`);
+                stepEl.classList.remove('step-active', 'step-completed', 'step-pending');
+                
+                if (i < nuevoPaso) {
+                    stepEl.classList.add('step-completed');
+                    stepEl.innerHTML = '<i class="fas fa-check"></i>';
+                } else if (i === nuevoPaso) {
+                    stepEl.classList.add('step-active');
+                    stepEl.textContent = i;
+                } else {
+                    stepEl.classList.add('step-pending');
+                    stepEl.textContent = i;
+                }
+            }
 
             paso = nuevoPaso;
             window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if (paso === 3) {
+                mostrarResumen();
+            }
         }
 
-        function validarCarrito() {
-            if (carrito.length === 0) {
-                alert('Tu carrito está vacío.');
+        function validarPaso2() {
+            const nombreComprador = document.getElementById('nombreComprador').value.trim();
+            const telefonoComprador = document.getElementById('telefonoComprador').value.trim();
+            const fecha = document.getElementById('fecha').value;
+            const tipo = document.querySelector('input[name="tipoEntrega"]:checked').value;
+            const esMismoReceptor = document.getElementById('mismoReceptor').checked;
+
+            if (!nombreComprador || !telefonoComprador || !fecha) {
+                alert('Por favor completa los datos de quien compra');
                 return false;
             }
+
+            if (!esMismoReceptor) {
+                const nombreReceptor = document.getElementById('nombreReceptor').value.trim();
+                const telefonoReceptor = document.getElementById('telefonoReceptor').value.trim();
+                if (!nombreReceptor || !telefonoReceptor) {
+                    alert('Por favor completa los datos de quien recibe, o marca "Es la misma persona"');
+                    return false;
+                }
+            }
+
+            if (tipo === 'express') {
+                const referencias = document.getElementById('referencias').value.trim();
+                if (!referencias) {
+                    alert('Por favor ingresa las referencias de dirección');
+                    return false;
+                }
+                if (!marker) {
+                    alert('Por favor marca la ubicación en el mapa');
+                    return false;
+                }
+            }
+
             return true;
         }
 
@@ -359,89 +564,291 @@
             const tipo = document.querySelector('input[name="tipoEntrega"]:checked').value;
             document.getElementById('seccionExpress').classList.toggle('hidden', tipo !== 'express');
             document.getElementById('seccionRecogida').classList.toggle('hidden', tipo !== 'recogida');
-            if (tipo === 'express') setTimeout(() => map?.invalidateSize(), 100);
+            
+            if (tipo === 'express') {
+                setTimeout(() => {
+                    if (!map) inicializarMapa();
+                    map?.invalidateSize();
+                }, 100);
+            }
+            
+            calcularTotales(carrito.reduce((sum, item) => sum + item.subtotal, 0));
         }
 
         function inicializarMapa() {
-            map = L.map('map').setView([CONFIG.floristeria.lat, CONFIG.floristeria.lng], 13);
+            map = L.map('map').setView([FLORISTERIA.lat, FLORISTERIA.lng], 13);
+            
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap'
+                attribution: '© OpenStreetMap',
+                maxZoom: 19
             }).addTo(map);
 
-            L.marker([CONFIG.floristeria.lat, CONFIG.floristeria.lng]).addTo(map).bindPopup('Floristería').openPopup();
+            L.marker([FLORISTERIA.lat, FLORISTERIA.lng])
+                .addTo(map)
+                .bindPopup('Floristería Santa Bárbara')
+                .openPopup();
 
-            map.on('click', e => {
+            L.circle([FLORISTERIA.lat, FLORISTERIA.lng], {
+                color: '#2D5A3D',
+                fillColor: '#2D5A3D',
+                fillOpacity: 0.1,
+                radius: 10000
+            }).addTo(map);
+
+            map.on('click', function(e) {
                 if (marker) map.removeLayer(marker);
-                marker = L.marker(e.latlng).addTo(map).bindPopup('Tu ubicación').openPopup();
-                calcularExpress(e.latlng.lat, e.latlng.lng);
+                
+                marker = L.marker(e.latlng, { draggable: true }).addTo(map)
+                    .bindPopup('Dirección de entrega')
+                    .openPopup();
+                
+                calcularDistancia(e.latlng.lat, e.latlng.lng);
+                
+                marker.on('dragend', function(e) {
+                    const pos = e.target.getLatLng();
+                    calcularDistancia(pos.lat, pos.lng);
+                });
             });
         }
 
-        function calcularExpress(lat, lng) {
+        function calcularDistancia(lat, lng) {
             const R = 6371;
-            const dLat = (lat - CONFIG.floristeria.lat) * Math.PI / 180;
-            const dLng = (lng - CONFIG.floristeria.lng) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(CONFIG.floristeria.lat * Math.PI / 180) * Math.cos(lat * Math.PI / 180) * Math.sin(dLng/2) * Math.sin(dLng/2);
+            const dLat = (lat - FLORISTERIA.lat) * Math.PI / 180;
+            const dLon = (lng - FLORISTERIA.lng) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(FLORISTERIA.lat * Math.PI / 180) * Math.cos(lat * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            const distancia = R * c;
-            const costo = Math.round(distancia * CONFIG.tarifaExpress);
-
+            distanciaKm = R * c;
+            
+            costoExpress = Math.round(distanciaKm * config.tarifaExpress);
+            
             document.getElementById('infoExpress').classList.remove('hidden');
-            document.getElementById('distanciaTexto').textContent = distancia.toFixed(1) + ' km';
-            document.getElementById('costoExpress').textContent = '₡' + costo.toLocaleString();
+            document.getElementById('distanciaTexto').textContent = distanciaKm.toFixed(1) + ' km';
+            document.getElementById('costoExpress').textContent = '₡' + costoExpress.toLocaleString();
+            
+            calcularTotales(carrito.reduce((sum, item) => sum + item.subtotal, 0));
+        }
+
+        function mostrarResumen() {
+            const container = document.getElementById('resumenProductos');
+            container.innerHTML = carrito.map(item => `
+                <div class="flex justify-between items-center py-2 border-b border-gray-200 last:border-0">
+                    <div class="flex items-center gap-3">
+                        <span class="bg-sb-green text-white text-xs px-2 py-1 rounded-full">${item.cantidad}x</span>
+                        <span class="text-gray-700">${item.nombre}</span>
+                    </div>
+                    <span class="font-medium">₡${item.subtotal.toLocaleString()}</span>
+                </div>
+            `).join('');
+
+            const subtotal = carrito.reduce((sum, item) => sum + item.subtotal, 0);
+            document.getElementById('resumenSubtotal').textContent = '₡' + subtotal.toLocaleString();
+            
+            const tipo = document.querySelector('input[name="tipoEntrega"]:checked').value;
+            if (tipo === 'express' && distanciaKm > 0) {
+                document.getElementById('filaExpressResumen').classList.remove('hidden');
+                document.getElementById('resumenDistancia').textContent = distanciaKm.toFixed(1);
+                document.getElementById('resumenExpress').textContent = '₡' + costoExpress.toLocaleString();
+            } else {
+                document.getElementById('filaExpressResumen').classList.add('hidden');
+            }
+            
+            document.getElementById('resumenTotal').textContent = document.getElementById('totalFinal').textContent;
+
+            // Mostrar datos de entrega
+            const nombreComprador = document.getElementById('nombreComprador').value;
+            const telefonoComprador = document.getElementById('telefonoComprador').value;
+            const esMismoReceptor = document.getElementById('mismoReceptor').checked;
+            const nombreReceptor = esMismoReceptor ? nombreComprador : document.getElementById('nombreReceptor').value;
+            const telefonoReceptor = esMismoReceptor ? telefonoComprador : document.getElementById('telefonoReceptor').value;
+            const fecha = document.getElementById('fecha').value;
+            const horario = document.getElementById('horario').value;
+            const tipoEntrega = document.querySelector('input[name="tipoEntrega"]:checked').value;
+            
+            let html = `
+                <p><strong>Compra:</strong> ${nombreComprador} (${telefonoComprador})</p>
+                <p><strong>Recibe:</strong> ${nombreReceptor} (${telefonoReceptor}) ${esMismoReceptor ? '<span class="text-gray-500">(misma persona)</span>' : ''}</p>
+                <p><strong>Fecha:</strong> ${fecha} - ${horario}</p>
+                <p><strong>Entrega:</strong> ${tipoEntrega === 'express' ? 'Express a domicilio' : 'Recogida en tienda'}</p>
+            `;
+            
+            if (tipoEntrega === 'express') {
+                html += `<p><strong>Dirección:</strong> ${distanciaKm.toFixed(1)} km desde la tienda</p>`;
+            }
+            
+            document.getElementById('resumenEntrega').innerHTML = html;
         }
 
         function enviarPedido() {
             if (!document.getElementById('terminos').checked) {
-                alert('Debes aceptar los términos');
+                alert('Debes aceptar los términos para continuar');
                 return;
             }
 
-            const nombre = document.getElementById('nombre').value;
-            const telefono = document.getElementById('telefono').value;
+            // Recopilar todos los datos
+            const nombreComprador = document.getElementById('nombreComprador').value.trim();
+            const telefonoComprador = document.getElementById('telefonoComprador').value.trim();
+            const esMismoReceptor = document.getElementById('mismoReceptor').checked;
+            const nombreReceptor = esMismoReceptor ? nombreComprador : document.getElementById('nombreReceptor').value.trim();
+            const telefonoReceptor = esMismoReceptor ? telefonoComprador : document.getElementById('telefonoReceptor').value.trim();
             const fecha = document.getElementById('fecha').value;
             const horario = document.getElementById('horario').value;
-            const mensajeTarjeta = document.getElementById('mensajeTarjeta').value;
-            const observaciones = document.getElementById('observaciones').value;
+            const mensajeTarjeta = document.getElementById('mensajeTarjeta').value.trim();
+            const observaciones = document.getElementById('observaciones').value.trim();
             const tipoEntrega = document.querySelector('input[name="tipoEntrega"]:checked').value;
-            const pago = document.querySelector('input[name="pago"]:checked').value;
+            const metodoPago = document.querySelector('input[name="pago"]:checked').value;
+            const referencias = document.getElementById('referencias')?.value.trim() || '';
+            const emailCopia = document.getElementById('emailCopia').value.trim();
+            const enviarCopia = document.getElementById('enviarCopiaEmail').checked;
 
             const subtotal = carrito.reduce((sum, item) => sum + item.subtotal, 0);
-            let distancia = 0;
-            let costoExpress = 0;
-
-            if (tipoEntrega === 'express') {
-                distancia = document.getElementById('distanciaTexto').textContent.replace(' km', '');
-                costoExpress = parseInt(document.getElementById('costoExpress').textContent.replace('₡', '').replace(/,/g, '')) || 0;
-            }
-
             const total = subtotal + costoExpress;
 
-            let texto = `¡Hola Floristería Santa Bárbara! 🌸\n\n*NUEVO PEDIDO*\n━━━━━━━━━━━━━━━\n\n`;
-            texto += `*Cliente:* ${nombre} - ${telefono}\n`;
-            texto += `*Entrega:* ${fecha} - ${horario}\n`;
-            texto += tipoEntrega === 'express' ? `Express a domicilio - ${distancia} km\nReferencias: ${document.getElementById('referencias').value}\n` : `Recogida en tienda\n`;
-            texto += `*Observaciones:* ${observaciones || 'Ninguna'}\n`;
-            if (mensajeTarjeta) texto += `*Mensaje tarjeta:* ${mensajeTarjeta}\n`;
-            texto += `\n*Productos:*\n`;
+            // Crear objeto del pedido para guardar en historial
+            const pedido = {
+                id: 'PED-' + Date.now(),
+                fecha: new Date().toISOString(),
+                cliente: nombreComprador,
+                telefonoCliente: telefonoComprador,
+                receptor: nombreReceptor,
+                telefonoReceptor: telefonoReceptor,
+                fechaEntrega: fecha,
+                horario: horario,
+                productos: carrito,
+                subtotal: subtotal,
+                envio: tipoEntrega === 'express' ? costoExpress : 0,
+                total: total,
+                tipoEntrega: tipoEntrega,
+                metodoPago: metodoPago,
+                estado: 'nuevo',
+                mensajeTarjeta: mensajeTarjeta,
+                observaciones: observaciones
+            };
+
+            // Guardar en historial (para que la dueña lo vea en admin)
+            guardarPedidoEnHistorial(pedido);
+
+            // Construir mensaje de WhatsApp
+            let texto = `¡Hola! Nuevo pedido en *Floristería Santa Bárbara* 🌸\n\n`;
+            texto += `*PEDIDO:* ${pedido.id}\n`;
+            texto += `━━━━━━━━━━━━━━━━━━━━\n\n`;
+            
+            texto += `*QUIEN COMPRA:*\n`;
+            texto += `Nombre: ${nombreComprador}\n`;
+            texto += `Teléfono: ${telefonoComprador}\n\n`;
+            
+            texto += `*QUIEN RECIBE:*\n`;
+            texto += `Nombre: ${nombreReceptor}\n`;
+            texto += `Teléfono: ${telefonoReceptor}\n`;
+            if (esMismoReceptor) texto += `(Misma persona que compra)\n`;
+            texto += `\n`;
+            
+            texto += `*ENTREGA:*\n`;
+            texto += `Fecha: ${fecha}\n`;
+            texto += `Horario: ${horario}\n`;
+            texto += `Tipo: ${tipoEntrega === 'express' ? 'Express a domicilio' : 'Recogida en tienda'}\n`;
+            
+            if (tipoEntrega === 'express') {
+                texto += `Distancia: ${distanciaKm.toFixed(1)} km\n`;
+                texto += `Costo envío: ₡${costoExpress.toLocaleString()}\n`;
+                texto += `Referencias: ${referencias}\n`;
+            }
+            texto += `\n`;
+            
+            texto += `*PRODUCTOS:*\n`;
             carrito.forEach(item => {
                 texto += `• ${item.nombre} x${item.cantidad} = ₡${item.subtotal.toLocaleString()}\n`;
             });
-            texto += `\n*PAGO:* ${pago === 'sinpe' ? 'SINPE Móvil' : 'Efectivo contra entrega'}\n`;
-            texto += `💰 *Total:* ₡${total.toLocaleString()}\n\n`;
+            texto += `\n`;
+            
+            if (mensajeTarjeta) {
+                texto += `*MENSAJE TARJETA:*\n${mensajeTarjeta}\n\n`;
+            }
+            
+            if (observaciones) {
+                texto += `*OBSERVACIONES:*\n${observaciones}\n\n`;
+            }
+            
+            texto += `*PAGO:*\n`;
+            texto += `Método: ${metodoPago === 'sinpe' ? 'SINPE Móvil' : 'Efectivo'}\n`;
+            texto += `Subtotal: ₡${subtotal.toLocaleString()}\n`;
+            if (tipoEntrega === 'express') texto += `Envío: ₡${costoExpress.toLocaleString()}\n`;
+            texto += `*TOTAL: ₡${total.toLocaleString()}*\n\n`;
+            
             texto += `Por favor confirmar disponibilidad. ¡Gracias! 🌺`;
 
-            const url = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(texto)}`;
-            window.open(url, '_blank');
+            // Enviar copia por email si solicitó
+            if (enviarCopia && emailCopia) {
+                enviarEmailCopia(emailCopia, pedido, texto);
+            }
 
-            localStorage.removeItem(CART_KEY);
+            // Abrir WhatsApp
+            const url = `https://wa.me/${config.whatsapp}?text=${encodeURIComponent(texto)}`;
+            window.open(url, '_blank');
+            
+            // Reproducir sonido de confirmación (opcional)
+            reproducirSonidoConfirmacion();
+            
+            // Limpiar carrito
+            if (confirm('¿Pedido enviado! ¿Deseas vaciar el carrito?')) {
+                localStorage.removeItem(CART_KEY);
+                window.location.href = 'index.html';
+            }
+        }
+
+        function guardarPedidoEnHistorial(pedido) {
+            // Guardar en localStorage para que el admin lo vea
+            let pedidos = JSON.parse(localStorage.getItem(PEDIDOS_KEY) || '[]');
+            pedidos.unshift(pedido); // Agregar al inicio
+            localStorage.setItem(PEDIDOS_KEY, JSON.stringify(pedidos));
+            
+            // También guardar en el sistema principal para el admin
+            const datos = JSON.parse(localStorage.getItem(DATA_KEY) || '{}');
+            if (!datos.pedidos) datos.pedidos = [];
+            datos.pedidos.unshift(pedido);
+            localStorage.setItem(DATA_KEY, JSON.stringify(datos));
+        }
+
+        function enviarEmailCopia(email, pedido, mensajeWhatsApp) {
+            // Nota: En un servidor real usarías un backend para enviar emails
+            // Aquí abrimos el cliente de email predeterminado
+            const asunto = `Copia de tu pedido ${pedido.id} - Floristería Santa Bárbara`;
+            const cuerpo = `Hola ${pedido.cliente},\n\n`;
+            const urlEmail = `mailto:${email}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo + mensajeWhatsApp)}`;
+            
+            // Abrir en nueva pestaña (algunos navegadores bloquean popup, por eso usamos timeout)
+            setTimeout(() => {
+                window.open(urlEmail, '_blank');
+            }, 1000);
+        }
+
+        function reproducirSonidoConfirmacion() {
+            // Crear beep simple con Web Audio API
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } catch (e) {
+                console.log('Audio no soportado');
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            cargarCarrito();
-            inicializarMapa();
-            document.getElementById('fecha').min = new Date(Date.now() + 86400000).toISOString().split('T')[0];
-            document.getElementById('fecha').value = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+            cargarDatos();
+            toggleReceptor(); // Inicializar estado
         });
     </script>
 </body>
