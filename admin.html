@@ -4,194 +4,351 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Admin | Floristería Santa Bárbara</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- QUITAMOS TAILWIND QUE ESTÁ CAUSANDO LOS PROBLEMAS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Estilos críticos para que se vea en celular -->
     <style>
-        * { box-sizing: border-box; }
-        body { margin: 0; padding: 0; }
-        input, select, textarea { 
-            background-color: #ffffff !important; 
-            color: #000000 !important; 
-            border: 2px solid #cccccc !important;
-            padding: 12px !important;
-            font-size: 16px !important;
-            width: 100% !important;
-            border-radius: 8px !important;
+        /* ESTILOS MANUALES - MÁXIMO CONTRASTE */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
-        button { 
-            min-height: 48px !important; 
-            font-size: 16px !important;
-            background-color: #2D5A3D !important;
-            color: white !important;
-            border: none !important;
-            border-radius: 8px !important;
-            padding: 12px 24px !important;
-            font-weight: bold !important;
+        body {
+            background-color: #f3f4f6;
+            font-family: Arial, sans-serif;
+            padding: 10px;
+        }
+        /* LOGIN */
+        #loginScreen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-box {
+            background-color: white;
+            padding: 30px 20px;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            border: 2px solid #000;
+        }
+        h1 {
+            font-size: 28px;
+            text-align: center;
+            margin-bottom: 25px;
+            color: #000;
+            font-weight: bold;
+        }
+        /* INPUTS - TOTALMENTE VISIBLES */
+        input, select, textarea {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 3px solid #000 !important;
+            border-radius: 12px;
+            font-size: 18px;
+            background-color: white !important;
+            color: black !important;
+        }
+        /* BOTONES - GRANDES Y VISIBLES */
+        button {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            background-color: #2D5A3D;
+            color: white;
+            margin-bottom: 10px;
+            cursor: pointer;
+            border: 2px solid #000;
+        }
+        button:hover {
+            background-color: #1e3f2a;
+        }
+        .btn-danger {
+            background-color: #c41e3a;
+        }
+        .btn-danger:hover {
+            background-color: #a01830;
+        }
+        .btn-gray {
+            background-color: #4b5563;
+        }
+        .dashboard-header {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .dashboard-header button {
+            width: auto;
+            flex: 1;
+            min-width: 100px;
+            padding: 15px 10px;
+        }
+        .tab {
+            background-color: white;
+            padding: 20px;
+            border-radius: 20px;
+            border: 3px solid #000;
+        }
+        .tab-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .tab-header h2 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #000;
+        }
+        .tab-header button {
+            width: auto;
+            padding: 12px 20px;
+            background-color: #2D5A3D;
+        }
+        /* MODAL */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            z-index: 1000;
         }
         .modal-content {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            max-width: 500px;
-            margin: 20px;
+            background-color: white;
+            padding: 25px;
+            border-radius: 25px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 4px solid #000;
+        }
+        .modal-content h3 {
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #000;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .modal-actions button {
+            flex: 1;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 16px;
+            color: #000;
+        }
+        /* PREVIEW DE FOTOS */
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .preview-item {
+            position: relative;
+        }
+        .preview-item img {
+            width: 100%;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid #000;
+        }
+        .preview-item button {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            background-color: #c41e3a;
+            color: white;
+            border-radius: 50%;
+            padding: 0;
+            font-size: 14px;
+        }
+        .producto-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border-bottom: 2px solid #ddd;
+        }
+        .producto-item img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid #000;
+        }
+        .categoria-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        .categoria-card {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 15px;
+            border: 2px solid #000;
+            text-align: center;
+        }
+        .categoria-card .icono {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
-<body class="bg-gray-100">
+<body>
     <!-- Login -->
-    <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
-        <div class="bg-white p-8 rounded-2xl shadow-lg max-w-md w-full">
-            <h1 class="text-2xl font-bold text-center mb-6">🌸 Santa Bárbara</h1>
-            <input type="email" id="email" placeholder="Correo electrónico" class="w-full mb-4">
-            <input type="password" id="clave" placeholder="Contraseña" class="w-full mb-4">
-            <button onclick="login()" class="w-full bg-green-700 text-white py-3 rounded-lg font-bold">Entrar</button>
-            <p class="text-sm text-center mt-4 text-gray-600">Primera vez: crea tu cuenta</p>
+    <div id="loginScreen">
+        <div class="login-box">
+            <h1>🌸 Santa Bárbara</h1>
+            <input type="email" id="email" placeholder="Correo electrónico">
+            <input type="password" id="clave" placeholder="Contraseña">
+            <button onclick="login()">ENTRAR</button>
+            <p style="text-align: center; margin-top: 20px; font-size: 16px; color: #000;">Primera vez: crea tu cuenta</p>
         </div>
     </div>
 
-    <!-- Dashboard -->
-    <div id="dashboard" class="hidden p-4">
-        <div class="flex gap-2 mb-4 overflow-x-auto">
-            <button onclick="showTab('productos')" class="px-4 py-2 bg-green-700 text-white rounded-lg">Productos</button>
-            <button onclick="showTab('categorias')" class="px-4 py-2 bg-gray-500 text-white rounded-lg">Categorías</button>
-            <button onclick="showTab('backup')" class="px-4 py-2 bg-gray-500 text-white rounded-lg">Backup</button>
-            <button onclick="logout()" class="px-4 py-2 bg-red-500 text-white rounded-lg">Salir</button>
+    <!-- Dashboard (oculto inicialmente) -->
+    <div id="dashboard" class="hidden">
+        <div class="dashboard-header">
+            <button onclick="showTab('productos')">📦 Productos</button>
+            <button onclick="showTab('categorias')">🏷️ Categorías</button>
+            <button onclick="showTab('backup')">💾 Backup</button>
+            <button onclick="logout()" class="btn-danger">🚪 Salir</button>
         </div>
 
         <!-- Productos -->
-        <div id="tab-productos" class="tab-content">
-            <div class="flex justify-between mb-4">
-                <h2 class="text-2xl font-bold">Productos</h2>
-                <button onclick="abrirModalProducto()" class="bg-green-700 text-white px-4 py-2 rounded-lg">+ Nuevo</button>
+        <div id="tab-productos" class="tab">
+            <div class="tab-header">
+                <h2>📦 Productos</h2>
+                <button onclick="abrirModalProducto()">+ NUEVO</button>
             </div>
-            <div id="listaProductos" class="bg-white p-4 rounded-lg"></div>
+            <div id="listaProductos"></div>
         </div>
 
         <!-- Categorías -->
-        <div id="tab-categorias" class="tab-content hidden">
-            <div class="flex justify-between mb-4">
-                <h2 class="text-2xl font-bold">Categorías</h2>
-                <button onclick="abrirModalCategoria()" class="bg-green-700 text-white px-4 py-2 rounded-lg">+ Nueva</button>
+        <div id="tab-categorias" class="tab hidden">
+            <div class="tab-header">
+                <h2>🏷️ Categorías</h2>
+                <button onclick="abrirModalCategoria()">+ NUEVA</button>
             </div>
-            <div id="listaCategorias" class="grid grid-cols-2 gap-4"></div>
+            <div id="listaCategorias" class="categoria-grid"></div>
         </div>
 
         <!-- Backup -->
-        <div id="tab-backup" class="tab-content hidden">
-            <h2 class="text-2xl font-bold mb-4">Copia de Seguridad</h2>
-            <div class="bg-white p-4 rounded-lg mb-4">
-                <button onclick="exportarDatos()" class="w-full bg-green-600 text-white py-3 rounded-lg mb-2">📥 Descargar Backup</button>
-                <p class="text-sm text-gray-600">Guarda este archivo para cambiar de celular</p>
+        <div id="tab-backup" class="tab hidden">
+            <h2 style="font-size: 24px; margin-bottom: 20px;">💾 Copia de Seguridad</h2>
+            <div style="background: #f9f9f9; padding: 20px; border-radius: 15px; border: 2px solid #000; margin-bottom: 20px;">
+                <button onclick="exportarDatos()" style="background-color: #2D5A3D;">📥 DESCARGAR BACKUP</button>
+                <p style="margin-top: 10px;">Guarda este archivo para cambiar de celular</p>
             </div>
-            <div class="bg-white p-4 rounded-lg">
+            <div style="background: #f9f9f9; padding: 20px; border-radius: 15px; border: 2px solid #000;">
                 <input type="file" id="inputBackup" accept=".json" class="hidden" onchange="importarDatos(this)">
-                <button onclick="document.getElementById('inputBackup').click()" class="w-full bg-blue-600 text-white py-3 rounded-lg">📤 Restaurar Backup</button>
-                <p class="text-sm text-gray-600 mt-2">Selecciona el archivo que guardaste</p>
+                <button onclick="document.getElementById('inputBackup').click()" style="background-color: #2563eb;">📤 RESTAURAR BACKUP</button>
+                <p style="margin-top: 10px;">Selecciona el archivo que guardaste</p>
             </div>
         </div>
     </div>
 
     <!-- Modal Categoría -->
-    <div id="modalCategoria" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-lg max-w-md w-full p-6">
-            <h3 class="text-xl font-bold mb-4">Nueva Categoría</h3>
+    <div id="modalCategoria" class="modal hidden">
+        <div class="modal-content">
+            <h3 id="tituloModalCat">Nueva Categoría</h3>
             <input type="hidden" id="catId">
-            <div class="mb-4">
-                <label class="block mb-2 font-bold">ID único</label>
-                <input type="text" id="catIdInput" class="w-full p-3 border-2 border-gray-300 rounded-lg" placeholder="rosas-rojas">
-            </div>
-            <div class="mb-4">
-                <label class="block mb-2 font-bold">Nombre</label>
-                <input type="text" id="catNombre" class="w-full p-3 border-2 border-gray-300 rounded-lg" placeholder="Ramos de Rosas">
-            </div>
-            <div class="mb-4">
-                <label class="block mb-2 font-bold">Icono</label>
-                <input type="text" id="catIcono" class="w-full p-3 border-2 border-gray-300 rounded-lg" value="🌸">
-            </div>
-            <div class="mb-4">
-                <label class="flex items-center">
-                    <input type="checkbox" id="catActiva" checked class="mr-2 w-5 h-5"> Activa
-                </label>
-            </div>
-            <div class="flex gap-2 justify-end">
-                <button onclick="cerrarModal('modalCategoria')" class="px-6 py-3 bg-gray-500 text-white rounded-lg">Cancelar</button>
-                <button onclick="guardarCategoria()" class="px-6 py-3 bg-green-700 text-white rounded-lg">Guardar</button>
+            
+            <label>ID único</label>
+            <input type="text" id="catIdInput" placeholder="rosas-rojas">
+            
+            <label>Nombre</label>
+            <input type="text" id="catNombre" placeholder="Ramos de Rosas">
+            
+            <label>Icono</label>
+            <input type="text" id="catIcono" value="🌸">
+            
+            <label style="display: flex; align-items: center; gap: 10px; margin-top: 15px;">
+                <input type="checkbox" id="catActiva" checked style="width: 20px; height: 20px;"> Activa
+            </label>
+            
+            <div class="modal-actions">
+                <button onclick="cerrarModal('modalCategoria')" class="btn-gray">CANCELAR</button>
+                <button onclick="guardarCategoria()">GUARDAR</button>
             </div>
         </div>
     </div>
 
     <!-- Modal Producto -->
-    <div id="modalProducto" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white rounded-lg max-w-2xl w-full p-6">
-            <h3 class="text-xl font-bold mb-4">Nuevo Producto</h3>
+    <div id="modalProducto" class="modal hidden">
+        <div class="modal-content">
+            <h3 id="tituloModal">Nuevo Producto</h3>
             <input type="hidden" id="prodId">
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                    <label class="block mb-2 font-bold">Código</label>
-                    <input type="text" id="prodCodigo" class="w-full p-3 border-2 border-gray-300 rounded-lg">
-                </div>
-                <div>
-                    <label class="block mb-2 font-bold">Nombre</label>
-                    <input type="text" id="prodNombre" class="w-full p-3 border-2 border-gray-300 rounded-lg">
-                </div>
-            </div>
+            <label>Código</label>
+            <input type="text" id="prodCodigo" placeholder="Ej: ROS-001">
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                    <label class="block mb-2 font-bold">Categoría</label>
-                    <select id="prodCategoria" class="w-full p-3 border-2 border-gray-300 rounded-lg"></select>
-                </div>
-                <div>
-                    <label class="block mb-2 font-bold">Stock</label>
-                    <input type="number" id="prodStock" value="10" class="w-full p-3 border-2 border-gray-300 rounded-lg">
-                </div>
-            </div>
+            <label>Nombre</label>
+            <input type="text" id="prodNombre" placeholder="Ej: Ramo de Rosas">
             
-            <div class="mb-4">
-                <label class="block mb-2 font-bold">Descripción</label>
-                <textarea id="prodDescripcion" rows="2" class="w-full p-3 border-2 border-gray-300 rounded-lg"></textarea>
-            </div>
+            <label>Categoría</label>
+            <select id="prodCategoria"></select>
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div>
-                    <label class="block mb-2 font-bold">Precio regular</label>
-                    <input type="number" id="prodPrecioRegular" class="w-full p-3 border-2 border-gray-300 rounded-lg">
-                </div>
-                <div>
-                    <label class="block mb-2 font-bold">Precio oferta</label>
-                    <input type="number" id="prodPrecioTemporada" class="w-full p-3 border-2 border-gray-300 rounded-lg">
-                </div>
-                <div class="flex items-end pb-3">
-                    <label class="flex items-center">
-                        <input type="checkbox" id="prodTemporadaActivo" class="mr-2 w-5 h-5"> Activar oferta
-                    </label>
-                </div>
-            </div>
+            <label>Stock</label>
+            <input type="number" id="prodStock" value="10">
             
-            <div class="mb-4">
-                <label class="block mb-2 font-bold">Fotos</label>
-                <div class="border-2 border-dashed p-6 text-center cursor-pointer bg-gray-50 rounded-lg" onclick="document.getElementById('inputFotos').click()">
-                    <p class="text-lg">📸 Haz clic para subir fotos</p>
-                    <p class="text-sm text-gray-600">Máximo 15 fotos</p>
-                    <input type="file" id="inputFotos" multiple accept="image/*" class="hidden" onchange="procesarFotos(this)">
-                </div>
-                <div id="previewFotos" class="grid grid-cols-4 gap-2 mt-4"></div>
-            </div>
+            <label>Descripción</label>
+            <textarea id="prodDescripcion" rows="2" placeholder="Descripción del producto..."></textarea>
             
-            <div class="flex gap-4 mb-4">
-                <label class="flex items-center">
-                    <input type="checkbox" id="prodActivo" checked class="mr-2 w-5 h-5"> Activo
+            <label>Precio regular</label>
+            <input type="number" id="prodPrecioRegular" placeholder="28000">
+            
+            <label>Precio oferta</label>
+            <input type="number" id="prodPrecioTemporada" placeholder="24000">
+            
+            <label style="display: flex; align-items: center; gap: 10px; margin: 15px 0;">
+                <input type="checkbox" id="prodTemporadaActivo" style="width: 20px; height: 20px;"> Activar oferta
+            </label>
+            
+            <label>Fotos</label>
+            <div style="border: 3px dashed #000; padding: 25px; text-align: center; cursor: pointer; background: #f9f9f9;" onclick="document.getElementById('inputFotos').click()">
+                <p style="font-size: 18px;">📸 TOCA PARA SUBIR FOTOS</p>
+                <p style="font-size: 14px;">Máximo 15 fotos</p>
+                <input type="file" id="inputFotos" multiple accept="image/*" class="hidden" onchange="procesarFotos(this)">
+            </div>
+            <div id="previewFotos" class="preview-grid"></div>
+            
+            <div style="display: flex; gap: 20px; margin: 20px 0;">
+                <label style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="prodActivo" checked style="width: 20px; height: 20px;"> Activo
                 </label>
-                <label class="flex items-center">
-                    <input type="checkbox" id="prodDestacado" class="mr-2 w-5 h-5"> Destacado
+                <label style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="prodDestacado" style="width: 20px; height: 20px;"> Destacado
                 </label>
             </div>
             
-            <div class="flex gap-2 justify-end">
-                <button onclick="cerrarModal('modalProducto')" class="px-6 py-3 bg-gray-500 text-white rounded-lg">Cancelar</button>
-                <button onclick="guardarProducto()" class="px-6 py-3 bg-green-700 text-white rounded-lg">Guardar</button>
+            <div class="modal-actions">
+                <button onclick="cerrarModal('modalProducto')" class="btn-gray">CANCELAR</button>
+                <button onclick="guardarProducto()">GUARDAR PRODUCTO</button>
             </div>
         </div>
     </div>
@@ -213,22 +370,22 @@
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(datos));
                 return true;
             } catch(e) {
-                alert('Error al guardar');
+                alert('❌ Error al guardar. Espacio lleno.');
                 return false;
             }
         }
 
         function cargarDatos() {
             const guardado = localStorage.getItem(STORAGE_KEY);
-            if (guardado) datos = JSON.parse(guardado);
-            actualizarContadores();
+            if (guardado) {
+                try {
+                    datos = JSON.parse(guardado);
+                } catch(e) {
+                    datos = { productos: [], categorias: [], pedidos: [], config: datos.config };
+                }
+            }
             renderizarCategorias();
             renderizarProductos();
-        }
-
-        function actualizarContadores() {
-            document.getElementById('countProductos').textContent = datos.productos.length;
-            document.getElementById('countCategorias').textContent = datos.categorias.length;
         }
 
         // Autenticación
@@ -243,7 +400,7 @@
         async function login() {
             const email = document.getElementById('email').value;
             const clave = document.getElementById('clave').value;
-            if (!email || !clave) return alert('Ingresa email y contraseña');
+            if (!email || !clave) return alert('❌ Ingresa email y contraseña');
             
             const hash = await hashString(email + clave);
             const guardado = localStorage.getItem('admin_hash');
@@ -256,7 +413,7 @@
                 localStorage.setItem(AUTH_KEY, 'ok');
                 location.reload();
             } else {
-                alert('Credenciales incorrectas');
+                alert('❌ Credenciales incorrectas');
             }
         }
 
@@ -273,26 +430,27 @@
         }
 
         function showTab(tab) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.add('hidden'));
             document.getElementById(`tab-${tab}`).classList.remove('hidden');
             if (tab === 'productos') renderizarProductos();
             if (tab === 'categorias') renderizarCategorias();
         }
 
-        // Categorías
+        // CATEGORÍAS
         function renderizarCategorias() {
             const container = document.getElementById('listaCategorias');
-            if (datos.categorias.length === 0) {
-                container.innerHTML = '<p class="text-center text-gray-500">No hay categorías</p>';
+            if (!datos.categorias || datos.categorias.length === 0) {
+                container.innerHTML = '<p style="text-align: center; padding: 30px;">No hay categorías. Crea una.</p>';
                 return;
             }
             container.innerHTML = datos.categorias.map(c => `
-                <div class="bg-white p-4 rounded-lg shadow">
-                    <div class="text-3xl mb-2">${c.icono}</div>
-                    <h3 class="font-bold">${c.nombre}</h3>
-                    <div class="flex gap-2 mt-2">
-                        <button onclick="abrirModalCategoria('${c.id}')" class="text-blue-600">✏️</button>
-                        <button onclick="eliminarCategoria('${c.id}')" class="text-red-600">🗑️</button>
+                <div class="categoria-card">
+                    <div class="icono">${c.icono || '🌸'}</div>
+                    <h3 style="font-weight: bold; font-size: 18px; margin: 5px 0;">${c.nombre}</h3>
+                    <p style="font-size: 12px; color: #666;">${c.id}</p>
+                    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
+                        <button style="width: auto; padding: 8px 15px; background-color: #2563eb;" onclick="abrirModalCategoria('${c.id}')">✏️</button>
+                        <button style="width: auto; padding: 8px 15px; background-color: #c41e3a;" onclick="eliminarCategoria('${c.id}')">🗑️</button>
                     </div>
                 </div>
             `).join('');
@@ -307,7 +465,7 @@
                 document.getElementById('catIdInput').disabled = true;
                 document.getElementById('catNombre').value = c.nombre;
                 document.getElementById('catIcono').value = c.icono;
-                document.getElementById('catActiva').checked = c.activa;
+                document.getElementById('catActiva').checked = c.activa !== false;
             } else {
                 document.getElementById('catId').value = '';
                 document.getElementById('catIdInput').value = '';
@@ -321,7 +479,7 @@
         function guardarCategoria() {
             const id = document.getElementById('catIdInput').value.trim().toLowerCase().replace(/\s+/g, '-');
             const nombre = document.getElementById('catNombre').value.trim();
-            if (!id || !nombre) return alert('ID y nombre obligatorios');
+            if (!id || !nombre) return alert('❌ ID y nombre obligatorios');
             
             const categoria = {
                 id: document.getElementById('catId').value || id,
@@ -332,16 +490,16 @@
             
             if (document.getElementById('catId').value) {
                 const index = datos.categorias.findIndex(c => c.id === categoria.id);
-                datos.categorias[index] = categoria;
+                if (index !== -1) datos.categorias[index] = categoria;
             } else {
-                if (datos.categorias.some(c => c.id === id)) return alert('ID ya existe');
+                if (datos.categorias.some(c => c.id === id)) return alert('❌ ID ya existe');
                 datos.categorias.push(categoria);
             }
             
             guardarDatos();
             cerrarModal('modalCategoria');
             renderizarCategorias();
-            actualizarContadores();
+            alert('✅ Categoría guardada');
         }
 
         function eliminarCategoria(id) {
@@ -349,27 +507,26 @@
                 datos.categorias = datos.categorias.filter(c => c.id !== id);
                 guardarDatos();
                 renderizarCategorias();
-                actualizarContadores();
             }
         }
 
-        // Productos
+        // PRODUCTOS
         function renderizarProductos() {
             const container = document.getElementById('listaProductos');
-            if (datos.productos.length === 0) {
-                container.innerHTML = '<p class="text-center text-gray-500">No hay productos</p>';
+            if (!datos.productos || datos.productos.length === 0) {
+                container.innerHTML = '<p style="text-align: center; padding: 30px;">No hay productos. Crea uno.</p>';
                 return;
             }
             container.innerHTML = datos.productos.map(p => `
-                <div class="border-b p-4 flex items-center gap-4">
-                    <img src="${p.imagenes?.[0] || 'https://via.placeholder.com/50'}" class="w-12 h-12 object-cover rounded">
-                    <div class="flex-1">
-                        <h3 class="font-bold">${p.nombre}</h3>
-                        <p class="text-sm">${p.codigo}</p>
+                <div class="producto-item">
+                    <img src="${p.imagenes?.[0] || 'https://via.placeholder.com/60'}" onerror="this.src='https://via.placeholder.com/60'">
+                    <div style="flex: 1;">
+                        <h3 style="font-weight: bold;">${p.nombre}</h3>
+                        <p>${p.codigo} - ₡${(p.precioTemporadaActivo ? p.precioTemporada : p.precioRegular)?.toLocaleString() || 0}</p>
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="abrirModalProducto('${p.id}')" class="text-blue-600">✏️</button>
-                        <button onclick="eliminarProducto('${p.id}')" class="text-red-600">🗑️</button>
+                    <div style="display: flex; gap: 10px;">
+                        <button style="width: auto; padding: 8px 15px; background-color: #2563eb;" onclick="abrirModalProducto('${p.id}')">✏️</button>
+                        <button style="width: auto; padding: 8px 15px; background-color: #c41e3a;" onclick="eliminarProducto('${p.id}')">🗑️</button>
                     </div>
                 </div>
             `).join('');
@@ -379,19 +536,20 @@
             document.getElementById('modalProducto').classList.remove('hidden');
             
             const select = document.getElementById('prodCategoria');
-            select.innerHTML = datos.categorias.map(c => `<option value="${c.id}">${c.nombre}</option>`);
+            select.innerHTML = '<option value="">Selecciona una categoría</option>' + 
+                (datos.categorias || []).map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
             
             fotosTemp = [];
             
             if (id) {
                 const p = datos.productos.find(x => x.id === id);
                 document.getElementById('prodId').value = p.id;
-                document.getElementById('prodCodigo').value = p.codigo;
-                document.getElementById('prodNombre').value = p.nombre;
-                document.getElementById('prodCategoria').value = p.categoria;
+                document.getElementById('prodCodigo').value = p.codigo || '';
+                document.getElementById('prodNombre').value = p.nombre || '';
+                document.getElementById('prodCategoria').value = p.categoria || '';
                 document.getElementById('prodDescripcion').value = p.descripcion || '';
                 document.getElementById('prodStock').value = p.stock || 0;
-                document.getElementById('prodPrecioRegular').value = p.precioRegular;
+                document.getElementById('prodPrecioRegular').value = p.precioRegular || '';
                 document.getElementById('prodPrecioTemporada').value = p.precioTemporada || '';
                 document.getElementById('prodTemporadaActivo').checked = p.precioTemporadaActivo || false;
                 document.getElementById('prodActivo').checked = p.activo !== false;
@@ -414,7 +572,7 @@
 
         function procesarFotos(input) {
             const archivos = Array.from(input.files);
-            if (fotosTemp.length + archivos.length > 15) return alert('Máximo 15 fotos');
+            if (fotosTemp.length + archivos.length > 15) return alert('❌ Máximo 15 fotos');
             
             archivos.forEach(archivo => {
                 const reader = new FileReader();
@@ -441,9 +599,9 @@
 
         function renderizarPreviews() {
             document.getElementById('previewFotos').innerHTML = fotosTemp.map((f, i) => `
-                <div class="relative">
-                    <img src="${f}" class="w-full h-16 object-cover rounded">
-                    <button onclick="fotosTemp.splice(${i},1);renderizarPreviews()" class="absolute -top-1 -right-1 bg-red-500 text-white w-5 h-5 rounded-full text-xs">✕</button>
+                <div class="preview-item">
+                    <img src="${f}">
+                    <button onclick="fotosTemp.splice(${i},1);renderizarPreviews()">✕</button>
                 </div>
             `).join('');
         }
@@ -464,11 +622,12 @@
                 destacado: document.getElementById('prodDestacado').checked
             };
             
-            if (!producto.codigo || !producto.nombre) return alert('Código y nombre obligatorios');
+            if (!producto.codigo || !producto.nombre) return alert('❌ Código y nombre obligatorios');
+            if (!producto.categoria) return alert('❌ Selecciona una categoría');
             
             if (document.getElementById('prodId').value) {
                 const index = datos.productos.findIndex(p => p.id === producto.id);
-                datos.productos[index] = producto;
+                if (index !== -1) datos.productos[index] = producto;
             } else {
                 datos.productos.push(producto);
             }
@@ -476,7 +635,6 @@
             if (guardarDatos()) {
                 cerrarModal('modalProducto');
                 renderizarProductos();
-                actualizarContadores();
                 alert('✅ Producto guardado');
             }
         }
@@ -486,11 +644,10 @@
                 datos.productos = datos.productos.filter(p => p.id !== id);
                 guardarDatos();
                 renderizarProductos();
-                actualizarContadores();
             }
         }
 
-        // Backup
+        // BACKUP
         function exportarDatos() {
             const backup = {
                 productos: datos.productos,
@@ -520,7 +677,7 @@
                         location.reload();
                     }
                 } catch(e) {
-                    alert('Archivo inválido');
+                    alert('❌ Archivo inválido');
                 }
             };
             reader.readAsText(file);
