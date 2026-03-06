@@ -574,6 +574,9 @@
             const archivos = Array.from(input.files);
             if (fotosTemp.length + archivos.length > 15) return alert('❌ Máximo 15 fotos');
             
+            let procesadas = 0;
+            alert(`📸 Procesando ${archivos.length} foto(s)... Espera un momento`);
+            
             archivos.forEach(archivo => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
@@ -581,14 +584,33 @@
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
                         const ctx = canvas.getContext('2d');
+                        
+                        // REDUCIR MÁS EL TAMAÑO: de 400px a 300px
                         let width = img.width, height = img.height;
-                        const maxSize = 400;
-                        if (width > height && width > maxSize) { height *= maxSize / width; width = maxSize; }
-                        else if (height > maxSize) { width *= maxSize / height; height = maxSize; }
-                        canvas.width = width; canvas.height = height;
+                        const maxSize = 300; // ANTES ERA 400
+                        
+                        if (width > height && width > maxSize) { 
+                            height *= maxSize / width; 
+                            width = maxSize; 
+                        } else if (height > maxSize) { 
+                            width *= maxSize / height; 
+                            height = maxSize; 
+                        }
+                        
+                        canvas.width = width; 
+                        canvas.height = height;
                         ctx.drawImage(img, 0, 0, width, height);
-                        fotosTemp.push(canvas.toDataURL('image/jpeg', 0.6));
-                        renderizarPreviews();
+                        
+                        // REDUCIR CALIDAD: de 0.6 a 0.4
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.4); // MENOS CALIDAD = MENOS ESPACIO
+                        
+                        fotosTemp.push(dataUrl);
+                        procesadas++;
+                        
+                        if (procesadas === archivos.length) {
+                            renderizarPreviews();
+                            alert(`✅ ${archivos.length} foto(s) procesadas. Ahora puedes guardar.`);
+                        }
                     };
                     img.src = e.target.result;
                 };
