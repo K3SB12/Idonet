@@ -34,36 +34,8 @@
     </script>
 
     <style>
-        #map { 
-            height: 380px; 
-            border-radius: 1rem; 
-            z-index: 1; 
-            background-color: #e5e7eb;
-            position: relative;
-        }
+        #map { height: 380px; border-radius: 1rem; z-index: 1; }
         @media (max-width: 640px) { #map { height: 300px; } }
-        
-        .leaflet-tile {
-            transition: opacity 0.3s ease-in-out;
-        }
-        .leaflet-tile-loaded {
-            opacity: 1 !important;
-        }
-        
-        .map-loading {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f3f4f6;
-            z-index: 1000;
-            border-radius: 1rem;
-        }
-        
         .step-active { background-color: #2D5A3D; color: white; }
         .step-completed { background-color: #4A7C59; color: white; }
         .step-pending { background-color: #e5e7eb; color: #6b7280; }
@@ -193,7 +165,6 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de entrega *</label>
                         <input type="date" id="fecha" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors">
-                        <p class="text-xs text-gray-500 mt-1">Puedes seleccionar hoy o días futuros</p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Horario preferido</label>
@@ -251,18 +222,7 @@
                 <div id="seccionExpress" class="mt-6">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Ubicación en el mapa *</label>
                     <p class="text-sm text-gray-500 mb-3">Toca en el mapa para marcar la dirección de entrega</p>
-                    
-                    <div class="relative">
-                        <div id="map" class="shadow-lg border-2 border-gray-200 rounded-xl">
-                            <div id="mapLoading" class="map-loading">
-                                <div class="text-center">
-                                    <i class="fas fa-spinner fa-spin text-3xl text-sb-green mb-2"></i>
-                                    <p class="text-sm text-gray-600">Cargando mapa...</p>
-                                    <p class="text-xs text-gray-400 mt-1">Esto puede tomar unos segundos</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <div id="map" class="shadow-lg border-2 border-gray-200 rounded-xl"></div>
                     
                     <div id="infoExpress" class="hidden mt-4 bg-sb-cream p-4 rounded-xl border border-gray-200">
                         <div class="flex justify-between items-center mb-2">
@@ -377,25 +337,10 @@
                 </span>
             </label>
 
-            <!-- Botón mejorado para móvil y PC -->
-            <button onclick="enviarPedido()" id="btnEnviarWhatsApp" class="w-full bg-green-600 hover:bg-green-700 text-white py-5 rounded-xl font-bold text-xl transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 animate-pulse-soft">
+            <button onclick="enviarPedido()" class="w-full bg-green-600 hover:bg-green-700 text-white py-5 rounded-xl font-bold text-xl transition-all duration-200 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 animate-pulse-soft">
                 <i class="fab fa-whatsapp text-3xl"></i>
-                <span>Enviar pedido por WhatsApp</span>
+                Enviar pedido por WhatsApp
             </button>
-
-            <!-- Mensaje de estado del envío -->
-            <div id="mensajeEnvio" class="hidden mt-4 text-center">
-                <i class="fas fa-spinner fa-spin text-sb-green text-2xl mb-2"></i>
-                <p class="text-sm text-gray-600">Abriendo WhatsApp...</p>
-                <p class="text-xs text-gray-500 mt-1">Si no se abre automáticamente, usa el botón de abajo</p>
-            </div>
-
-            <!-- Botón de respaldo (aparece si falla el automático) -->
-            <div id="btnRespaldo" class="hidden mt-4">
-                <a id="linkRespaldo" href="#" target="_blank" class="block w-full bg-sb-green text-white py-3 rounded-xl font-bold text-center hover:bg-sb-green-light transition-all">
-                    <i class="fab fa-whatsapp mr-2"></i>Abrir WhatsApp manualmente
-                </a>
-            </div>
 
             <p class="text-center text-sm text-gray-500 mt-4">
                 <i class="fas fa-lock mr-1"></i>Serás redirigido a WhatsApp con todos los detalles
@@ -420,9 +365,8 @@
         let paso = 1;
         let costoExpress = 0;
         let distanciaKm = 0;
-        let mapaInicializado = false;
 
-        // COORDENADAS: Santa Bárbara, Heredia (del parque 200m sur)
+        // COORDENADAS CORREGIDAS: Santa Bárbara, Heredia (del parque 200m sur)
         const FLORISTERIA = { lat: 10.0369, lng: -84.1594 };
 
         function cargarDatos() {
@@ -434,9 +378,9 @@
             
             cargarCarrito();
             
-            // CORRECCIÓN 1: Fecha mínima es HOY (no mañana)
-            const hoy = new Date();
-            const fechaStr = hoy.toISOString().split('T')[0];
+            const manana = new Date();
+            manana.setDate(manana.getDate() + 1);
+            const fechaStr = manana.toISOString().split('T')[0];
             document.getElementById('fecha').min = fechaStr;
             document.getElementById('fecha').value = fechaStr;
         }
@@ -624,16 +568,12 @@
             
             if (tipo === 'express') {
                 setTimeout(() => {
-                    if (!mapaInicializado) {
+                    if (!map) {
                         inicializarMapa();
                     } else {
-                        map.invalidateSize(true);
-                        setTimeout(() => {
-                            map.setView([FLORISTERIA.lat, FLORISTERIA.lng], 13);
-                            recargarTiles();
-                        }, 100);
+                        map.invalidateSize();
                     }
-                }, 300);
+                }, 100);
             }
             
             calcularTotales(carrito.reduce((sum, item) => sum + item.subtotal, 0));
@@ -641,113 +581,45 @@
 
         function inicializarMapa() {
             const mapContainer = document.getElementById('map');
-            const loadingDiv = document.getElementById('mapLoading');
+            mapContainer.style.display = 'block';
             
-            if (!mapContainer) return;
+            map = L.map('map').setView([FLORISTERIA.lat, FLORISTERIA.lng], 13);
             
-            try {
-                map = L.map('map', {
-                    center: [FLORISTERIA.lat, FLORISTERIA.lng],
-                    zoom: 13,
-                    zoomControl: true,
-                    attributionControl: true,
-                    preferCanvas: true
-                });
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap',
+                maxZoom: 19
+            }).addTo(map);
 
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-                    subdomains: 'abcd',
-                    maxZoom: 20,
-                    minZoom: 5,
-                    crossOrigin: true,
-                    updateWhenIdle: true,
-                    keepBuffer: 2
-                }).addTo(map);
+            L.marker([FLORISTERIA.lat, FLORISTERIA.lng])
+                .addTo(map)
+                .bindPopup('Floristería Santa Bárbara')
+                .openPopup();
 
-                L.marker([FLORISTERIA.lat, FLORISTERIA.lng])
-                    .addTo(map)
-                    .bindPopup('Floristería Santa Bárbara<br>📍 Punto de partida')
+            L.circle([FLORISTERIA.lat, FLORISTERIA.lng], {
+                color: '#2D5A3D',
+                fillColor: '#2D5A3D',
+                fillOpacity: 0.1,
+                radius: 10000
+            }).addTo(map);
+
+            map.on('click', function(e) {
+                if (marker) map.removeLayer(marker);
+                
+                marker = L.marker(e.latlng, { draggable: true }).addTo(map)
+                    .bindPopup('Dirección de entrega')
                     .openPopup();
-
-                L.circle([FLORISTERIA.lat, FLORISTERIA.lng], {
-                    color: '#2D5A3D',
-                    fillColor: '#2D5A3D',
-                    fillOpacity: 0.1,
-                    radius: 15000,
-                    weight: 2,
-                    dashArray: '5, 10'
-                }).addTo(map);
-
-                map.on('click', function(e) {
-                    if (marker) map.removeLayer(marker);
-                    
-                    marker = L.marker(e.latlng, { 
-                        draggable: true,
-                        icon: L.divIcon({
-                            className: 'custom-marker',
-                            html: '<div style="background-color: #C41E3A; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"></div>',
-                            iconSize: [24, 24],
-                            iconAnchor: [12, 12]
-                        })
-                    }).addTo(map)
-                        .bindPopup('📍 Dirección de entrega<br><small>Arrastra para ajustar</small>')
-                        .openPopup();
-                    
-                    calcularDistancia(e.latlng.lat, e.latlng.lng);
-                    
-                    marker.on('dragend', function(e) {
-                        const pos = e.target.getLatLng();
-                        calcularDistancia(pos.lat, pos.lng);
-                    });
+                
+                calcularDistancia(e.latlng.lat, e.latlng.lng);
+                
+                marker.on('dragend', function(e) {
+                    const pos = e.target.getLatLng();
+                    calcularDistancia(pos.lat, pos.lng);
                 });
-
-                map.on('tileload', function() {
-                    if (loadingDiv) {
-                        loadingDiv.style.opacity = '0';
-                        setTimeout(() => loadingDiv.style.display = 'none', 300);
-                    }
-                });
-
-                setTimeout(() => {
-                    if (loadingDiv && loadingDiv.style.display !== 'none') {
-                        loadingDiv.innerHTML = `
-                            <div class="text-center">
-                                <i class="fas fa-exclamation-triangle text-2xl text-yellow-500 mb-2"></i>
-                                <p class="text-sm text-gray-600">Cargando mapa...</p>
-                                <p class="text-xs text-gray-400 mt-1">Puede tardar en conexiones lentas</p>
-                            </div>
-                        `;
-                    }
-                }, 5000);
-
-                mapaInicializado = true;
-
-                setTimeout(() => {
-                    map.invalidateSize(true);
-                }, 100);
-
-            } catch (error) {
-                console.error('Error inicializando mapa:', error);
-                if (loadingDiv) {
-                    loadingDiv.innerHTML = `
-                        <div class="text-center p-4">
-                            <i class="fas fa-exclamation-circle text-3xl text-red-500 mb-2"></i>
-                            <p class="text-sm text-gray-700">Error al cargar el mapa</p>
-                            <p class="text-xs text-gray-500 mt-1">Recarga la página e intenta de nuevo</p>
-                            <button onclick="location.reload()" class="mt-2 px-3 py-1 bg-sb-green text-white text-xs rounded">Recargar</button>
-                        </div>
-                    `;
-                }
-            }
-        }
-
-        function recargarTiles() {
-            if (!map) return;
-            map.eachLayer((layer) => {
-                if (layer instanceof L.TileLayer) {
-                    layer.redraw();
-                }
             });
+
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 100);
         }
 
         function calcularDistancia(lat, lng) {
@@ -818,7 +690,6 @@
             document.getElementById('resumenEntrega').innerHTML = html;
         }
 
-        // CORRECCIÓN 2: Función mejorada para enviar a WhatsApp
         function enviarPedido() {
             if (!document.getElementById('terminos').checked) {
                 alert('Debes aceptar los términos para continuar');
@@ -865,7 +736,6 @@
 
             guardarPedidoEnHistorial(pedido);
 
-            // Construir mensaje de WhatsApp
             let texto = `¡Hola! Nuevo pedido en *Floristería Santa Bárbara* 🌸\n\n`;
             texto += `*PEDIDO:* ${pedido.id}\n`;
             texto += `━━━━━━━━━━━━━━━━━━━━\n\n`;
@@ -918,78 +788,15 @@
                 enviarEmailCopia(emailCopia, pedido, texto);
             }
 
-            // PREPARAR URL DE WHATSAPP (versión universal para móvil y PC)
-            const numeroWhatsApp = config.whatsapp.replace(/\D/g, ''); // Solo números
-            const textoCodificado = encodeURIComponent(texto);
+            const url = `https://wa.me/${config.whatsapp}?text=${encodeURIComponent(texto)}`;
+            window.open(url, '_blank');
             
-            // URLs para diferentes plataformas
-            const urlWhatsAppWeb = `https://web.whatsapp.com/send?phone=${numeroWhatsApp}&text=${textoCodificado}`;
-            const urlWhatsAppAPI = `https://api.whatsapp.com/send?phone=${numeroWhatsApp}&text=${textoCodificado}`;
-            const urlWhatsAppDirecto = `https://wa.me/${numeroWhatsApp}?text=${textoCodificado}`;
-
-            // Mostrar mensaje de "Abriendo..."
-            const mensajeEnvio = document.getElementById('mensajeEnvio');
-            const btnRespaldo = document.getElementById('btnRespaldo');
-            const linkRespaldo = document.getElementById('linkRespaldo');
-            
-            mensajeEnvio.classList.remove('hidden');
-            document.getElementById('btnEnviarWhatsApp').disabled = true;
-            document.getElementById('btnEnviarWhatsApp').classList.add('opacity-50', 'cursor-not-allowed');
-
-            // Detectar si es móvil o PC
-            const esMovil = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            
-            // Intentar abrir WhatsApp
-            let urlParaAbrir = esMovil ? urlWhatsAppDirecto : urlWhatsAppWeb;
-            
-            // Para móviles, intentar primero la app nativa
-            if (esMovil) {
-                // Intentar con esquema nativo de WhatsApp
-                const urlNativa = `whatsapp://send?phone=${numeroWhatsApp}&text=${textoCodificado}`;
-                
-                // Crear iframe invisible para intentar abrir app nativa
-                const iframe = document.createElement('iframe');
-                iframe.style.display = 'none';
-                iframe.src = urlNativa;
-                document.body.appendChild(iframe);
-                
-                // Si no funciona en 2 segundos, usar URL web
-                setTimeout(() => {
-                    document.body.removeChild(iframe);
-                    window.location.href = urlParaAbrir;
-                }, 2000);
-            } else {
-                // PC: Abrir en nueva pestaña
-                const nuevaVentana = window.open(urlParaAbrir, '_blank');
-                
-                // Si el popup fue bloqueado, mostrar botón de respaldo
-                if (!nuevaVentana || nuevaVentana.closed || typeof nuevaVentana.closed === 'undefined') {
-                    setTimeout(() => {
-                        mensajeEnvio.classList.add('hidden');
-                        btnRespaldo.classList.remove('hidden');
-                        linkRespaldo.href = urlWhatsAppAPI;
-                    }, 1000);
-                }
-            }
-
-            // Mostrar botón de respaldo después de 3 segundos por si falla
-            setTimeout(() => {
-                if (!mensajeEnvio.classList.contains('hidden')) {
-                    mensajeEnvio.classList.add('hidden');
-                    btnRespaldo.classList.remove('hidden');
-                    linkRespaldo.href = esMovil ? urlWhatsAppDirecto : urlWhatsAppWeb;
-                }
-            }, 3000);
-
-            // Limpiar carrito después de un momento
-            setTimeout(() => {
-                if (confirm('¿Pedido enviado! ¿Deseas vaciar el carrito?')) {
-                    localStorage.removeItem(CART_KEY);
-                    window.location.href = 'index.html';
-                }
-            }, 5000);
-
             reproducirSonidoConfirmacion();
+            
+            if (confirm('¿Pedido enviado! ¿Deseas vaciar el carrito?')) {
+                localStorage.removeItem(CART_KEY);
+                window.location.href = 'index.html';
+            }
         }
 
         function guardarPedidoEnHistorial(pedido) {
@@ -1035,18 +842,14 @@
             }
         }
 
-        // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
             cargarDatos();
             toggleReceptor();
             
-            // Precargar mapa en segundo plano
+            // INICIALIZAR MAPA SI EXPRESS ESTÁ SELECCIONADO POR DEFECTO
             setTimeout(() => {
-                const tipoEntrega = document.querySelector('input[name="tipoEntrega"]:checked')?.value;
-                if (tipoEntrega === 'express' && !mapaInicializado) {
-                    inicializarMapa();
-                }
-            }, 1000);
+                if (!map) inicializarMapa();
+            }, 300);
         });
     </script>
 </body>
