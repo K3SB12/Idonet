@@ -751,6 +751,47 @@
         }
 
         window.onload = verificarSesion;
+
+        // ============================================
+        // PUBLICAR CATÁLOGO PARA TODOS LOS CLIENTES
+        // ============================================
+        function publicarCatalogo() {
+            const catalogoPublico = {
+                productos: datos.productos.filter(p => p.activo),
+                categorias: datos.categorias.filter(c => c.activa),
+                fecha: new Date().toISOString()
+            };
+            
+            // Guardar en localStorage (para la dueña)
+            localStorage.setItem('floristeria_completa', JSON.stringify(datos));
+            
+            // Crear archivo JSON público
+            const blob = new Blob([JSON.stringify(catalogoPublico, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            // Mostrar instrucción para subir a GitHub
+            alert('✅ Catálogo actualizado.\n\nAhora sube este archivo a GitHub:\n1. Descarga el archivo que se abrirá\n2. Súbelo a tu repositorio como "catalogo.json"\n3. Los clientes verán los cambios automáticamente');
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'catalogo.json';
+            a.click();
+        }
+        
+        // Modificar guardarProducto para que también publique
+        const originalGuardarProducto = guardarProducto;
+        guardarProducto = function() {
+            originalGuardarProducto();
+            publicarCatalogo();
+        };
+        
+        // Modificar guardarCategoria para que también publique
+        const originalGuardarCategoria = guardarCategoria;
+        guardarCategoria = function() {
+            originalGuardarCategoria();
+            publicarCatalogo();
+        };
+        
     </script>
 </body>
 </html>
