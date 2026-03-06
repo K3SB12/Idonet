@@ -25,67 +25,24 @@
         }
     </script>
     <style>
-        .drop-zone { 
-            border: 3px dashed #ccc; 
-            transition: all 0.3s; 
-        }
-        .drop-zone:hover, .drop-zone.dragover { 
-            border-color: #2D5A3D; 
-            background: #f0fdf4; 
-        }
-        .preview-img { 
-            width: 100px; 
-            height: 100px; 
-            object-fit: cover; 
-            border-radius: 8px; 
-        }
-        .tab-active {
-            background-color: rgba(255,255,255,0.1);
-            border-left: 4px solid #4A7C59;
-        }
-        .pedido-nuevo {
-            animation: pulse-border 2s infinite;
-        }
-        @keyframes pulse-border {
-            0%, 100% { border-left-color: #C41E3A; }
-            50% { border-left-color: transparent; }
-        }
-        .notificacion {
-            animation: slideIn 0.3s ease-out;
-        }
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        /* Mejoras táctiles para móvil */
-        button, .clickable {
-            min-height: 44px;
-            min-width: 44px;
-        }
-        input, select, textarea {
-            font-size: 16px !important; /* Evita zoom en iOS */
-        }
-        /* Indicador de carga */
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #2D5A3D;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        .drop-zone { border: 3px dashed #ccc; transition: all 0.3s; }
+        .drop-zone:hover, .drop-zone.dragover { border-color: #2D5A3D; background: #f0fdf4; }
+        .preview-img { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; }
+        .tab-active { background-color: rgba(255,255,255,0.1); border-left: 4px solid #4A7C59; }
+        .pedido-nuevo { animation: pulse-border 2s infinite; }
+        @keyframes pulse-border { 0%,100% { border-left-color: #C41E3A; } 50% { border-left-color: transparent; } }
+        .notificacion { animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #2D5A3D; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
-    <!-- Pantalla de carga inicial -->
-    <div id="loadingScreen" class="fixed inset-0 bg-white z-[200] flex items-center justify-center hidden">
+    <!-- Pantalla de carga -->
+    <div id="loadingScreen" class="fixed inset-0 bg-white/80 z-[200] flex items-center justify-center hidden">
         <div class="text-center">
             <div class="spinner mx-auto mb-4"></div>
-            <p class="text-gray-600">Cargando tus datos...</p>
+            <p class="text-gray-600">Procesando...</p>
         </div>
     </div>
 
@@ -97,29 +54,15 @@
                 <h1 class="text-2xl font-bold text-sb-green mt-4">Santa Bárbara</h1>
                 <p class="text-gray-500 mt-2">Panel de Administración</p>
             </div>
-            
             <div id="loginForm">
                 <input type="email" id="email" placeholder="Correo electrónico" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 mb-4 focus:border-sb-green focus:outline-none transition-colors">
                 <input type="password" id="clave" placeholder="Contraseña" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 mb-6 focus:border-sb-green focus:outline-none transition-colors">
-                <button onclick="login()" class="w-full bg-sb-green text-white py-3 rounded-xl font-semibold hover:bg-sb-green-light transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
-                    Entrar al Sistema
-                </button>
+                <button onclick="login()" class="w-full bg-sb-green text-white py-3 rounded-xl font-semibold hover:bg-sb-green-light transition-all duration-200 shadow-md">Entrar al Sistema</button>
             </div>
-
             <div id="firstTimeMsg" class="hidden mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
-                <p class="text-sm text-blue-800 text-center">
-                    <i class="fas fa-info-circle mr-2"></i>
-                    <strong>Primera vez:</strong> Crea tu cuenta ingresando cualquier email y contraseña. 
-                    <br><br>
-                    <span class="text-xs">Estos datos se guardarán solo en este navegador.</span>
-                </p>
+                <p class="text-sm text-blue-800 text-center"><i class="fas fa-info-circle mr-2"></i><strong>Primera vez:</strong> Crea tu cuenta ingresando cualquier email y contraseña.</p>
             </div>
-
-            <div class="mt-6 text-center">
-                <a href="index.html" class="text-gray-500 hover:text-sb-green text-sm transition-colors">
-                    ← Volver a la tienda
-                </a>
-            </div>
+            <div class="mt-6 text-center"><a href="index.html" class="text-gray-500 hover:text-sb-green text-sm transition-colors">← Volver a la tienda</a></div>
         </div>
     </div>
 
@@ -128,193 +71,73 @@
         <!-- Sidebar -->
         <aside class="w-full md:w-64 bg-sb-dark text-white flex-shrink-0">
             <div class="p-6 border-b border-gray-700">
-                <div class="flex items-center gap-3">
-                    <span class="text-3xl">🌸</span>
-                    <div>
-                        <h2 class="text-lg font-bold">Santa Bárbara</h2>
-                        <p class="text-xs text-gray-400">Panel Admin</p>
-                    </div>
-                </div>
+                <div class="flex items-center gap-3"><span class="text-3xl">🌸</span><div><h2 class="text-lg font-bold">Santa Bárbara</h2><p class="text-xs text-gray-400">Panel Admin</p></div></div>
             </div>
-            
             <nav class="p-4 space-y-1">
-                <button onclick="showTab('pedidos')" id="tab-btn-pedidos" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/10 transition flex items-center gap-3 relative">
-                    <i class="fas fa-shopping-bag w-5"></i> 
-                    <span>Pedidos</span>
-                    <span id="badgePedidosNuevos" class="ml-auto bg-red-500 text-xs px-2 py-1 rounded-full hidden">0</span>
-                </button>
-                
-                <button onclick="showTab('productos')" id="tab-btn-productos" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/10 transition flex items-center gap-3 tab-active">
-                    <i class="fas fa-box w-5"></i> 
-                    <span>Productos</span>
-                    <span id="countProductos" class="ml-auto bg-sb-green text-xs px-2 py-1 rounded-full">0</span>
-                </button>
-                
-                <button onclick="showTab('categorias')" id="tab-btn-categorias" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/10 transition flex items-center gap-3">
-                    <i class="fas fa-tags w-5"></i> 
-                    <span>Categorías</span>
-                    <span id="countCategorias" class="ml-auto bg-gray-600 text-xs px-2 py-1 rounded-full">0</span>
-                </button>
-                
-                <button onclick="showTab('config')" id="tab-btn-config" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/10 transition flex items-center gap-3">
-                    <i class="fas fa-cog w-5"></i> 
-                    <span>Configuración</span>
-                </button>
-
-                <button onclick="showTab('backup')" id="tab-btn-backup" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/10 transition flex items-center gap-3 text-yellow-400">
-                    <i class="fas fa-database w-5"></i> 
-                    <span>Copia de Seguridad</span>
-                </button>
+                <button onclick="showTab('pedidos')" id="tab-btn-pedidos" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/10 transition flex items-center gap-3"><i class="fas fa-shopping-bag w-5"></i><span>Pedidos</span><span id="badgePedidosNuevos" class="ml-auto bg-red-500 text-xs px-2 py-1 rounded-full hidden">0</span></button>
+                <button onclick="showTab('productos')" id="tab-btn-productos" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/10 transition flex items-center gap-3 tab-active"><i class="fas fa-box w-5"></i><span>Productos</span><span id="countProductos" class="ml-auto bg-sb-green text-xs px-2 py-1 rounded-full">0</span></button>
+                <button onclick="showTab('categorias')" id="tab-btn-categorias" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/10 transition flex items-center gap-3"><i class="fas fa-tags w-5"></i><span>Categorías</span><span id="countCategorias" class="ml-auto bg-gray-600 text-xs px-2 py-1 rounded-full">0</span></button>
+                <button onclick="showTab('config')" id="tab-btn-config" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/10 transition flex items-center gap-3"><i class="fas fa-cog w-5"></i><span>Configuración</span></button>
+                <button onclick="showTab('backup')" id="tab-btn-backup" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/10 transition flex items-center gap-3 text-yellow-400"><i class="fas fa-database w-5"></i><span>Copia de Seguridad</span></button>
             </nav>
-
-            <div class="p-4 mt-auto border-t border-gray-700">
-                <button onclick="logout()" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/10 transition flex items-center gap-3 text-red-400">
-                    <i class="fas fa-sign-out-alt w-5"></i> 
-                    <span>Cerrar Sesión</span>
-                </button>
-            </div>
+            <div class="p-4 mt-auto border-t border-gray-700"><button onclick="logout()" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/10 transition flex items-center gap-3 text-red-400"><i class="fas fa-sign-out-alt w-5"></i><span>Cerrar Sesión</span></button></div>
         </aside>
 
         <!-- Main Content -->
         <main class="flex-1 p-4 md:p-8 overflow-y-auto relative">
-            
-            <!-- Notificaciones flotantes -->
             <div id="notificacionesContainer" class="fixed top-4 right-4 z-50 space-y-2 max-w-sm"></div>
-
-            <!-- Barra de progreso para operaciones largas -->
-            <div id="progressBar" class="hidden fixed top-0 left-0 w-full h-1 bg-green-200 z-[100]">
-                <div class="h-full bg-sb-green transition-all duration-300" style="width: 0%"></div>
-            </div>
-
-            <!-- Alertas -->
+            <div id="progressBar" class="hidden fixed top-0 left-0 w-full h-1 bg-green-200 z-[100]"><div class="h-full bg-sb-green transition-all duration-300" style="width:0%"></div></div>
             <div id="alertContainer" class="mb-6"></div>
 
             <!-- PEDIDOS -->
             <div id="tab-pedidos" class="tab-content hidden">
                 <div class="flex justify-between items-center mb-6 flex-wrap gap-4">
-                    <div>
-                        <h2 class="text-2xl md:text-3xl font-bold text-gray-800">Pedidos Recibidos</h2>
-                        <p class="text-gray-500 mt-1">Historial de pedidos de clientes</p>
-                    </div>
+                    <div><h2 class="text-2xl md:text-3xl font-bold text-gray-800">Pedidos Recibidos</h2><p class="text-gray-500 mt-1">Historial de pedidos de clientes</p></div>
                     <div class="flex gap-2">
-                        <button onclick="marcarTodosVistos()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm">
-                            <i class="fas fa-check-double mr-2"></i>Marcar todos vistos
-                        </button>
-                        <button onclick="exportarPedidos()" class="px-4 py-2 bg-sb-green text-white rounded-lg hover:bg-sb-green-light transition text-sm">
-                            <i class="fas fa-download mr-2"></i>Exportar
-                        </button>
+                        <button onclick="marcarTodosVistos()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm"><i class="fas fa-check-double mr-2"></i>Marcar todos vistos</button>
+                        <button onclick="exportarPedidos()" class="px-4 py-2 bg-sb-green text-white rounded-lg hover:bg-sb-green-light transition text-sm"><i class="fas fa-download mr-2"></i>Exportar</button>
                     </div>
                 </div>
-
-                <!-- Filtros -->
                 <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
                     <button onclick="filtrarPedidos('todos')" class="px-4 py-2 rounded-full bg-sb-green text-white text-sm font-medium">Todos</button>
                     <button onclick="filtrarPedidos('nuevo')" class="px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 text-sm font-medium">Nuevos</button>
                     <button onclick="filtrarPedidos('confirmado')" class="px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 text-sm font-medium">Confirmados</button>
                     <button onclick="filtrarPedidos('entregado')" class="px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 text-sm font-medium">Entregados</button>
                 </div>
-
                 <div id="listaPedidos" class="space-y-4"></div>
-                
-                <div id="emptyPedidos" class="hidden text-center py-12 text-gray-500 bg-white rounded-2xl border border-gray-200">
-                    <i class="fas fa-shopping-bag text-5xl mb-4 text-gray-300"></i>
-                    <p class="text-lg">No hay pedidos aún</p>
-                    <p class="text-sm mt-2">Los pedidos aparecerán aquí cuando los clientes los envíen</p>
-                </div>
+                <div id="emptyPedidos" class="hidden text-center py-12 text-gray-500 bg-white rounded-2xl border border-gray-200"><i class="fas fa-shopping-bag text-5xl mb-4 text-gray-300"></i><p class="text-lg">No hay pedidos aún</p><p class="text-sm mt-2">Los pedidos aparecerán aquí cuando los clientes los envíen</p></div>
             </div>
 
             <!-- Productos -->
             <div id="tab-productos" class="tab-content">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                    <div>
-                        <h2 class="text-2xl md:text-3xl font-bold text-gray-800">Gestión de Productos</h2>
-                        <p class="text-gray-500 mt-1">Administra tu catálogo de flores y arreglos</p>
-                    </div>
-                    <button onclick="abrirModalProducto()" class="bg-sb-green text-white px-6 py-3 rounded-xl hover:bg-sb-green-light transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
-                        <i class="fas fa-plus"></i> 
-                        <span>Nuevo Producto</span>
-                    </button>
+                    <div><h2 class="text-2xl md:text-3xl font-bold text-gray-800">Gestión de Productos</h2><p class="text-gray-500 mt-1">Administra tu catálogo de flores y arreglos</p></div>
+                    <button onclick="abrirModalProducto()" class="bg-sb-green text-white px-6 py-3 rounded-xl hover:bg-sb-green-light transition-all flex items-center gap-2 shadow-md"><i class="fas fa-plus"></i><span>Nuevo Producto</span></button>
                 </div>
-
-                <!-- Stats -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600">
-                                <i class="fas fa-check text-xl"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500">Activos</p>
-                                <p class="text-2xl font-bold text-gray-800" id="statActivos">0</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600">
-                                <i class="fas fa-star text-xl"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500">Destacados</p>
-                                <p class="text-2xl font-bold text-gray-800" id="statDestacados">0</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-red-600">
-                                <i class="fas fa-tag text-xl"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500">En Oferta</p>
-                                <p class="text-2xl font-bold text-gray-800" id="statOfertas">0</p>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100"><div class="flex items-center gap-3"><div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600"><i class="fas fa-check text-xl"></i></div><div><p class="text-sm text-gray-500">Activos</p><p class="text-2xl font-bold text-gray-800" id="statActivos">0</p></div></div></div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100"><div class="flex items-center gap-3"><div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600"><i class="fas fa-star text-xl"></i></div><div><p class="text-sm text-gray-500">Destacados</p><p class="text-2xl font-bold text-gray-800" id="statDestacados">0</p></div></div></div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100"><div class="flex items-center gap-3"><div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-red-600"><i class="fas fa-tag text-xl"></i></div><div><p class="text-sm text-gray-500">En Oferta</p><p class="text-2xl font-bold text-gray-800" id="statOfertas">0</p></div></div></div>
                 </div>
-
                 <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-200">
                     <div class="overflow-x-auto">
                         <table class="w-full">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Producto</th>
-                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Código</th>
-                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Precio</th>
-                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Stock</th>
-                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Estado</th>
-                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Acciones</th>
-                                </tr>
-                            </thead>
+                            <thead class="bg-gray-50"><tr><th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Producto</th><th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Código</th><th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Precio</th><th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Stock</th><th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Estado</th><th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Acciones</th></tr></thead>
                             <tbody id="listaProductos" class="divide-y divide-gray-100"></tbody>
                         </table>
                     </div>
-                    <div id="emptyProductos" class="hidden text-center py-12 text-gray-500">
-                        <i class="fas fa-box-open text-4xl mb-3 text-gray-300"></i>
-                        <p>No hay productos aún. ¡Crea el primero!</p>
-                    </div>
+                    <div id="emptyProductos" class="hidden text-center py-12 text-gray-500"><i class="fas fa-box-open text-4xl mb-3 text-gray-300"></i><p>No hay productos aún. ¡Crea el primero!</p></div>
                 </div>
             </div>
 
             <!-- Categorías -->
             <div id="tab-categorias" class="tab-content hidden">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                    <div>
-                        <h2 class="text-2xl md:text-3xl font-bold text-gray-800">Categorías</h2>
-                        <p class="text-gray-500 mt-1">Organiza tus productos por categorías</p>
-                    </div>
-                    <button onclick="abrirModalCategoria()" class="bg-sb-green text-white px-6 py-3 rounded-xl hover:bg-sb-green-light transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg">
-                        <i class="fas fa-plus"></i> 
-                        <span>Nueva Categoría</span>
-                    </button>
+                    <div><h2 class="text-2xl md:text-3xl font-bold text-gray-800">Categorías</h2><p class="text-gray-500 mt-1">Organiza tus productos por categorías</p></div>
+                    <button onclick="abrirModalCategoria()" class="bg-sb-green text-white px-6 py-3 rounded-xl hover:bg-sb-green-light transition-all flex items-center gap-2 shadow-md"><i class="fas fa-plus"></i><span>Nueva Categoría</span></button>
                 </div>
-
                 <div id="listaCategorias" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-                
-                <div id="emptyCategorias" class="hidden text-center py-12 text-gray-500 bg-white rounded-2xl border border-gray-200">
-                    <i class="fas fa-tags text-4xl mb-3 text-gray-300"></i>
-                    <p>No hay categorías. Crea una para organizar tus productos.</p>
-                </div>
+                <div id="emptyCategorias" class="hidden text-center py-12 text-gray-500 bg-white rounded-2xl border border-gray-200"><i class="fas fa-tags text-4xl mb-3 text-gray-300"></i><p>No hay categorías. Crea una para organizar tus productos.</p></div>
             </div>
 
             <!-- Configuración -->
@@ -322,46 +145,15 @@
                 <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Configuración General</h2>
                 <div class="bg-white rounded-2xl shadow-sm p-6 md:p-8 max-w-2xl border border-gray-200">
                     <div class="space-y-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Nombre del negocio</label>
-                            <input type="text" id="configNombre" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Número WhatsApp (sin espacios, ej: 50686053613)</label>
-                            <input type="text" id="configWhatsapp" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors">
-                            <p class="text-xs text-gray-500 mt-1">Este número recibirá los pedidos de los clientes</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Email para notificaciones</label>
-                            <input type="email" id="configEmail" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors" placeholder="tu@email.com">
-                            <p class="text-xs text-gray-500 mt-1">Opcional: para recibir copias de pedidos</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Tarifa express por km (₡)</label>
-                            <input type="number" id="configTarifa" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors">
-                            <p class="text-xs text-gray-500 mt-1">Se calcula automáticamente según la distancia en el mapa</p>
-                        </div>
-                        
+                        <div><label class="block text-sm font-medium text-gray-700 mb-2">Nombre del negocio</label><input type="text" id="configNombre" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-2">Número WhatsApp (ej: 50686053613)</label><input type="text" id="configWhatsapp" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-2">Email para notificaciones</label><input type="email" id="configEmail" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none" placeholder="tu@email.com"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-2">Tarifa express por km (₡)</label><input type="number" id="configTarifa" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none"></div>
                         <div class="bg-blue-50 p-4 rounded-xl border border-blue-200">
                             <h4 class="font-semibold text-blue-900 mb-3"><i class="fas fa-map-marker-alt mr-2"></i>Ubicación de la tienda</h4>
-                            <div class="grid md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Latitud</label>
-                                    <input type="text" id="configLat" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors" placeholder="10.034784">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Longitud</label>
-                                    <input type="text" id="configLng" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors" placeholder="-84.158785">
-                                </div>
-                            </div>
-                            <p class="text-xs text-gray-500 mt-2">Coordenadas de Santa Bárbara, Heredia. Solo cambiar si la tienda se muda.</p>
+                            <div class="grid md:grid-cols-2 gap-4"><div><label class="block text-sm font-medium text-gray-700 mb-2">Latitud</label><input type="text" id="configLat" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none" placeholder="10.034784"></div><div><label class="block text-sm font-medium text-gray-700 mb-2">Longitud</label><input type="text" id="configLng" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none" placeholder="-84.158785"></div></div>
                         </div>
-                        
-                        <div class="pt-4 border-t border-gray-200">
-                            <button onclick="guardarConfig()" class="w-full sm:w-auto bg-sb-green text-white px-8 py-3 rounded-xl hover:bg-sb-green-light transition-all duration-200 shadow-md hover:shadow-lg font-medium">
-                                <i class="fas fa-save mr-2"></i>Guardar Cambios
-                            </button>
-                        </div>
+                        <div class="pt-4 border-t border-gray-200"><button onclick="guardarConfig()" class="w-full sm:w-auto bg-sb-green text-white px-8 py-3 rounded-xl hover:bg-sb-green-light font-medium"><i class="fas fa-save mr-2"></i>Guardar Cambios</button></div>
                     </div>
                 </div>
             </div>
@@ -369,116 +161,40 @@
             <!-- Backup -->
             <div id="tab-backup" class="tab-content hidden">
                 <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Copia de Seguridad</h2>
-                
                 <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
-                        <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center text-green-600 mb-4">
-                            <i class="fas fa-download text-2xl"></i>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2">Guardar Copia</h3>
-                        <p class="text-gray-600 mb-6 text-sm">Descarga todos tus productos (con fotos), categorías, pedidos y configuración en un archivo. Guárdalo en tu computadora como respaldo.</p>
-                        <button onclick="exportarDatos()" class="w-full bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 transition-all duration-200 font-medium shadow-md">
-                            <i class="fas fa-download mr-2"></i>Descargar Respaldo
-                        </button>
-                    </div>
-
-                    <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
-                        <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mb-4">
-                            <i class="fas fa-upload text-2xl"></i>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2">Restaurar Copia</h3>
-                        <p class="text-gray-600 mb-6 text-sm">Si cambias de computadora o borras los datos, selecciona aquí tu archivo de respaldo para recuperar todo (incluyendo fotos).</p>
-                        
-                        <label class="block w-full">
-                            <input type="file" id="inputBackup" accept=".json" class="hidden" onchange="importarDatos(this)">
-                            <div class="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition-all duration-200 font-medium shadow-md text-center cursor-pointer">
-                                <i class="fas fa-upload mr-2"></i>Seleccionar Archivo
-                            </div>
-                        </label>
-                    </div>
+                    <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-200"><div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center text-green-600 mb-4"><i class="fas fa-download text-2xl"></i></div><h3 class="text-xl font-bold mb-2">Guardar Copia</h3><p class="text-gray-600 mb-6 text-sm">Descarga todos tus productos (con fotos), categorías, pedidos y configuración.</p><button onclick="exportarDatos()" class="w-full bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 font-medium"><i class="fas fa-download mr-2"></i>Descargar Respaldo</button></div>
+                    <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-200"><div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mb-4"><i class="fas fa-upload text-2xl"></i></div><h3 class="text-xl font-bold mb-2">Restaurar Copia</h3><p class="text-gray-600 mb-6 text-sm">Selecciona tu archivo de respaldo para recuperar todo (incluyendo fotos).</p><label class="block w-full"><input type="file" id="inputBackup" accept=".json" class="hidden" onchange="importarDatos(this)"><div class="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 font-medium text-center cursor-pointer"><i class="fas fa-upload mr-2"></i>Seleccionar Archivo</div></label></div>
                 </div>
-
-                <div class="mt-8 bg-yellow-50 border border-yellow-200 rounded-xl p-6">
-                    <h4 class="font-bold text-yellow-800 mb-2"><i class="fas fa-exclamation-triangle mr-2"></i>Importante</h4>
-                    <ul class="text-sm text-yellow-700 space-y-1 list-disc list-inside">
-                        <li>Tus fotos se guardan en el almacenamiento interno del navegador (IndexedDB). ¡No hay límite de espacio!</li>
-                        <li>Si borras el historial/cookies, perderás todo. Haz copias de seguridad regularmente.</li>
-                        <li>Para usar en otra computadora, exporta el archivo .json e impórtalo allí.</li>
-                        <li>El sistema puede manejar cientos de fotos sin problemas de espacio.</li>
-                    </ul>
-                </div>
+                <div class="mt-8 bg-yellow-50 border border-yellow-200 rounded-xl p-6"><h4 class="font-bold text-yellow-800 mb-2"><i class="fas fa-exclamation-triangle mr-2"></i>Importante</h4><ul class="text-sm text-yellow-700 space-y-1 list-disc list-inside"><li>Tus fotos se guardan en IndexedDB. ¡No hay límite de espacio!</li><li>Haz copias de seguridad regularmente.</li></ul></div>
             </div>
-
         </main>
     </div>
 
     <!-- Modal Producto -->
     <div id="modalProducto" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 overflow-y-auto backdrop-blur-sm">
         <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div class="p-6 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
-                <h3 class="text-xl font-bold text-gray-800" id="tituloModal">Nuevo Producto</h3>
-                <button onclick="cerrarModal('modalProducto')" class="text-gray-400 hover:text-gray-600 text-2xl transition-colors">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
+            <div class="p-6 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10"><h3 class="text-xl font-bold text-gray-800" id="tituloModal">Nuevo Producto</h3><button onclick="cerrarModal('modalProducto')" class="text-gray-400 hover:text-gray-600 text-2xl"><i class="fas fa-times"></i></button></div>
             <div class="p-6 space-y-6">
                 <input type="hidden" id="prodId">
-
                 <div class="grid md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Código único *</label>
-                        <input type="text" id="prodCodigo" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors" placeholder="Ej: RAM-ROS-001">
-                        <p class="text-xs text-gray-500 mt-1">Identificador único del producto</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Nombre del producto *</label>
-                        <input type="text" id="prodNombre" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors" placeholder="Ej: Ramo de 12 Rosas Rojas">
-                    </div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-2">Código único *</label><input type="text" id="prodCodigo" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none" placeholder="Ej: RAM-ROS-001"></div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-2">Nombre del producto *</label><input type="text" id="prodNombre" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none" placeholder="Ej: Ramo de 12 Rosas Rojas"></div>
                 </div>
-
                 <div class="grid md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Categoría *</label>
-                        <select id="prodCategoria" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors bg-white"></select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Stock disponible</label>
-                        <input type="number" id="prodStock" min="0" value="10" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors">
-                    </div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-2">Categoría *</label><select id="prodCategoria" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none bg-white"></select></div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-2">Stock disponible</label><input type="number" id="prodStock" min="0" value="10" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none"></div>
                 </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
-                    <textarea id="prodDescripcion" rows="3" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors resize-none" placeholder="Describe el producto, materiales, ocasiones ideales..."></textarea>
-                </div>
-
-                <!-- Precios -->
+                <div><label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label><textarea id="prodDescripcion" rows="3" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none resize-none" placeholder="Describe el producto..."></textarea></div>
                 <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
                     <h4 class="font-semibold mb-4 text-lg text-gray-800">Precios</h4>
                     <div class="grid md:grid-cols-3 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Precio regular (₡) *</label>
-                            <input type="number" id="prodPrecioRegular" required min="0" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors" placeholder="28000">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Precio oferta (₡)</label>
-                            <input type="number" id="prodPrecioTemporada" min="0" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors" placeholder="24000">
-                            <p class="text-xs text-gray-500 mt-1">Dejar vacío si no aplica</p>
-                        </div>
-                        <div class="flex items-end pb-3">
-                            <label class="flex items-center gap-3 cursor-pointer">
-                                <input type="checkbox" id="prodTemporadaActivo" class="w-5 h-5 text-sb-green rounded border-gray-300 focus:ring-sb-green">
-                                <span class="text-sm font-medium text-gray-700">Activar precio de oferta</span>
-                            </label>
-                        </div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-2">Precio regular (₡) *</label><input type="number" id="prodPrecioRegular" required min="0" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none" placeholder="28000"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-2">Precio oferta (₡)</label><input type="number" id="prodPrecioTemporada" min="0" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none" placeholder="24000"><p class="text-xs text-gray-500 mt-1">Dejar vacío si no aplica</p></div>
+                        <div class="flex items-end pb-3"><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="prodTemporadaActivo" class="w-5 h-5 text-sb-green rounded border-gray-300 focus:ring-sb-green"><span class="text-sm font-medium text-gray-700">Activar precio de oferta</span></label></div>
                     </div>
                 </div>
-
-                <!-- Imágenes - MEJORADO para IndexedDB -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-3">Fotos del producto (máx. 15)</label>
-                    
                     <div class="drop-zone rounded-xl p-8 text-center cursor-pointer bg-gray-50 border-2 border-dashed border-gray-300 hover:border-sb-green hover:bg-sb-green/5 transition-all" onclick="document.getElementById('inputFotos').click()">
                         <i class="fas fa-cloud-upload-alt text-5xl text-sb-green mb-4"></i>
                         <p class="text-lg font-medium text-gray-700">Haz clic para subir fotos</p>
@@ -486,50 +202,18 @@
                         <p class="text-xs text-yellow-600 mt-1">📸 Puedes seleccionar varias fotos a la vez</p>
                         <input type="file" id="inputFotos" multiple accept="image/*" class="hidden" onchange="procesarFotos(this)">
                     </div>
-
-                    <div class="mt-4 flex justify-between items-center">
-                        <span class="text-sm text-gray-600">
-                            <span id="contadorFotos" class="font-bold text-sb-green text-lg">0</span> / 15 fotos
-                        </span>
-                        <button type="button" onclick="limpiarFotos()" class="text-red-600 hover:text-red-800 text-sm font-medium">
-                            <i class="fas fa-trash mr-1"></i>Limpiar todas
-                        </button>
-                    </div>
-
-                    <!-- Barra de progreso de subida -->
-                    <div id="uploadProgress" class="hidden mt-2">
-                        <div class="flex justify-between text-xs text-gray-600 mb-1">
-                            <span>Procesando fotos...</span>
-                            <span id="uploadProgressText">0%</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div id="uploadProgressBar" class="bg-sb-green h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
-                        </div>
-                    </div>
-
+                    <div class="mt-4 flex justify-between items-center"><span class="text-sm text-gray-600"><span id="contadorFotos" class="font-bold text-sb-green text-lg">0</span> / 15 fotos</span><button type="button" onclick="limpiarFotos()" class="text-red-600 hover:text-red-800 text-sm font-medium"><i class="fas fa-trash mr-1"></i>Limpiar todas</button></div>
+                    <div id="uploadProgress" class="hidden mt-2"><div class="flex justify-between text-xs text-gray-600 mb-1"><span>Procesando fotos...</span><span id="uploadProgressText">0%</span></div><div class="w-full bg-gray-200 rounded-full h-2"><div id="uploadProgressBar" class="bg-sb-green h-2 rounded-full transition-all duration-300" style="width:0%"></div></div></div>
                     <div id="previewFotos" class="mt-4 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 max-h-80 overflow-y-auto p-3 bg-gray-50 rounded-xl border border-gray-200"></div>
                 </div>
-
-                <!-- Opciones -->
                 <div class="flex flex-col sm:flex-row gap-4 pt-4 border-t border-gray-200">
-                    <label class="flex items-center gap-3 cursor-pointer">
-                        <input type="checkbox" id="prodActivo" checked class="w-5 h-5 text-sb-green rounded border-gray-300 focus:ring-sb-green">
-                        <span class="text-sm font-medium text-gray-700">Producto activo (visible en tienda)</span>
-                    </label>
-                    <label class="flex items-center gap-3 cursor-pointer">
-                        <input type="checkbox" id="prodDestacado" class="w-5 h-5 text-sb-gold rounded border-gray-300 focus:ring-sb-gold">
-                        <span class="text-sm font-medium text-gray-700">Destacado (aparece en inicio)</span>
-                    </label>
+                    <label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="prodActivo" checked class="w-5 h-5 text-sb-green rounded border-gray-300 focus:ring-sb-green"><span class="text-sm font-medium text-gray-700">Producto activo (visible en tienda)</span></label>
+                    <label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="prodDestacado" class="w-5 h-5 text-sb-gold rounded border-gray-300 focus:ring-sb-gold"><span class="text-sm font-medium text-gray-700">Destacado (aparece en inicio)</span></label>
                 </div>
             </div>
-
             <div class="p-6 border-t border-gray-200 flex flex-col sm:flex-row justify-end gap-3 sticky bottom-0 bg-white">
-                <button onclick="cerrarModal('modalProducto')" class="w-full sm:w-auto px-8 py-3 rounded-xl border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-200 font-medium">
-                    Cancelar
-                </button>
-                <button onclick="guardarProducto()" class="w-full sm:w-auto px-8 py-3 rounded-xl bg-sb-green text-white hover:bg-sb-green-light transition-all duration-200 font-medium shadow-md hover:shadow-lg">
-                    <i class="fas fa-save mr-2"></i>Guardar Producto
-                </button>
+                <button onclick="cerrarModal('modalProducto')" class="w-full sm:w-auto px-8 py-3 rounded-xl border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-medium">Cancelar</button>
+                <button onclick="guardarProducto()" class="w-full sm:w-auto px-8 py-3 rounded-xl bg-sb-green text-white hover:bg-sb-green-light font-medium shadow-md"><i class="fas fa-save mr-2"></i>Guardar Producto</button>
             </div>
         </div>
     </div>
@@ -539,52 +223,21 @@
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl">
             <h3 class="text-xl font-bold mb-6 text-gray-800" id="tituloModalCat">Nueva Categoría</h3>
             <input type="hidden" id="catId">
-            
             <div class="space-y-5">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">ID único (ej: rosas-rojas) *</label>
-                    <input type="text" id="catIdInput" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors" placeholder="rosas-rojas">
-                    <p class="text-xs text-gray-500 mt-1">Solo letras minúsculas, números y guiones. No se puede cambiar después.</p>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Nombre visible *</label>
-                    <input type="text" id="catNombre" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors" placeholder="Ej: Rosas Rojas">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Icono (emoji)</label>
-                    <input type="text" id="catIcono" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors text-2xl" value="🌸" maxlength="2">
-                </div>
-                <div class="flex items-center gap-3">
-                    <input type="checkbox" id="catActiva" checked class="w-5 h-5 text-sb-green rounded border-gray-300 focus:ring-sb-green">
-                    <label for="catActiva" class="text-sm font-medium text-gray-700">Activa (visible en tienda)</label>
-                </div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-2">ID único (ej: rosas-rojas) *</label><input type="text" id="catIdInput" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none" placeholder="rosas-rojas"><p class="text-xs text-gray-500 mt-1">Solo letras minúsculas, números y guiones. No se puede cambiar después.</p></div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-2">Nombre visible *</label><input type="text" id="catNombre" required class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none" placeholder="Ej: Rosas Rojas"></div>
+                <div><label class="block text-sm font-medium text-gray-700 mb-2">Icono (emoji)</label><input type="text" id="catIcono" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none text-2xl" value="🌸" maxlength="2"></div>
+                <div class="flex items-center gap-3"><input type="checkbox" id="catActiva" checked class="w-5 h-5 text-sb-green rounded border-gray-300 focus:ring-sb-green"><label for="catActiva" class="text-sm font-medium text-gray-700">Activa (visible en tienda)</label></div>
             </div>
-            
             <div class="mt-8 flex flex-col sm:flex-row justify-end gap-3">
-                <button onclick="cerrarModal('modalCategoria')" class="w-full sm:w-auto px-6 py-3 rounded-xl border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-200 font-medium">
-                    Cancelar
-                </button>
-                <button onclick="guardarCategoria()" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-sb-green text-white hover:bg-sb-green-light transition-all duration-200 font-medium shadow-md">
-                    Guardar Categoría
-                </button>
+                <button onclick="cerrarModal('modalCategoria')" class="w-full sm:w-auto px-6 py-3 rounded-xl border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-medium">Cancelar</button>
+                <button onclick="guardarCategoria()" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-sb-green text-white hover:bg-sb-green-light font-medium shadow-md">Guardar Categoría</button>
             </div>
         </div>
     </div>
 
     <!-- Modal Detalle Pedido -->
-    <div id="modalPedido" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
-        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div class="p-6 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
-                <h3 class="text-xl font-bold text-gray-800">Detalle del Pedido</h3>
-                <button onclick="cerrarModal('modalPedido')" class="text-gray-400 hover:text-gray-600 text-2xl transition-colors">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div id="contenidoModalPedido" class="p-6">
-                <!-- Se llena dinámicamente -->
-            </div>
-        </div>
-    </div>
+    <div id="modalPedido" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto"><div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"><div class="p-6 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white"><h3 class="text-xl font-bold text-gray-800">Detalle del Pedido</h3><button onclick="cerrarModal('modalPedido')" class="text-gray-400 hover:text-gray-600 text-2xl"><i class="fas fa-times"></i></button></div><div id="contenidoModalPedido" class="p-6"></div></div></div>
 
     <script>
         // ============================================
@@ -625,33 +278,21 @@
                 request.onupgradeneeded = (event) => {
                     const db = event.target.result;
                     
-                    // Almacén para productos (sin imágenes)
                     if (!db.objectStoreNames.contains('productos')) {
                         const store = db.createObjectStore('productos', { keyPath: 'id' });
                         store.createIndex('categoria', 'categoria', { unique: false });
-                        store.createIndex('activo', 'activo', { unique: false });
                     }
-                    
-                    // Almacén para imágenes (separado para evitar límites)
                     if (!db.objectStoreNames.contains('imagenes')) {
                         const imgStore = db.createObjectStore('imagenes', { keyPath: 'id' });
                         imgStore.createIndex('productoId', 'productoId', { unique: false });
-                        imgStore.createIndex('indice', 'indice', { unique: false });
                     }
-                    
-                    // Almacén para categorías
                     if (!db.objectStoreNames.contains('categorias')) {
-                        const catStore = db.createObjectStore('categorias', { keyPath: 'id' });
+                        db.createObjectStore('categorias', { keyPath: 'id' });
                     }
-                    
-                    // Almacén para pedidos
                     if (!db.objectStoreNames.contains('pedidos')) {
                         const pedStore = db.createObjectStore('pedidos', { keyPath: 'id' });
                         pedStore.createIndex('fecha', 'fecha', { unique: false });
-                        pedStore.createIndex('estado', 'estado', { unique: false });
                     }
-                    
-                    // Almacén para configuración
                     if (!db.objectStoreNames.contains('config')) {
                         db.createObjectStore('config', { keyPath: 'clave' });
                     }
@@ -660,16 +301,8 @@
                 request.onsuccess = async (event) => {
                     db = event.target.result;
                     console.log('✅ IndexedDB conectada');
-                    
-                    // Cargar datos a memoria
                     await cargarDatosDesdeDB();
                     mostrarLoading(false);
-                    
-                    // Si no hay categorías, crear por defecto
-                    if (datosEnMemoria.categorias.length === 0) {
-                        await crearCategoriasPorDefecto();
-                    }
-                    
                     verificarSesion();
                     resolve();
                 };
@@ -678,131 +311,188 @@
                     console.error('❌ Error abriendo DB:', event.target.error);
                     mostrarAlerta('Error al conectar con la base de datos', 'error');
                     mostrarLoading(false);
-                    
-                    // Fallback a localStorage si IndexedDB falla
                     cargarDatosFallback();
                     reject(event.target.error);
                 };
             });
         }
 
-        // Crear categorías por defecto si es primera vez
-        async function crearCategoriasPorDefecto() {
-            const categoriasDefault = [
-                { id: 'ramos-de-rosas', nombre: 'Ramos de Rosas', icono: '🌹', orden: 1, activa: true },
-                { id: 'ramos-de-girasoles', nombre: 'Ramos de Girasoles', icono: '🌻', orden: 2, activa: true },
-                { id: 'arreglos-tropicales', nombre: 'Arreglos Tropicales', icono: '🌺', orden: 3, activa: true },
-                { id: 'plantas-interior', nombre: 'Plantas de Interior', icono: '🌿', orden: 4, activa: true }
-            ];
-            
-            for (const cat of categoriasDefault) {
-                await guardarCategoriaEnDB(cat);
-                datosEnMemoria.categorias.push(cat);
-            }
-            
-            console.log('✅ Categorías por defecto creadas');
-            actualizarStats();
-        }
-
-        // Cargar todos los datos desde IndexedDB a memoria
         async function cargarDatosDesdeDB() {
             if (!db) return;
             
             try {
-                // Cargar categorías
-                const categorias = await new Promise((resolve, reject) => {
+                // Categorías
+                const categorias = await new Promise((resolve) => {
                     const tx = db.transaction('categorias', 'readonly');
                     const store = tx.objectStore('categorias');
                     const request = store.getAll();
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
+                    request.onsuccess = () => resolve(request.result || []);
                 });
-                datosEnMemoria.categorias = categorias || [];
-                
-                // Cargar productos (sin imágenes)
-                const productos = await new Promise((resolve, reject) => {
+                datosEnMemoria.categorias = categorias;
+
+                // Productos (sin imágenes)
+                const productos = await new Promise((resolve) => {
                     const tx = db.transaction('productos', 'readonly');
                     const store = tx.objectStore('productos');
                     const request = store.getAll();
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
+                    request.onsuccess = () => resolve(request.result || []);
                 });
-                
+
                 // Cargar imágenes para cada producto
                 for (const producto of productos) {
                     const imagenes = await cargarImagenesDeProducto(producto.id);
                     producto.imagenes = imagenes;
                 }
-                datosEnMemoria.productos = productos || [];
-                
-                // Cargar pedidos
-                const pedidos = await new Promise((resolve, reject) => {
+                datosEnMemoria.productos = productos;
+
+                // Pedidos
+                const pedidos = await new Promise((resolve) => {
                     const tx = db.transaction('pedidos', 'readonly');
                     const store = tx.objectStore('pedidos');
                     const request = store.getAll();
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
+                    request.onsuccess = () => resolve(request.result || []);
                 });
-                datosEnMemoria.pedidos = pedidos || [];
-                
-                // Cargar configuración
-                const config = await new Promise((resolve, reject) => {
+                datosEnMemoria.pedidos = pedidos;
+
+                // Configuración
+                const configItems = await new Promise((resolve) => {
                     const tx = db.transaction('config', 'readonly');
                     const store = tx.objectStore('config');
                     const request = store.getAll();
-                    request.onsuccess = () => {
-                        const configs = request.result;
-                        const configObj = {};
-                        configs.forEach(item => configObj[item.clave] = item.valor);
-                        resolve(configObj);
-                    };
-                    request.onerror = () => reject(request.error);
+                    request.onsuccess = () => resolve(request.result || []);
                 });
                 
-                if (config) {
-                    datosEnMemoria.config = {
-                        nombre: config.nombre || 'Floristería Santa Bárbara',
-                        whatsapp: config.whatsapp || '50686053613',
-                        email: config.email || '',
-                        tarifaExpress: config.tarifaExpress || 650,
-                        lat: config.lat || 10.034784,
-                        lng: config.lng || -84.158785
-                    };
-                }
-                
+                const configObj = {};
+                configItems.forEach(item => configObj[item.clave] = item.valor);
+                datosEnMemoria.config = {
+                    nombre: configObj.nombre || 'Floristería Santa Bárbara',
+                    whatsapp: configObj.whatsapp || '50686053613',
+                    email: configObj.email || '',
+                    tarifaExpress: configObj.tarifaExpress || 650,
+                    lat: configObj.lat || 10.034784,
+                    lng: configObj.lng || -84.158785
+                };
+
                 console.log('✅ Datos cargados:', {
                     productos: datosEnMemoria.productos.length,
                     categorias: datosEnMemoria.categorias.length,
                     pedidos: datosEnMemoria.pedidos.length
                 });
                 
+                actualizarStats();
+                
             } catch (error) {
                 console.error('❌ Error cargando datos:', error);
-                mostrarAlerta('Error cargando datos. Usando respaldo.', 'error');
-                cargarDatosFallback();
             }
         }
 
-        // Cargar imágenes de un producto específico
         async function cargarImagenesDeProducto(productoId) {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
+                if (!db) return resolve([]);
                 const tx = db.transaction('imagenes', 'readonly');
                 const store = tx.objectStore('imagenes');
                 const index = store.index('productoId');
                 const request = index.getAll(productoId);
-                
                 request.onsuccess = () => {
-                    const imagenes = request.result
-                        .sort((a, b) => a.indice - b.indice)
-                        .map(img => img.data);
+                    const imagenes = (request.result || []).sort((a,b) => a.indice - b.indice).map(img => img.data);
                     resolve(imagenes);
                 };
-                
-                request.onerror = () => reject(request.error);
+                request.onerror = () => resolve([]);
             });
         }
 
-        // Fallback a localStorage si IndexedDB falla
+        async function guardarProductoEnDB(producto, imagenes) {
+            if (!db) return false;
+            
+            const tx = db.transaction(['productos', 'imagenes'], 'readwrite');
+            
+            try {
+                const productoSinImgs = { ...producto };
+                delete productoSinImgs.imagenes;
+                
+                await new Promise((res, rej) => {
+                    const r = tx.objectStore('productos').put(productoSinImgs);
+                    r.onsuccess = () => res(); r.onerror = () => rej(r.error);
+                });
+                
+                const imgStore = tx.objectStore('imagenes');
+                const index = imgStore.index('productoId');
+                
+                const oldImgs = await new Promise((res) => {
+                    const r = index.getAll(producto.id);
+                    r.onsuccess = () => res(r.result || []);
+                });
+                
+                for (const img of oldImgs) {
+                    await new Promise((res, rej) => {
+                        const r = imgStore.delete(img.id);
+                        r.onsuccess = () => res(); r.onerror = () => rej(r.error);
+                    });
+                }
+                
+                for (let i = 0; i < imagenes.length; i++) {
+                    await new Promise((res, rej) => {
+                        const r = imgStore.put({
+                            id: `${producto.id}_img_${i}`,
+                            productoId: producto.id,
+                            indice: i,
+                            data: imagenes[i]
+                        });
+                        r.onsuccess = () => res(); r.onerror = () => rej(r.error);
+                    });
+                }
+                
+                await new Promise((res, rej) => {
+                    tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error);
+                });
+                
+                return true;
+            } catch (error) {
+                console.error('Error guardando producto:', error);
+                tx.abort();
+                return false;
+            }
+        }
+
+        async function guardarCategoriaEnDB(categoria) {
+            if (!db) return false;
+            try {
+                const tx = db.transaction('categorias', 'readwrite');
+                await new Promise((res, rej) => {
+                    const r = tx.objectStore('categorias').put(categoria);
+                    r.onsuccess = () => res(); r.onerror = () => rej(r.error);
+                });
+                await new Promise((res, rej) => {
+                    tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error);
+                });
+                return true;
+            } catch (error) {
+                console.error('Error guardando categoría:', error);
+                return false;
+            }
+        }
+
+        async function guardarConfigEnDB(config) {
+            if (!db) return false;
+            try {
+                const tx = db.transaction('config', 'readwrite');
+                const store = tx.objectStore('config');
+                for (const [clave, valor] of Object.entries(config)) {
+                    await new Promise((res, rej) => {
+                        const r = store.put({ clave, valor });
+                        r.onsuccess = () => res(); r.onerror = () => rej(r.error);
+                    });
+                }
+                await new Promise((res, rej) => {
+                    tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error);
+                });
+                return true;
+            } catch (error) {
+                console.error('Error guardando config:', error);
+                return false;
+            }
+        }
+
         function cargarDatosFallback() {
             try {
                 const guardado = localStorage.getItem('floristeria_datos');
@@ -812,133 +502,8 @@
                     datosEnMemoria.categorias = parsed.categorias || [];
                     datosEnMemoria.pedidos = parsed.pedidos || [];
                     datosEnMemoria.config = parsed.config || datosEnMemoria.config;
-                    
-                    console.log('⚠️ Usando localStorage como fallback');
-                    mostrarAlerta('Usando almacenamiento de respaldo', 'warning');
                 }
-            } catch (e) {
-                console.error('Error en fallback:', e);
-            }
-        }
-
-        // Guardar producto en DB (con imágenes)
-        async function guardarProductoEnDB(producto, imagenes) {
-            if (!db) return false;
-            
-            const tx = db.transaction(['productos', 'imagenes'], 'readwrite');
-            
-            try {
-                // Guardar producto (sin imágenes)
-                const productoSinImgs = { ...producto };
-                delete productoSinImgs.imagenes;
-                await tx.objectStore('productos').put(productoSinImgs);
-                
-                // Eliminar imágenes antiguas
-                const imgStore = tx.objectStore('imagenes');
-                const index = imgStore.index('productoId');
-                const oldImgs = await index.getAll(producto.id);
-                
-                for (const img of oldImgs) {
-                    await imgStore.delete(img.id);
-                }
-                
-                // Guardar nuevas imágenes
-                for (let i = 0; i < imagenes.length; i++) {
-                    await imgStore.put({
-                        id: `${producto.id}_img_${i}`,
-                        productoId: producto.id,
-                        indice: i,
-                        data: imagenes[i]
-                    });
-                }
-                
-                await tx.done;
-                return true;
-                
-            } catch (error) {
-                console.error('Error guardando producto:', error);
-                tx.abort();
-                return false;
-            }
-        }
-
-        // Guardar categoría en DB
-        async function guardarCategoriaEnDB(categoria) {
-            if (!db) return false;
-            
-            try {
-                const tx = db.transaction('categorias', 'readwrite');
-                await tx.objectStore('categorias').put(categoria);
-                await tx.done;
-                return true;
-            } catch (error) {
-                console.error('Error guardando categoría:', error);
-                return false;
-            }
-        }
-
-        // Guardar pedido en DB
-        async function guardarPedidoEnDB(pedido) {
-            if (!db) return false;
-            
-            try {
-                const tx = db.transaction('pedidos', 'readwrite');
-                await tx.objectStore('pedidos').put(pedido);
-                await tx.done;
-                return true;
-            } catch (error) {
-                console.error('Error guardando pedido:', error);
-                return false;
-            }
-        }
-
-        // Guardar configuración en DB
-        async function guardarConfigEnDB(config) {
-            if (!db) return false;
-            
-            try {
-                const tx = db.transaction('config', 'readwrite');
-                const store = tx.objectStore('config');
-                
-                for (const [clave, valor] of Object.entries(config)) {
-                    await store.put({ clave, valor });
-                }
-                
-                await tx.done;
-                return true;
-            } catch (error) {
-                console.error('Error guardando config:', error);
-                return false;
-            }
-        }
-
-        // Eliminar producto de DB
-        async function eliminarProductoDeDB(productoId) {
-            if (!db) return false;
-            
-            const tx = db.transaction(['productos', 'imagenes'], 'readwrite');
-            
-            try {
-                // Eliminar producto
-                await tx.objectStore('productos').delete(productoId);
-                
-                // Eliminar imágenes asociadas
-                const imgStore = tx.objectStore('imagenes');
-                const index = imgStore.index('productoId');
-                const imagenes = await index.getAll(productoId);
-                
-                for (const img of imagenes) {
-                    await imgStore.delete(img.id);
-                }
-                
-                await tx.done;
-                return true;
-                
-            } catch (error) {
-                console.error('Error eliminando producto:', error);
-                tx.abort();
-                return false;
-            }
+            } catch (e) {}
         }
 
         // ============================================
@@ -951,8 +516,7 @@
             } else {
                 document.getElementById('loginScreen').classList.remove('hidden');
                 document.getElementById('dashboard').classList.add('hidden');
-                const datosExistentes = localStorage.getItem('floristeria_datos');
-                if (!datosExistentes && datosEnMemoria.categorias.length === 0) {
+                if (!localStorage.getItem('floristeria_datos') && datosEnMemoria.categorias.length === 0) {
                     document.getElementById('firstTimeMsg').classList.remove('hidden');
                 }
             }
@@ -961,11 +525,7 @@
         async function login() {
             const email = document.getElementById('email').value.trim();
             const clave = document.getElementById('clave').value;
-            
-            if (!email || !clave) {
-                mostrarAlerta('Por favor ingresa email y contraseña', 'error');
-                return;
-            }
+            if (!email || !clave) return mostrarAlerta('Ingresa email y contraseña', 'error');
 
             const hash = await hashString(email + clave);
             const guardado = localStorage.getItem('admin_hash');
@@ -973,13 +533,13 @@
             if (!guardado) {
                 localStorage.setItem('admin_hash', hash);
                 localStorage.setItem(AUTH_KEY, 'logged_in');
-                mostrarAlerta('¡Cuenta creada exitosamente!', 'success');
+                mostrarAlerta('✅ Cuenta creada', 'success');
                 setTimeout(entrarDashboard, 500);
             } else if (guardado === hash) {
                 localStorage.setItem(AUTH_KEY, 'logged_in');
                 entrarDashboard();
             } else {
-                mostrarAlerta('Email o contraseña incorrectos', 'error');
+                mostrarAlerta('Credenciales incorrectas', 'error');
             }
         }
 
@@ -994,10 +554,8 @@
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('dashboard').classList.remove('hidden');
             actualizarStats();
-            showTab('pedidos');
+            showTab('productos');
             verificarPedidosNuevos();
-            
-            // Iniciar intervalo de verificación de pedidos
             setInterval(verificarPedidosNuevos, 30000);
         }
 
@@ -1009,58 +567,10 @@
         }
 
         // ============================================
-        // FUNCIONES DE UI
+        // UI
         // ============================================
         function mostrarLoading(mostrar) {
-            const loading = document.getElementById('loadingScreen');
-            if (mostrar) {
-                loading.classList.remove('hidden');
-            } else {
-                loading.classList.add('hidden');
-            }
-        }
-
-        function showProgress(porcentaje, texto) {
-            const bar = document.getElementById('progressBar');
-            const barInner = bar.querySelector('div');
-            bar.classList.remove('hidden');
-            barInner.style.width = porcentaje + '%';
-            
-            if (porcentaje >= 100) {
-                setTimeout(() => bar.classList.add('hidden'), 500);
-            }
-        }
-
-        function actualizarStats() {
-            const activos = datosEnMemoria.productos.filter(p => p.activo).length;
-            const destacados = datosEnMemoria.productos.filter(p => p.destacado).length;
-            const ofertas = datosEnMemoria.productos.filter(p => p.precioTemporadaActivo).length;
-            
-            document.getElementById('countProductos').textContent = datosEnMemoria.productos.length;
-            document.getElementById('countCategorias').textContent = datosEnMemoria.categorias.length;
-            document.getElementById('statActivos').textContent = activos;
-            document.getElementById('statDestacados').textContent = destacados;
-            document.getElementById('statOfertas').textContent = ofertas;
-        }
-
-        function mostrarNotificacion(mensaje, tipo = 'info') {
-            const container = document.getElementById('notificacionesContainer');
-            const notif = document.createElement('div');
-            notif.className = `notificacion bg-white border-l-4 ${tipo === 'success' ? 'border-green-500' : tipo === 'error' ? 'border-red-500' : 'border-blue-500'} p-4 rounded-lg shadow-lg flex items-center gap-3 min-w-[300px]`;
-            notif.innerHTML = `
-                <i class="fas ${tipo === 'success' ? 'fa-check-circle text-green-500' : tipo === 'error' ? 'fa-exclamation-circle text-red-500' : 'fa-info-circle text-blue-500'} text-xl"></i>
-                <div class="flex-1">
-                    <p class="font-medium text-gray-800">${mensaje}</p>
-                </div>
-                <button onclick="this.parentElement.remove()" class="text-gray-400 hover:text-gray-600">
-                    <i class="fas fa-times"></i>
-                </button>
-            `;
-            container.appendChild(notif);
-            
-            setTimeout(() => {
-                notif.remove();
-            }, 5000);
+            document.getElementById('loadingScreen').classList.toggle('hidden', !mostrar);
         }
 
         function mostrarAlerta(mensaje, tipo = 'success') {
@@ -1069,32 +579,26 @@
                          tipo === 'error' ? 'bg-red-100 text-red-800 border-red-200' : 
                          'bg-blue-100 text-blue-800 border-blue-200';
             const icono = tipo === 'success' ? 'check-circle' : tipo === 'error' ? 'exclamation-circle' : 'info-circle';
-            
-            container.innerHTML = `
-                <div class="${color} border px-4 py-3 rounded-xl flex items-center gap-2 animate-fade-in">
-                    <i class="fas fa-${icono}"></i>
-                    <span class="font-medium">${mensaje}</span>
-                </div>
-            `;
-            
-            setTimeout(() => {
-                container.innerHTML = '';
-            }, 5000);
+            container.innerHTML = `<div class="${color} border px-4 py-3 rounded-xl flex items-center gap-2"><i class="fas fa-${icono}"></i><span>${mensaje}</span></div>`;
+            setTimeout(() => container.innerHTML = '', 5000);
         }
 
-        // ============================================
-        // NAVEGACIÓN DE TABS
-        // ============================================
+        function actualizarStats() {
+            const activos = datosEnMemoria.productos.filter(p => p.activo).length;
+            const destacados = datosEnMemoria.productos.filter(p => p.destacado).length;
+            const ofertas = datosEnMemoria.productos.filter(p => p.precioTemporadaActivo).length;
+            document.getElementById('countProductos').textContent = datosEnMemoria.productos.length;
+            document.getElementById('countCategorias').textContent = datosEnMemoria.categorias.length;
+            document.getElementById('statActivos').textContent = activos;
+            document.getElementById('statDestacados').textContent = destacados;
+            document.getElementById('statOfertas').textContent = ofertas;
+        }
+
         function showTab(tab) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-            document.querySelectorAll('[id^="tab-btn-"]').forEach(b => {
-                b.classList.remove('tab-active');
-                b.classList.remove('bg-white/10');
-            });
-            
+            document.querySelectorAll('[id^="tab-btn-"]').forEach(b => b.classList.remove('tab-active'));
             document.getElementById(`tab-${tab}`).classList.remove('hidden');
             document.getElementById(`tab-btn-${tab}`).classList.add('tab-active');
-            
             if (tab === 'productos') renderizarProductos();
             if (tab === 'categorias') renderizarCategorias();
             if (tab === 'config') cargarConfig();
@@ -1102,181 +606,55 @@
         }
 
         // ============================================
-        // PEDIDOS
+        // PEDIDOS (resumen)
         // ============================================
         function renderizarPedidos() {
             const container = document.getElementById('listaPedidos');
             const empty = document.getElementById('emptyPedidos');
-            
             let pedidosMostrar = datosEnMemoria.pedidos || [];
-            
-            if (filtroPedidosActual !== 'todos') {
-                pedidosMostrar = pedidosMostrar.filter(p => p.estado === filtroPedidosActual);
-            }
-            
-            // Ordenar por fecha, más recientes primero
-            pedidosMostrar.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+            if (filtroPedidosActual !== 'todos') pedidosMostrar = pedidosMostrar.filter(p => p.estado === filtroPedidosActual);
+            pedidosMostrar.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
             
             if (pedidosMostrar.length === 0) {
                 container.innerHTML = '';
                 empty.classList.remove('hidden');
                 return;
             }
-            
             empty.classList.add('hidden');
             container.innerHTML = pedidosMostrar.map(p => {
                 const fecha = new Date(p.fecha).toLocaleString('es-CR');
                 const esNuevo = p.estado === 'nuevo' && !p.visto;
-                const productosTexto = p.productos.map(prod => `${prod.cantidad}x ${prod.nombre}`).join(', ');
-                
-                return `
-                    <div class="bg-white rounded-xl p-5 shadow-sm border-l-4 ${esNuevo ? 'border-red-500 pedido-nuevo' : p.estado === 'entregado' ? 'border-green-500' : p.estado === 'confirmado' ? 'border-blue-500' : 'border-gray-300'} hover:shadow-md transition-all cursor-pointer" onclick="verDetallePedido('${p.id}')">
-                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <div class="flex-1">
-                                <div class="flex items-center gap-3 mb-2">
-                                    <span class="font-bold text-gray-800">${p.id}</span>
-                                    ${esNuevo ? '<span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">NUEVO</span>' : ''}
-                                    <span class="text-xs text-gray-500">${fecha}</span>
-                                </div>
-                                <p class="text-sm text-gray-600 mb-1"><strong>De:</strong> ${p.cliente}</p>
-                                <p class="text-sm text-gray-600 mb-1"><strong>Para:</strong> ${p.receptor}</p>
-                                <p class="text-sm text-gray-500 truncate">${productosTexto}</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-xl font-bold text-sb-green">₡${p.total.toLocaleString()}</p>
-                                <p class="text-xs text-gray-500 capitalize">${p.tipoEntrega}</p>
-                                <select onchange="cambiarEstadoPedido('${p.id}', this.value); event.stopPropagation();" class="mt-2 text-xs border rounded-lg px-2 py-1 bg-white" onclick="event.stopPropagation();">
-                                    <option value="nuevo" ${p.estado === 'nuevo' ? 'selected' : ''}>Nuevo</option>
-                                    <option value="confirmado" ${p.estado === 'confirmado' ? 'selected' : ''}>Confirmado</option>
-                                    <option value="en_proceso" ${p.estado === 'en_proceso' ? 'selected' : ''}>En proceso</option>
-                                    <option value="entregado" ${p.estado === 'entregado' ? 'selected' : ''}>Entregado</option>
-                                    <option value="cancelado" ${p.estado === 'cancelado' ? 'selected' : ''}>Cancelado</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                `;
+                return `<div class="bg-white rounded-xl p-5 shadow-sm border-l-4 ${esNuevo ? 'border-red-500 pedido-nuevo' : p.estado === 'entregado' ? 'border-green-500' : p.estado === 'confirmado' ? 'border-blue-500' : 'border-gray-300'} cursor-pointer" onclick="verDetallePedido('${p.id}')">
+                    <div class="flex flex-col md:flex-row justify-between gap-4"><div class="flex-1"><div class="flex items-center gap-3 mb-2"><span class="font-bold">${p.id}</span>${esNuevo ? '<span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">NUEVO</span>' : ''}<span class="text-xs text-gray-500">${fecha}</span></div><p class="text-sm"><strong>De:</strong> ${p.cliente}</p><p class="text-sm"><strong>Para:</strong> ${p.receptor}</p></div><div class="text-right"><p class="text-xl font-bold text-sb-green">₡${p.total.toLocaleString()}</p><p class="text-xs capitalize">${p.tipoEntrega}</p><select onchange="cambiarEstadoPedido('${p.id}', this.value); event.stopPropagation();" class="mt-2 text-xs border rounded-lg px-2 py-1" onclick="event.stopPropagation()"><option value="nuevo" ${p.estado==='nuevo'?'selected':''}>Nuevo</option><option value="confirmado" ${p.estado==='confirmado'?'selected':''}>Confirmado</option><option value="entregado" ${p.estado==='entregado'?'selected':''}>Entregado</option><option value="cancelado" ${p.estado==='cancelado'?'selected':''}>Cancelado</option></select></div></div></div>`;
             }).join('');
         }
 
         function filtrarPedidos(filtro) {
             filtroPedidosActual = filtro;
             renderizarPedidos();
-            
-            // Actualizar botones de filtro
-            document.querySelectorAll('#tab-pedidos button[onclick^="filtrarPedidos"]').forEach(btn => {
-                if (btn.textContent.toLowerCase().includes(filtro === 'todos' ? 'todos' : filtro)) {
-                    btn.classList.remove('bg-gray-200', 'text-gray-700');
-                    btn.classList.add('bg-sb-green', 'text-white');
-                } else {
-                    btn.classList.remove('bg-sb-green', 'text-white');
-                    btn.classList.add('bg-gray-200', 'text-gray-700');
-                }
-            });
         }
 
         function verDetallePedido(id) {
             const pedido = datosEnMemoria.pedidos.find(p => p.id === id);
             if (!pedido) return;
-            
-            // Marcar como visto
             pedido.visto = true;
             guardarPedidoEnDB(pedido);
             verificarPedidosNuevos();
-            
             const modal = document.getElementById('modalPedido');
-            const contenido = document.getElementById('contenidoModalPedido');
-            
-            const fecha = new Date(pedido.fecha).toLocaleString('es-CR');
-            
-            contenido.innerHTML = `
-                <div class="space-y-4">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-sm text-gray-500">Pedido</p>
-                            <h4 class="text-2xl font-bold text-gray-800">${pedido.id}</h4>
-                            <p class="text-sm text-gray-500">${fecha}</p>
-                        </div>
-                        <span class="px-3 py-1 rounded-full text-sm font-medium ${pedido.estado === 'nuevo' ? 'bg-red-100 text-red-800' : pedido.estado === 'entregado' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'} capitalize">
-                            ${pedido.estado.replace('_', ' ')}
-                        </span>
-                    </div>
-                    
-                    <div class="grid md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl">
-                        <div>
-                            <p class="text-sm text-gray-500 mb-1">Quien compra</p>
-                            <p class="font-medium">${pedido.cliente}</p>
-                            <p class="text-sm text-gray-600">${pedido.telefonoCliente}</p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-500 mb-1">Quien recibe</p>
-                            <p class="font-medium">${pedido.receptor}</p>
-                            <p class="text-sm text-gray-600">${pedido.telefonoReceptor}</p>
-                            ${pedido.cliente === pedido.receptor ? '<p class="text-xs text-gray-400">(Misma persona)</p>' : ''}
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <p class="text-sm text-gray-500 mb-2">Productos</p>
-                        <div class="space-y-2">
-                            ${pedido.productos.map(prod => `
-                                <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                                    <div class="flex items-center gap-3">
-                                        <img src="${prod.imagen || 'https://via.placeholder.com/80?text=Flor'}" class="w-12 h-12 object-cover rounded-lg" onerror="this.src='https://via.placeholder.com/80?text=Flor'">
-                                        <div>
-                                            <p class="font-medium">${prod.nombre}</p>
-                                            <p class="text-sm text-gray-500">${prod.cantidad} x ₡${prod.precioUnitario.toLocaleString()}</p>
-                                        </div>
-                                    </div>
-                                    <p class="font-bold">₡${prod.subtotal.toLocaleString()}</p>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                    
-                    <div class="bg-sb-cream p-4 rounded-xl">
-                        <div class="flex justify-between mb-2">
-                            <span>Subtotal:</span>
-                            <span>₡${pedido.subtotal.toLocaleString()}</span>
-                        </div>
-                        ${pedido.envio > 0 ? `
-                            <div class="flex justify-between mb-2">
-                                <span>Envío:</span>
-                                <span>₡${pedido.envio.toLocaleString()}</span>
-                            </div>
-                        ` : ''}
-                        <div class="flex justify-between text-xl font-bold text-sb-green pt-2 border-t border-gray-300">
-                            <span>Total:</span>
-                            <span>₡${pedido.total.toLocaleString()}</span>
-                        </div>
-                    </div>
-                    
-                    ${pedido.mensajeTarjeta ? `
-                        <div class="bg-pink-50 p-4 rounded-xl border border-pink-200">
-                            <p class="text-sm text-pink-800 font-medium mb-1">Mensaje para tarjeta:</p>
-                            <p class="text-pink-700 italic">"${pedido.mensajeTarjeta}"</p>
-                        </div>
-                    ` : ''}
-                    
-                    ${pedido.observaciones ? `
-                        <div class="bg-yellow-50 p-4 rounded-xl border border-yellow-200">
-                            <p class="text-sm text-yellow-800 font-medium mb-1">Observaciones:</p>
-                            <p class="text-yellow-700">${pedido.observaciones}</p>
-                        </div>
-                    ` : ''}
-                    
-                    <div class="flex gap-3 pt-4">
-                        <a href="https://wa.me/${pedido.telefonoCliente.replace(/\D/g, '')}?text=${encodeURIComponent('Hola ' + pedido.cliente + ', confirmamos tu pedido ' + pedido.id)}" target="_blank" class="flex-1 bg-green-600 text-white py-3 rounded-xl text-center font-medium hover:bg-green-700 transition">
-                            <i class="fab fa-whatsapp mr-2"></i>Contactar cliente
-                        </a>
-                        <button onclick="cerrarModal('modalPedido')" class="px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition">
-                            Cerrar
-                        </button>
-                    </div>
-                </div>
-            `;
-            
+            document.getElementById('contenidoModalPedido').innerHTML = `<pre>${JSON.stringify(pedido, null, 2)}</pre>`;
             modal.classList.remove('hidden');
+        }
+
+        async function guardarPedidoEnDB(pedido) {
+            if (!db) return;
+            try {
+                const tx = db.transaction('pedidos', 'readwrite');
+                await new Promise((res,rej) => {
+                    const r = tx.objectStore('pedidos').put(pedido);
+                    r.onsuccess = () => res(); r.onerror = () => rej(r.error);
+                });
+                await new Promise((res,rej) => { tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); });
+            } catch (e) {}
         }
 
         function cambiarEstadoPedido(id, nuevoEstado) {
@@ -1285,68 +663,38 @@
                 pedido.estado = nuevoEstado;
                 guardarPedidoEnDB(pedido);
                 renderizarPedidos();
-                mostrarAlerta(`Pedido marcado como ${nuevoEstado.replace('_', ' ')}`, 'success');
+                mostrarAlerta(`Pedido marcado como ${nuevoEstado.replace('_',' ')}`, 'success');
             }
         }
 
         function verificarPedidosNuevos() {
             const pedidosNuevos = datosEnMemoria.pedidos.filter(p => p.estado === 'nuevo' && !p.visto).length;
             const badge = document.getElementById('badgePedidosNuevos');
-            
             if (pedidosNuevos > 0) {
                 badge.textContent = pedidosNuevos;
                 badge.classList.remove('hidden');
-                
-                // Mostrar notificación flotante solo si hay nuevos
-                if (pedidosNuevos > 0 && (!window.ultimaNotificacion || Date.now() - window.ultimaNotificacion > 10000)) {
-                    mostrarNotificacion(`¡${pedidosNuevos} pedido${pedidosNuevos > 1 ? 's' : ''} nuevo${pedidosNuevos > 1 ? 's' : ''}!`, 'success');
-                    window.ultimaNotificacion = Date.now();
-                }
             } else {
                 badge.classList.add('hidden');
             }
-            
-            if (document.getElementById('tab-pedidos').classList.contains('hidden') === false) {
-                renderizarPedidos();
-            }
+            if (!document.getElementById('tab-pedidos').classList.contains('hidden')) renderizarPedidos();
         }
 
         function marcarTodosVistos() {
-            datosEnMemoria.pedidos.forEach(p => p.visto = true);
-            datosEnMemoria.pedidos.forEach(p => guardarPedidoEnDB(p));
+            datosEnMemoria.pedidos.forEach(p => { p.visto = true; guardarPedidoEnDB(p); });
             verificarPedidosNuevos();
             renderizarPedidos();
             mostrarAlerta('Todos los pedidos marcados como vistos', 'success');
         }
 
         function exportarPedidos() {
-            const csv = convertirPedidosACSV(datosEnMemoria.pedidos);
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const csv = 'ID,Fecha,Cliente,Total\n' + datosEnMemoria.pedidos.map(p => `${p.id},${p.fecha},${p.cliente},${p.total}`).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
             a.download = `pedidos-${new Date().toISOString().split('T')[0]}.csv`;
-            document.body.appendChild(a);
             a.click();
-            document.body.removeChild(a);
             URL.revokeObjectURL(url);
-        }
-
-        function convertirPedidosACSV(pedidos) {
-            const headers = ['ID', 'Fecha', 'Cliente', 'Tel Cliente', 'Receptor', 'Tel Receptor', 'Productos', 'Total', 'Estado', 'Tipo Entrega'];
-            const rows = pedidos.map(p => [
-                p.id,
-                p.fecha,
-                p.cliente,
-                p.telefonoCliente,
-                p.receptor,
-                p.telefonoReceptor,
-                p.productos.map(prod => `${prod.cantidad}x ${prod.nombre}`).join('; '),
-                p.total,
-                p.estado,
-                p.tipoEntrega
-            ]);
-            return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
         }
 
         // ============================================
@@ -1355,50 +703,15 @@
         function renderizarProductos() {
             const tbody = document.getElementById('listaProductos');
             const empty = document.getElementById('emptyProductos');
-            
             if (datosEnMemoria.productos.length === 0) {
                 tbody.innerHTML = '';
                 empty.classList.remove('hidden');
                 return;
             }
-            
             empty.classList.add('hidden');
-            tbody.innerHTML = datosEnMemoria.productos.map((p, index) => {
+            tbody.innerHTML = datosEnMemoria.productos.map(p => {
                 const precio = p.precioTemporadaActivo && p.precioTemporada ? p.precioTemporada : p.precioRegular;
-                const img = p.imagenes?.[0] || 'https://via.placeholder.com/80?text=Sin+foto';
-                
-                return `
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <img src="${img}" class="w-12 h-12 object-cover rounded-lg border border-gray-200" onerror="this.src='https://via.placeholder.com/80?text=Sin+foto'">
-                                <div>
-                                    <div class="font-medium text-gray-900">${p.nombre}</div>
-                                    ${p.destacado ? '<span class="text-xs text-sb-gold">⭐ Destacado</span>' : ''}
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-600 font-mono">${p.codigo}</td>
-                        <td class="px-6 py-4">
-                            <div class="font-bold text-sb-green">₡${precio.toLocaleString()}</div>
-                            ${p.precioTemporadaActivo ? `<div class="text-xs text-gray-400 line-through">₡${p.precioRegular.toLocaleString()}</div>` : ''}
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-600">${p.stock || 0}</td>
-                        <td class="px-6 py-4">
-                            <span class="px-3 py-1 rounded-full text-xs font-medium ${p.activo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}">
-                                ${p.activo ? 'Activo' : 'Inactivo'}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4">
-                            <button onclick="abrirModalProducto('${p.id}')" class="text-blue-600 hover:text-blue-800 mr-3 transition-colors" title="Editar">
-                                <i class="fas fa-edit text-lg"></i>
-                            </button>
-                            <button onclick="eliminarProducto('${p.id}')" class="text-red-600 hover:text-red-800 transition-colors" title="Eliminar">
-                                <i class="fas fa-trash text-lg"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
+                return `<tr class="hover:bg-gray-50"><td class="px-6 py-4"><div class="flex items-center gap-3"><img src="${p.imagenes?.[0] || 'https://via.placeholder.com/80'}" class="w-12 h-12 object-cover rounded-lg"><div><div class="font-medium">${p.nombre}</div>${p.destacado ? '<span class="text-xs text-sb-gold">⭐ Destacado</span>' : ''}</div></div></td><td class="px-6 py-4 text-sm">${p.codigo}</td><td class="px-6 py-4"><div class="font-bold text-sb-green">₡${precio.toLocaleString()}</div>${p.precioTemporadaActivo ? `<div class="text-xs line-through">₡${p.precioRegular.toLocaleString()}</div>` : ''}</td><td class="px-6 py-4">${p.stock}</td><td class="px-6 py-4"><span class="px-3 py-1 rounded-full text-xs font-medium ${p.activo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}">${p.activo ? 'Activo' : 'Inactivo'}</span></td><td class="px-6 py-4"><button onclick="abrirModalProducto('${p.id}')" class="text-blue-600 hover:text-blue-800 mr-3"><i class="fas fa-edit"></i></button><button onclick="eliminarProducto('${p.id}')" class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button></td></tr>`;
             }).join('');
         }
 
@@ -1407,9 +720,7 @@
             document.getElementById('tituloModal').textContent = id ? 'Editar Producto' : 'Nuevo Producto';
             
             const select = document.getElementById('prodCategoria');
-            select.innerHTML = datosEnMemoria.categorias.map(c => 
-                `<option value="${c.id}">${c.icono} ${c.nombre}</option>`
-            ).join('');
+            select.innerHTML = datosEnMemoria.categorias.map(c => `<option value="${c.id}">${c.icono} ${c.nombre}</option>`).join('');
             
             fotosTemp = [];
             
@@ -1426,12 +737,7 @@
                 document.getElementById('prodTemporadaActivo').checked = p.precioTemporadaActivo || false;
                 document.getElementById('prodActivo').checked = p.activo !== false;
                 document.getElementById('prodDestacado').checked = p.destacado || false;
-                
-                // Cargar imágenes existentes
-                if (p.imagenes && p.imagenes.length > 0) {
-                    fotosTemp = [...p.imagenes];
-                    console.log('📸 Cargando imágenes existentes:', fotosTemp.length);
-                }
+                if (p.imagenes) fotosTemp = [...p.imagenes];
             } else {
                 document.getElementById('prodId').value = '';
                 document.getElementById('prodCodigo').value = '';
@@ -1444,124 +750,73 @@
                 document.getElementById('prodActivo').checked = true;
                 document.getElementById('prodDestacado').checked = false;
             }
-            
             renderizarPreviews();
         }
 
-        // Procesar fotos - MEJORADO para múltiples archivos
         function procesarFotos(input) {
             const archivos = Array.from(input.files);
+            if (fotosTemp.length + archivos.length > 15) return mostrarAlerta('Máximo 15 imágenes', 'error');
             
-            if (fotosTemp.length + archivos.length > 15) {
-                mostrarAlerta('Máximo 15 imágenes por producto', 'error');
-                return;
-            }
-            
-            // Mostrar barra de progreso
             document.getElementById('uploadProgress').classList.remove('hidden');
-            document.getElementById('uploadProgressBar').style.width = '0%';
-            document.getElementById('uploadProgressText').textContent = '0%';
-            
             let procesadas = 0;
             
-            archivos.forEach((archivo, index) => {
+            archivos.forEach(archivo => {
                 if (!archivo.type.startsWith('image/')) return;
-                
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     const img = new Image();
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
                         const ctx = canvas.getContext('2d');
-                        
-                        // Redimensionar para optimizar (600px máximo)
+                        let width = img.width, height = img.height;
                         const maxSize = 600;
-                        let width = img.width;
-                        let height = img.height;
-                        
-                        if (width > height && width > maxSize) {
-                            height *= maxSize / width;
-                            width = maxSize;
-                        } else if (height > maxSize) {
-                            width *= maxSize / height;
-                            height = maxSize;
-                        }
-                        
-                        canvas.width = width;
-                        canvas.height = height;
+                        if (width > height && width > maxSize) { height *= maxSize / width; width = maxSize; }
+                        else if (height > maxSize) { width *= maxSize / height; height = maxSize; }
+                        canvas.width = width; canvas.height = height;
                         ctx.drawImage(img, 0, 0, width, height);
-                        
-                        // Calidad 0.7 para buen balance
                         const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
                         fotosTemp.push(dataUrl);
-                        
                         procesadas++;
                         const porcentaje = Math.round((procesadas / archivos.length) * 100);
                         document.getElementById('uploadProgressBar').style.width = porcentaje + '%';
                         document.getElementById('uploadProgressText').textContent = porcentaje + '%';
-                        
                         if (procesadas === archivos.length) {
-                            setTimeout(() => {
-                                document.getElementById('uploadProgress').classList.add('hidden');
-                                mostrarNotificacion(`✅ ${archivos.length} foto${archivos.length > 1 ? 's' : ''} procesada${archivos.length > 1 ? 's' : ''}`, 'success');
-                            }, 500);
+                            setTimeout(() => document.getElementById('uploadProgress').classList.add('hidden'), 500);
                         }
-                        
                         renderizarPreviews();
                     };
                     img.src = e.target.result;
                 };
                 reader.readAsDataURL(archivo);
             });
-            
             input.value = '';
         }
 
         function renderizarPreviews() {
             document.getElementById('contadorFotos').textContent = fotosTemp.length;
-            document.getElementById('previewFotos').innerHTML = fotosTemp.map((foto, index) => `
-                <div class="relative group">
-                    <img src="${foto}" class="w-full h-24 object-cover rounded-lg border border-gray-200">
-                    <button onclick="eliminarFoto(${index})" class="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity shadow-md">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            `).join('');
+            document.getElementById('previewFotos').innerHTML = fotosTemp.map((f, i) => `<div class="relative group"><img src="${f}" class="w-full h-24 object-cover rounded-lg border"><button onclick="eliminarFoto(${i})" class="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100"><i class="fas fa-times"></i></button></div>`).join('');
         }
 
-        function eliminarFoto(index) {
-            fotosTemp.splice(index, 1);
-            renderizarPreviews();
-        }
-
-        function limpiarFotos() {
-            if (fotosTemp.length > 0 && confirm('¿Eliminar todas las fotos?')) {
-                fotosTemp = [];
-                renderizarPreviews();
-            }
-        }
+        function eliminarFoto(index) { fotosTemp.splice(index, 1); renderizarPreviews(); }
+        function limpiarFotos() { if (fotosTemp.length && confirm('¿Eliminar todas?')) { fotosTemp = []; renderizarPreviews(); } }
 
         async function guardarProducto() {
             if (operacionEnProgreso) return;
-            
             const id = document.getElementById('prodId').value;
             const codigo = document.getElementById('prodCodigo').value.trim();
             const nombre = document.getElementById('prodNombre').value.trim();
+            if (!codigo || !nombre) return mostrarAlerta('Código y nombre obligatorios', 'error');
             
-            if (!codigo || !nombre) {
-                mostrarAlerta('Código y nombre son obligatorios', 'error');
-                return;
-            }
+            const categoria = document.getElementById('prodCategoria').value;
+            if (!categoria) return mostrarAlerta('Selecciona una categoría', 'error');
             
             operacionEnProgreso = true;
             mostrarLoading(true);
             
             const producto = {
                 id: id || 'prod-' + Date.now(),
-                codigo: codigo,
-                nombre: nombre,
-                categoria: document.getElementById('prodCategoria').value,
-                descripcion: document.getElementById('prodDescripcion').value.trim(),
+                codigo, nombre, categoria,
+                descripcion: document.getElementById('prodDescripcion').value.trim() || '',
                 stock: parseInt(document.getElementById('prodStock').value) || 0,
                 precioRegular: parseInt(document.getElementById('prodPrecioRegular').value) || 0,
                 precioTemporada: parseInt(document.getElementById('prodPrecioTemporada').value) || null,
@@ -1572,53 +827,48 @@
             
             try {
                 const guardado = await guardarProductoEnDB(producto, fotosTemp);
+                if (!guardado) throw new Error('Error al guardar en DB');
                 
-                if (guardado) {
-                    // Actualizar memoria
-                    if (id) {
-                        const index = datosEnMemoria.productos.findIndex(p => p.id === id);
-                        datosEnMemoria.productos[index] = { ...producto, imagenes: fotosTemp };
-                    } else {
-                        datosEnMemoria.productos.push({ ...producto, imagenes: fotosTemp });
-                    }
-                    
-                    cerrarModal('modalProducto');
-                    renderizarProductos();
-                    actualizarStats();
-                    mostrarAlerta('✅ Producto guardado correctamente', 'success');
+                if (id) {
+                    const index = datosEnMemoria.productos.findIndex(p => p.id === id);
+                    if (index !== -1) datosEnMemoria.productos[index] = { ...producto, imagenes: [...fotosTemp] };
+                    else datosEnMemoria.productos.push({ ...producto, imagenes: [...fotosTemp] });
                 } else {
-                    throw new Error('Error al guardar en DB');
+                    datosEnMemoria.productos.push({ ...producto, imagenes: [...fotosTemp] });
                 }
+                
+                fotosTemp = [];
+                cerrarModal('modalProducto');
+                renderizarProductos();
+                actualizarStats();
+                mostrarAlerta('✅ Producto guardado', 'success');
             } catch (error) {
-                console.error('Error:', error);
-                mostrarAlerta('Error al guardar el producto', 'error');
+                mostrarAlerta('Error al guardar', 'error');
             }
-            
             mostrarLoading(false);
             operacionEnProgreso = false;
         }
 
         async function eliminarProducto(id) {
-            if (confirm('¿Eliminar este producto permanentemente?')) {
-                mostrarLoading(true);
-                
-                try {
-                    const eliminado = await eliminarProductoDeDB(id);
-                    
-                    if (eliminado) {
-                        datosEnMemoria.productos = datosEnMemoria.productos.filter(p => p.id !== id);
-                        renderizarProductos();
-                        actualizarStats();
-                        mostrarAlerta('Producto eliminado', 'success');
-                    } else {
-                        throw new Error('Error al eliminar');
-                    }
-                } catch (error) {
-                    mostrarAlerta('Error al eliminar', 'error');
+            if (!confirm('¿Eliminar permanentemente?')) return;
+            mostrarLoading(true);
+            try {
+                if (db) {
+                    const tx = db.transaction(['productos', 'imagenes'], 'readwrite');
+                    await new Promise((res,rej) => { const r = tx.objectStore('productos').delete(id); r.onsuccess = () => res(); r.onerror = () => rej(r.error); });
+                    const imgStore = tx.objectStore('imagenes');
+                    const index = imgStore.index('productoId');
+                    const oldImgs = await new Promise((res) => { const r = index.getAll(id); r.onsuccess = () => res(r.result || []); });
+                    for (const img of oldImgs) await new Promise((res,rej) => { const r = imgStore.delete(img.id); r.onsuccess = () => res(); r.onerror = () => rej(r.error); });
                 }
-                
-                mostrarLoading(false);
+                datosEnMemoria.productos = datosEnMemoria.productos.filter(p => p.id !== id);
+                renderizarProductos();
+                actualizarStats();
+                mostrarAlerta('Producto eliminado', 'success');
+            } catch (error) {
+                mostrarAlerta('Error al eliminar', 'error');
             }
+            mostrarLoading(false);
         }
 
         // ============================================
@@ -1627,32 +877,24 @@
         function renderizarCategorias() {
             const container = document.getElementById('listaCategorias');
             const empty = document.getElementById('emptyCategorias');
-            
             if (datosEnMemoria.categorias.length === 0) {
                 container.innerHTML = '';
                 empty.classList.remove('hidden');
                 return;
             }
-            
             empty.classList.add('hidden');
             container.innerHTML = datosEnMemoria.categorias.map(c => `
-                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
                     <div class="flex items-start justify-between mb-4">
                         <div class="text-4xl">${c.icono}</div>
                         <div class="flex gap-2">
-                            <button onclick="abrirModalCategoria('${c.id}')" class="text-blue-600 hover:text-blue-800 p-2 hover:bg-blue-50 rounded-lg transition-colors">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button onclick="eliminarCategoria('${c.id}')" class="text-red-600 hover:text-red-800 p-2 hover:bg-red-50 rounded-lg transition-colors">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                            <button onclick="abrirModalCategoria('${c.id}')" class="text-blue-600 hover:text-blue-800 p-2"><i class="fas fa-edit"></i></button>
+                            <button onclick="eliminarCategoria('${c.id}')" class="text-red-600 hover:text-red-800 p-2"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>
-                    <h3 class="font-bold text-lg text-gray-800 mb-1">${c.nombre}</h3>
+                    <h3 class="font-bold text-lg">${c.nombre}</h3>
                     <p class="text-sm text-gray-500 font-mono mb-3">${c.id}</p>
-                    <span class="px-3 py-1 rounded-full text-xs font-medium ${c.activa ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}">
-                        ${c.activa ? 'Activa' : 'Inactiva'}
-                    </span>
+                    <span class="px-3 py-1 rounded-full text-xs font-medium ${c.activa ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}">${c.activa ? 'Activa' : 'Inactiva'}</span>
                 </div>
             `).join('');
         }
@@ -1683,58 +925,45 @@
             const idOriginal = document.getElementById('catId').value;
             const id = document.getElementById('catIdInput').value.trim().toLowerCase().replace(/\s+/g, '-');
             const nombre = document.getElementById('catNombre').value.trim();
+            const icono = document.getElementById('catIcono').value.trim() || '🌸';
+            const activa = document.getElementById('catActiva').checked;
             
-            if (!id || !nombre) {
-                mostrarAlerta('ID y nombre son obligatorios', 'error');
-                return;
-            }
+            if (!id || !nombre) return mostrarAlerta('ID y nombre obligatorios', 'error');
+            if (!idOriginal && datosEnMemoria.categorias.some(c => c.id === id)) return mostrarAlerta('ID ya existe', 'error');
             
-            if (!idOriginal && datosEnMemoria.categorias.some(c => c.id === id)) {
-                mostrarAlerta('Ya existe una categoría con ese ID', 'error');
-                return;
-            }
-            
-            const categoria = {
-                id: idOriginal || id,
-                nombre: nombre,
-                icono: document.getElementById('catIcono').value || '🌸',
-                orden: datosEnMemoria.categorias.length + 1,
-                activa: document.getElementById('catActiva').checked
-            };
+            const categoria = { id: idOriginal || id, nombre, icono, orden: datosEnMemoria.categorias.length + 1, activa };
             
             try {
                 const guardado = await guardarCategoriaEnDB(categoria);
+                if (!guardado) throw new Error('Error DB');
                 
-                if (guardado) {
-                    if (idOriginal) {
-                        const index = datosEnMemoria.categorias.findIndex(c => c.id === idOriginal);
-                        datosEnMemoria.categorias[index] = categoria;
-                    } else {
-                        datosEnMemoria.categorias.push(categoria);
-                    }
-                    
-                    cerrarModal('modalCategoria');
-                    renderizarCategorias();
-                    actualizarStats();
-                    mostrarAlerta('Categoría guardada correctamente', 'success');
+                if (idOriginal) {
+                    const index = datosEnMemoria.categorias.findIndex(c => c.id === idOriginal);
+                    if (index !== -1) datosEnMemoria.categorias[index] = categoria;
+                    else datosEnMemoria.categorias.push(categoria);
                 } else {
-                    throw new Error('Error al guardar');
+                    datosEnMemoria.categorias.push(categoria);
                 }
+                
+                cerrarModal('modalCategoria');
+                renderizarCategorias();
+                actualizarStats();
+                mostrarAlerta('✅ Categoría guardada', 'success');
             } catch (error) {
-                mostrarAlerta('Error al guardar la categoría', 'error');
+                mostrarAlerta('Error al guardar', 'error');
             }
         }
 
         function eliminarCategoria(id) {
             const productosEnCategoria = datosEnMemoria.productos.filter(p => p.categoria === id).length;
             let mensaje = '¿Eliminar esta categoría?';
-            if (productosEnCategoria > 0) {
-                mensaje += `\n\n⚠️ Hay ${productosEnCategoria} productos en esta categoría. Se quedarán sin categoría asignada.`;
-            }
-            
+            if (productosEnCategoria > 0) mensaje += `\n⚠️ Hay ${productosEnCategoria} productos en esta categoría.`;
             if (confirm(mensaje)) {
                 datosEnMemoria.categorias = datosEnMemoria.categorias.filter(c => c.id !== id);
-                guardarCategoriaEnDB({ id, _delete: true }); // Marcar para eliminar
+                if (db) {
+                    const tx = db.transaction('categorias', 'readwrite');
+                    tx.objectStore('categorias').delete(id);
+                }
                 renderizarCategorias();
                 actualizarStats();
                 mostrarAlerta('Categoría eliminada', 'success');
@@ -1749,137 +978,87 @@
             document.getElementById('configWhatsapp').value = datosEnMemoria.config.whatsapp;
             document.getElementById('configEmail').value = datosEnMemoria.config.email || '';
             document.getElementById('configTarifa').value = datosEnMemoria.config.tarifaExpress;
-            document.getElementById('configLat').value = datosEnMemoria.config.lat || 10.034784;
-            document.getElementById('configLng').value = datosEnMemoria.config.lng || -84.158785;
+            document.getElementById('configLat').value = datosEnMemoria.config.lat;
+            document.getElementById('configLng').value = datosEnMemoria.config.lng;
         }
 
         async function guardarConfig() {
-            datosEnMemoria.config.nombre = document.getElementById('configNombre').value.trim();
-            datosEnMemoria.config.whatsapp = document.getElementById('configWhatsapp').value.trim();
-            datosEnMemoria.config.email = document.getElementById('configEmail').value.trim();
-            datosEnMemoria.config.tarifaExpress = parseInt(document.getElementById('configTarifa').value) || 650;
-            datosEnMemoria.config.lat = parseFloat(document.getElementById('configLat').value) || 10.034784;
-            datosEnMemoria.config.lng = parseFloat(document.getElementById('configLng').value) || -84.158785;
-            
+            datosEnMemoria.config = {
+                nombre: document.getElementById('configNombre').value.trim(),
+                whatsapp: document.getElementById('configWhatsapp').value.trim(),
+                email: document.getElementById('configEmail').value.trim(),
+                tarifaExpress: parseInt(document.getElementById('configTarifa').value) || 650,
+                lat: parseFloat(document.getElementById('configLat').value) || 10.034784,
+                lng: parseFloat(document.getElementById('configLng').value) || -84.158785
+            };
             try {
                 const guardado = await guardarConfigEnDB(datosEnMemoria.config);
-                
-                if (guardado) {
-                    mostrarAlerta('✅ Configuración guardada', 'success');
-                } else {
-                    throw new Error('Error al guardar');
-                }
-            } catch (error) {
-                mostrarAlerta('Error al guardar configuración', 'error');
+                mostrarAlerta(guardado ? '✅ Configuración guardada' : 'Error al guardar', guardado ? 'success' : 'error');
+            } catch {
+                mostrarAlerta('Error al guardar', 'error');
             }
         }
 
         // ============================================
-        // BACKUP Y RESTORE
+        // BACKUP
         // ============================================
         async function exportarDatos() {
             mostrarLoading(true);
-            
             try {
-                // Recolectar todos los datos para backup
-                const backup = {
-                    version: 2,
-                    fecha: new Date().toISOString(),
-                    productos: datosEnMemoria.productos,
-                    categorias: datosEnMemoria.categorias,
-                    pedidos: datosEnMemoria.pedidos,
-                    config: datosEnMemoria.config
-                };
-                
+                const backup = { productos: datosEnMemoria.productos, categorias: datosEnMemoria.categorias, pedidos: datosEnMemoria.pedidos, config: datosEnMemoria.config };
                 const dataStr = JSON.stringify(backup, null, 2);
                 const blob = new Blob([dataStr], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
-                
-                const fecha = new Date().toISOString().split('T')[0];
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `respaldo-floristeria-${fecha}.json`;
-                document.body.appendChild(a);
+                a.download = `respaldo-${new Date().toISOString().split('T')[0]}.json`;
                 a.click();
-                document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                
-                mostrarAlerta('✅ Copia de seguridad descargada', 'success');
+                mostrarAlerta('✅ Backup descargado', 'success');
             } catch (error) {
-                console.error('Error exportando:', error);
                 mostrarAlerta('Error al crear backup', 'error');
             }
-            
             mostrarLoading(false);
         }
 
         async function importarDatos(input) {
             const archivo = input.files[0];
             if (!archivo) return;
-            
             mostrarLoading(true);
-            
             const reader = new FileReader();
             reader.onload = async (e) => {
                 try {
                     const datosImportados = JSON.parse(e.target.result);
+                    if (!confirm('¿Restaurar copia? Se reemplazarán todos los datos.')) return;
                     
-                    if (!datosImportados.productos || !datosImportados.categorias) {
-                        throw new Error('Archivo inválido');
+                    if (db) {
+                        // Limpiar todo
+                        const tx = db.transaction(['productos','imagenes','categorias','pedidos','config'], 'readwrite');
+                        tx.objectStore('productos').clear();
+                        tx.objectStore('imagenes').clear();
+                        tx.objectStore('categorias').clear();
+                        tx.objectStore('pedidos').clear();
+                        tx.objectStore('config').clear();
+                        await new Promise((res,rej) => { tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); });
+                        
+                        // Guardar nuevos
+                        for (const cat of datosImportados.categorias || []) await guardarCategoriaEnDB(cat);
+                        for (const prod of datosImportados.productos || []) {
+                            await guardarProductoEnDB(prod, prod.imagenes || []);
+                        }
+                        for (const ped of datosImportados.pedidos || []) await guardarPedidoEnDB(ped);
+                        await guardarConfigEnDB(datosImportados.config || datosEnMemoria.config);
                     }
                     
-                    if (confirm(`¿Restaurar copia de seguridad?\n\nProductos: ${datosImportados.productos.length}\nCategorías: ${datosImportados.categorias.length}\nPedidos: ${datosImportados.pedidos?.length || 0}\n\n⚠️ Se reemplazarán todos los datos actuales.`)) {
-                        
-                        // Limpiar datos actuales
-                        for (const producto of datosEnMemoria.productos) {
-                            await eliminarProductoDeDB(producto.id);
-                        }
-                        
-                        // Importar nuevos datos
-                        datosEnMemoria.productos = [];
-                        datosEnMemoria.categorias = [];
-                        datosEnMemoria.pedidos = datosImportados.pedidos || [];
-                        datosEnMemoria.config = datosImportados.config || datosEnMemoria.config;
-                        
-                        // Guardar categorías
-                        for (const cat of datosImportados.categorias) {
-                            await guardarCategoriaEnDB(cat);
-                            datosEnMemoria.categorias.push(cat);
-                        }
-                        
-                        // Guardar productos con imágenes
-                        for (const prod of datosImportados.productos) {
-                            const imagenes = prod.imagenes || [];
-                            const productoSinImgs = { ...prod };
-                            delete productoSinImgs.imagenes;
-                            
-                            await guardarProductoEnDB(productoSinImgs, imagenes);
-                            datosEnMemoria.productos.push({ ...productoSinImgs, imagenes });
-                        }
-                        
-                        // Guardar pedidos
-                        for (const ped of datosEnMemoria.pedidos) {
-                            await guardarPedidoEnDB(ped);
-                        }
-                        
-                        // Guardar config
-                        await guardarConfigEnDB(datosEnMemoria.config);
-                        
-                        renderizarProductos();
-                        renderizarCategorias();
-                        actualizarStats();
-                        
-                        mostrarAlerta('✅ Datos restaurados correctamente', 'success');
-                    }
+                    await cargarDatosDesdeDB();
+                    mostrarAlerta('✅ Datos restaurados', 'success');
                 } catch (err) {
-                    console.error('Error importando:', err);
-                    mostrarAlerta('Error al leer el archivo. Asegúrate de que sea un respaldo válido.', 'error');
+                    mostrarAlerta('Error al restaurar', 'error');
                 }
-                
                 mostrarLoading(false);
+                input.value = '';
             };
             reader.readAsText(archivo);
-            input.value = '';
         }
 
         // ============================================
@@ -1889,7 +1068,6 @@
             document.getElementById(id).classList.add('hidden');
         }
 
-        // Inicialización
         window.onload = async function() {
             await inicializarDB();
         };
