@@ -373,6 +373,13 @@
             modal.appendChild(imgGrande);
             document.body.appendChild(modal);
         }
+
+    // Forzar recarga si hay una nueva versión
+            const version = '1.0.2'; // Cambia este número cada vez que actualices
+            if (!localStorage.getItem('sb_version') || localStorage.getItem('sb_version') !== version) {
+                localStorage.setItem('sb_version', version);
+                window.location.reload(true);
+            }
     </script>
 </body>
 </html>
