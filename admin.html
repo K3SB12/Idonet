@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Admin | Floristería Santa Bárbara</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -57,9 +57,38 @@
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
+        /* Mejoras táctiles para móvil */
+        button, .clickable {
+            min-height: 44px;
+            min-width: 44px;
+        }
+        input, select, textarea {
+            font-size: 16px !important; /* Evita zoom en iOS */
+        }
+        /* Indicador de carga */
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #2D5A3D;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
+    <!-- Pantalla de carga inicial -->
+    <div id="loadingScreen" class="fixed inset-0 bg-white z-[200] flex items-center justify-center hidden">
+        <div class="text-center">
+            <div class="spinner mx-auto mb-4"></div>
+            <p class="text-gray-600">Cargando tus datos...</p>
+        </div>
+    </div>
+
     <!-- Login -->
     <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-white p-8 rounded-2xl shadow-lg max-w-md w-full">
@@ -152,10 +181,15 @@
             <!-- Notificaciones flotantes -->
             <div id="notificacionesContainer" class="fixed top-4 right-4 z-50 space-y-2 max-w-sm"></div>
 
+            <!-- Barra de progreso para operaciones largas -->
+            <div id="progressBar" class="hidden fixed top-0 left-0 w-full h-1 bg-green-200 z-[100]">
+                <div class="h-full bg-sb-green transition-all duration-300" style="width: 0%"></div>
+            </div>
+
             <!-- Alertas -->
             <div id="alertContainer" class="mb-6"></div>
 
-            <!-- PEDIDOS (Nuevo) -->
+            <!-- PEDIDOS -->
             <div id="tab-pedidos" class="tab-content hidden">
                 <div class="flex justify-between items-center mb-6 flex-wrap gap-4">
                     <div>
@@ -308,17 +342,16 @@
                             <p class="text-xs text-gray-500 mt-1">Se calcula automáticamente según la distancia en el mapa</p>
                         </div>
                         
-                        <!-- NUEVO: Configuración de coordenadas -->
                         <div class="bg-blue-50 p-4 rounded-xl border border-blue-200">
                             <h4 class="font-semibold text-blue-900 mb-3"><i class="fas fa-map-marker-alt mr-2"></i>Ubicación de la tienda</h4>
                             <div class="grid md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Latitud</label>
-                                    <input type="text" id="configLat" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors" placeholder="10.0369">
+                                    <input type="text" id="configLat" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors" placeholder="10.034784">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Longitud</label>
-                                    <input type="text" id="configLng" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors" placeholder="-84.1594">
+                                    <input type="text" id="configLng" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-sb-green focus:outline-none transition-colors" placeholder="-84.158785">
                                 </div>
                             </div>
                             <p class="text-xs text-gray-500 mt-2">Coordenadas de Santa Bárbara, Heredia. Solo cambiar si la tienda se muda.</p>
@@ -343,7 +376,7 @@
                             <i class="fas fa-download text-2xl"></i>
                         </div>
                         <h3 class="text-xl font-bold mb-2">Guardar Copia</h3>
-                        <p class="text-gray-600 mb-6 text-sm">Descarga todos tus productos, categorías, pedidos y configuración en un archivo. Guárdalo en tu computadora como respaldo.</p>
+                        <p class="text-gray-600 mb-6 text-sm">Descarga todos tus productos (con fotos), categorías, pedidos y configuración en un archivo. Guárdalo en tu computadora como respaldo.</p>
                         <button onclick="exportarDatos()" class="w-full bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 transition-all duration-200 font-medium shadow-md">
                             <i class="fas fa-download mr-2"></i>Descargar Respaldo
                         </button>
@@ -354,7 +387,7 @@
                             <i class="fas fa-upload text-2xl"></i>
                         </div>
                         <h3 class="text-xl font-bold mb-2">Restaurar Copia</h3>
-                        <p class="text-gray-600 mb-6 text-sm">Si cambias de computadora o borras los datos, selecciona aquí tu archivo de respaldo para recuperar todo.</p>
+                        <p class="text-gray-600 mb-6 text-sm">Si cambias de computadora o borras los datos, selecciona aquí tu archivo de respaldo para recuperar todo (incluyendo fotos).</p>
                         
                         <label class="block w-full">
                             <input type="file" id="inputBackup" accept=".json" class="hidden" onchange="importarDatos(this)">
@@ -368,10 +401,10 @@
                 <div class="mt-8 bg-yellow-50 border border-yellow-200 rounded-xl p-6">
                     <h4 class="font-bold text-yellow-800 mb-2"><i class="fas fa-exclamation-triangle mr-2"></i>Importante</h4>
                     <ul class="text-sm text-yellow-700 space-y-1 list-disc list-inside">
-                        <li>Los datos se guardan SOLO en este navegador</li>
-                        <li>Si borras el historial/cookies, perderás todo</li>
-                        <li>Haz copias de seguridad regularmente</li>
-                        <li>Para usar en otra computadora, exporta e importa el archivo</li>
+                        <li>Tus fotos se guardan en el almacenamiento interno del navegador (IndexedDB). ¡No hay límite de espacio!</li>
+                        <li>Si borras el historial/cookies, perderás todo. Haz copias de seguridad regularmente.</li>
+                        <li>Para usar en otra computadora, exporta el archivo .json e impórtalo allí.</li>
+                        <li>El sistema puede manejar cientos de fotos sin problemas de espacio.</li>
                     </ul>
                 </div>
             </div>
@@ -442,7 +475,7 @@
                     </div>
                 </div>
 
-                <!-- Imágenes -->
+                <!-- Imágenes - MEJORADO para IndexedDB -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-3">Fotos del producto (máx. 15)</label>
                     
@@ -450,6 +483,7 @@
                         <i class="fas fa-cloud-upload-alt text-5xl text-sb-green mb-4"></i>
                         <p class="text-lg font-medium text-gray-700">Haz clic para subir fotos</p>
                         <p class="text-sm text-gray-500 mt-2">Desde tu celular o computadora</p>
+                        <p class="text-xs text-yellow-600 mt-1">📸 Puedes seleccionar varias fotos a la vez</p>
                         <input type="file" id="inputFotos" multiple accept="image/*" class="hidden" onchange="procesarFotos(this)">
                     </div>
 
@@ -460,6 +494,17 @@
                         <button type="button" onclick="limpiarFotos()" class="text-red-600 hover:text-red-800 text-sm font-medium">
                             <i class="fas fa-trash mr-1"></i>Limpiar todas
                         </button>
+                    </div>
+
+                    <!-- Barra de progreso de subida -->
+                    <div id="uploadProgress" class="hidden mt-2">
+                        <div class="flex justify-between text-xs text-gray-600 mb-1">
+                            <span>Procesando fotos...</span>
+                            <span id="uploadProgressText">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div id="uploadProgressBar" class="bg-sb-green h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
                     </div>
 
                     <div id="previewFotos" class="mt-4 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 max-h-80 overflow-y-auto p-3 bg-gray-50 rounded-xl border border-gray-200"></div>
@@ -542,7 +587,15 @@
     </div>
 
     <script>
-        let datos = {
+        // ============================================
+        // VARIABLES GLOBALES Y CONFIGURACIÓN
+        // ============================================
+        const DB_NAME = 'FloristeriaSB';
+        const DB_VERSION = 2;
+        const AUTH_KEY = 'admin_auth';
+        
+        let db = null;
+        let datosEnMemoria = {
             productos: [],
             categorias: [],
             pedidos: [],
@@ -551,24 +604,346 @@
                 whatsapp: '50686053613',
                 email: '',
                 tarifaExpress: 650,
-                lat: 10.0369,
-                lng: -84.1594
+                lat: 10.034784,
+                lng: -84.158785
             }
         };
 
         let fotosTemp = [];
         let filtroPedidosActual = 'todos';
-        const DATA_KEY = 'floristeria_datos';
-        const AUTH_KEY = 'admin_auth';
+        let operacionEnProgreso = false;
 
-        // Inicialización
-        document.addEventListener('DOMContentLoaded', () => {
-            verificarSesion();
-            // Verificar pedidos nuevos cada 30 segundos
-            setInterval(verificarPedidosNuevos, 30000);
-        });
+        // ============================================
+        // INICIALIZACIÓN - IndexedDB
+        // ============================================
+        async function inicializarDB() {
+            return new Promise((resolve, reject) => {
+                mostrarLoading(true);
+                
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    
+                    // Almacén para productos (sin imágenes)
+                    if (!db.objectStoreNames.contains('productos')) {
+                        const store = db.createObjectStore('productos', { keyPath: 'id' });
+                        store.createIndex('categoria', 'categoria', { unique: false });
+                        store.createIndex('activo', 'activo', { unique: false });
+                    }
+                    
+                    // Almacén para imágenes (separado para evitar límites)
+                    if (!db.objectStoreNames.contains('imagenes')) {
+                        const imgStore = db.createObjectStore('imagenes', { keyPath: 'id' });
+                        imgStore.createIndex('productoId', 'productoId', { unique: false });
+                        imgStore.createIndex('indice', 'indice', { unique: false });
+                    }
+                    
+                    // Almacén para categorías
+                    if (!db.objectStoreNames.contains('categorias')) {
+                        const catStore = db.createObjectStore('categorias', { keyPath: 'id' });
+                    }
+                    
+                    // Almacén para pedidos
+                    if (!db.objectStoreNames.contains('pedidos')) {
+                        const pedStore = db.createObjectStore('pedidos', { keyPath: 'id' });
+                        pedStore.createIndex('fecha', 'fecha', { unique: false });
+                        pedStore.createIndex('estado', 'estado', { unique: false });
+                    }
+                    
+                    // Almacén para configuración
+                    if (!db.objectStoreNames.contains('config')) {
+                        db.createObjectStore('config', { keyPath: 'clave' });
+                    }
+                };
+                
+                request.onsuccess = async (event) => {
+                    db = event.target.result;
+                    console.log('✅ IndexedDB conectada');
+                    
+                    // Cargar datos a memoria
+                    await cargarDatosDesdeDB();
+                    mostrarLoading(false);
+                    
+                    // Si no hay categorías, crear por defecto
+                    if (datosEnMemoria.categorias.length === 0) {
+                        await crearCategoriasPorDefecto();
+                    }
+                    
+                    verificarSesion();
+                    resolve();
+                };
+                
+                request.onerror = (event) => {
+                    console.error('❌ Error abriendo DB:', event.target.error);
+                    mostrarAlerta('Error al conectar con la base de datos', 'error');
+                    mostrarLoading(false);
+                    
+                    // Fallback a localStorage si IndexedDB falla
+                    cargarDatosFallback();
+                    reject(event.target.error);
+                };
+            });
+        }
 
-        // Autenticación
+        // Crear categorías por defecto si es primera vez
+        async function crearCategoriasPorDefecto() {
+            const categoriasDefault = [
+                { id: 'ramos-de-rosas', nombre: 'Ramos de Rosas', icono: '🌹', orden: 1, activa: true },
+                { id: 'ramos-de-girasoles', nombre: 'Ramos de Girasoles', icono: '🌻', orden: 2, activa: true },
+                { id: 'arreglos-tropicales', nombre: 'Arreglos Tropicales', icono: '🌺', orden: 3, activa: true },
+                { id: 'plantas-interior', nombre: 'Plantas de Interior', icono: '🌿', orden: 4, activa: true }
+            ];
+            
+            for (const cat of categoriasDefault) {
+                await guardarCategoriaEnDB(cat);
+                datosEnMemoria.categorias.push(cat);
+            }
+            
+            console.log('✅ Categorías por defecto creadas');
+            actualizarStats();
+        }
+
+        // Cargar todos los datos desde IndexedDB a memoria
+        async function cargarDatosDesdeDB() {
+            if (!db) return;
+            
+            try {
+                // Cargar categorías
+                const categorias = await new Promise((resolve, reject) => {
+                    const tx = db.transaction('categorias', 'readonly');
+                    const store = tx.objectStore('categorias');
+                    const request = store.getAll();
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+                datosEnMemoria.categorias = categorias || [];
+                
+                // Cargar productos (sin imágenes)
+                const productos = await new Promise((resolve, reject) => {
+                    const tx = db.transaction('productos', 'readonly');
+                    const store = tx.objectStore('productos');
+                    const request = store.getAll();
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+                
+                // Cargar imágenes para cada producto
+                for (const producto of productos) {
+                    const imagenes = await cargarImagenesDeProducto(producto.id);
+                    producto.imagenes = imagenes;
+                }
+                datosEnMemoria.productos = productos || [];
+                
+                // Cargar pedidos
+                const pedidos = await new Promise((resolve, reject) => {
+                    const tx = db.transaction('pedidos', 'readonly');
+                    const store = tx.objectStore('pedidos');
+                    const request = store.getAll();
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+                datosEnMemoria.pedidos = pedidos || [];
+                
+                // Cargar configuración
+                const config = await new Promise((resolve, reject) => {
+                    const tx = db.transaction('config', 'readonly');
+                    const store = tx.objectStore('config');
+                    const request = store.getAll();
+                    request.onsuccess = () => {
+                        const configs = request.result;
+                        const configObj = {};
+                        configs.forEach(item => configObj[item.clave] = item.valor);
+                        resolve(configObj);
+                    };
+                    request.onerror = () => reject(request.error);
+                });
+                
+                if (config) {
+                    datosEnMemoria.config = {
+                        nombre: config.nombre || 'Floristería Santa Bárbara',
+                        whatsapp: config.whatsapp || '50686053613',
+                        email: config.email || '',
+                        tarifaExpress: config.tarifaExpress || 650,
+                        lat: config.lat || 10.034784,
+                        lng: config.lng || -84.158785
+                    };
+                }
+                
+                console.log('✅ Datos cargados:', {
+                    productos: datosEnMemoria.productos.length,
+                    categorias: datosEnMemoria.categorias.length,
+                    pedidos: datosEnMemoria.pedidos.length
+                });
+                
+            } catch (error) {
+                console.error('❌ Error cargando datos:', error);
+                mostrarAlerta('Error cargando datos. Usando respaldo.', 'error');
+                cargarDatosFallback();
+            }
+        }
+
+        // Cargar imágenes de un producto específico
+        async function cargarImagenesDeProducto(productoId) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction('imagenes', 'readonly');
+                const store = tx.objectStore('imagenes');
+                const index = store.index('productoId');
+                const request = index.getAll(productoId);
+                
+                request.onsuccess = () => {
+                    const imagenes = request.result
+                        .sort((a, b) => a.indice - b.indice)
+                        .map(img => img.data);
+                    resolve(imagenes);
+                };
+                
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // Fallback a localStorage si IndexedDB falla
+        function cargarDatosFallback() {
+            try {
+                const guardado = localStorage.getItem('floristeria_datos');
+                if (guardado) {
+                    const parsed = JSON.parse(guardado);
+                    datosEnMemoria.productos = parsed.productos || [];
+                    datosEnMemoria.categorias = parsed.categorias || [];
+                    datosEnMemoria.pedidos = parsed.pedidos || [];
+                    datosEnMemoria.config = parsed.config || datosEnMemoria.config;
+                    
+                    console.log('⚠️ Usando localStorage como fallback');
+                    mostrarAlerta('Usando almacenamiento de respaldo', 'warning');
+                }
+            } catch (e) {
+                console.error('Error en fallback:', e);
+            }
+        }
+
+        // Guardar producto en DB (con imágenes)
+        async function guardarProductoEnDB(producto, imagenes) {
+            if (!db) return false;
+            
+            const tx = db.transaction(['productos', 'imagenes'], 'readwrite');
+            
+            try {
+                // Guardar producto (sin imágenes)
+                const productoSinImgs = { ...producto };
+                delete productoSinImgs.imagenes;
+                await tx.objectStore('productos').put(productoSinImgs);
+                
+                // Eliminar imágenes antiguas
+                const imgStore = tx.objectStore('imagenes');
+                const index = imgStore.index('productoId');
+                const oldImgs = await index.getAll(producto.id);
+                
+                for (const img of oldImgs) {
+                    await imgStore.delete(img.id);
+                }
+                
+                // Guardar nuevas imágenes
+                for (let i = 0; i < imagenes.length; i++) {
+                    await imgStore.put({
+                        id: `${producto.id}_img_${i}`,
+                        productoId: producto.id,
+                        indice: i,
+                        data: imagenes[i]
+                    });
+                }
+                
+                await tx.done;
+                return true;
+                
+            } catch (error) {
+                console.error('Error guardando producto:', error);
+                tx.abort();
+                return false;
+            }
+        }
+
+        // Guardar categoría en DB
+        async function guardarCategoriaEnDB(categoria) {
+            if (!db) return false;
+            
+            try {
+                const tx = db.transaction('categorias', 'readwrite');
+                await tx.objectStore('categorias').put(categoria);
+                await tx.done;
+                return true;
+            } catch (error) {
+                console.error('Error guardando categoría:', error);
+                return false;
+            }
+        }
+
+        // Guardar pedido en DB
+        async function guardarPedidoEnDB(pedido) {
+            if (!db) return false;
+            
+            try {
+                const tx = db.transaction('pedidos', 'readwrite');
+                await tx.objectStore('pedidos').put(pedido);
+                await tx.done;
+                return true;
+            } catch (error) {
+                console.error('Error guardando pedido:', error);
+                return false;
+            }
+        }
+
+        // Guardar configuración en DB
+        async function guardarConfigEnDB(config) {
+            if (!db) return false;
+            
+            try {
+                const tx = db.transaction('config', 'readwrite');
+                const store = tx.objectStore('config');
+                
+                for (const [clave, valor] of Object.entries(config)) {
+                    await store.put({ clave, valor });
+                }
+                
+                await tx.done;
+                return true;
+            } catch (error) {
+                console.error('Error guardando config:', error);
+                return false;
+            }
+        }
+
+        // Eliminar producto de DB
+        async function eliminarProductoDeDB(productoId) {
+            if (!db) return false;
+            
+            const tx = db.transaction(['productos', 'imagenes'], 'readwrite');
+            
+            try {
+                // Eliminar producto
+                await tx.objectStore('productos').delete(productoId);
+                
+                // Eliminar imágenes asociadas
+                const imgStore = tx.objectStore('imagenes');
+                const index = imgStore.index('productoId');
+                const imagenes = await index.getAll(productoId);
+                
+                for (const img of imagenes) {
+                    await imgStore.delete(img.id);
+                }
+                
+                await tx.done;
+                return true;
+                
+            } catch (error) {
+                console.error('Error eliminando producto:', error);
+                tx.abort();
+                return false;
+            }
+        }
+
+        // ============================================
+        // AUTENTICACIÓN
+        // ============================================
         function verificarSesion() {
             const auth = localStorage.getItem(AUTH_KEY);
             if (auth === 'logged_in') {
@@ -576,8 +951,8 @@
             } else {
                 document.getElementById('loginScreen').classList.remove('hidden');
                 document.getElementById('dashboard').classList.add('hidden');
-                const datosExistentes = localStorage.getItem(DATA_KEY);
-                if (!datosExistentes) {
+                const datosExistentes = localStorage.getItem('floristeria_datos');
+                if (!datosExistentes && datosEnMemoria.categorias.length === 0) {
                     document.getElementById('firstTimeMsg').classList.remove('hidden');
                 }
             }
@@ -598,7 +973,7 @@
             if (!guardado) {
                 localStorage.setItem('admin_hash', hash);
                 localStorage.setItem(AUTH_KEY, 'logged_in');
-                mostrarAlerta('Cuenta creada exitosamente', 'success');
+                mostrarAlerta('¡Cuenta creada exitosamente!', 'success');
                 setTimeout(entrarDashboard, 500);
             } else if (guardado === hash) {
                 localStorage.setItem(AUTH_KEY, 'logged_in');
@@ -618,9 +993,12 @@
         function entrarDashboard() {
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('dashboard').classList.remove('hidden');
-            cargarDatos();
-            showTab('pedidos'); // Mostrar pedidos primero
+            actualizarStats();
+            showTab('pedidos');
             verificarPedidosNuevos();
+            
+            // Iniciar intervalo de verificación de pedidos
+            setInterval(verificarPedidosNuevos, 30000);
         }
 
         function logout() {
@@ -630,72 +1008,47 @@
             }
         }
 
-        // Gestión de Datos
-        function cargarDatos() {
-            const guardado = localStorage.getItem(DATA_KEY);
-            if (guardado) {
-                datos = JSON.parse(guardado);
-                if (!datos.pedidos) datos.pedidos = [];
-                // Asegurar que las coordenadas existan
-                if (!datos.config.lat) datos.config.lat = 10.0369;
-                if (!datos.config.lng) datos.config.lng = -84.1594;
+        // ============================================
+        // FUNCIONES DE UI
+        // ============================================
+        function mostrarLoading(mostrar) {
+            const loading = document.getElementById('loadingScreen');
+            if (mostrar) {
+                loading.classList.remove('hidden');
             } else {
-                datos.categorias = [
-                    { id: 'ramos-de-rosas', nombre: 'Ramos de Rosas', icono: '🌹', orden: 1, activa: true },
-                    { id: 'ramos-de-girasoles', nombre: 'Ramos de Girasoles', icono: '🌻', orden: 2, activa: true }
-                ];
-                guardarDatos();
+                loading.classList.add('hidden');
             }
-            actualizarStats();
         }
 
-        function guardarDatos() {
-            localStorage.setItem(DATA_KEY, JSON.stringify(datos));
-            actualizarStats();
+        function showProgress(porcentaje, texto) {
+            const bar = document.getElementById('progressBar');
+            const barInner = bar.querySelector('div');
+            bar.classList.remove('hidden');
+            barInner.style.width = porcentaje + '%';
+            
+            if (porcentaje >= 100) {
+                setTimeout(() => bar.classList.add('hidden'), 500);
+            }
         }
 
         function actualizarStats() {
-            const activos = datos.productos.filter(p => p.activo).length;
-            const destacados = datos.productos.filter(p => p.destacado).length;
-            const ofertas = datos.productos.filter(p => p.precioTemporadaActivo).length;
+            const activos = datosEnMemoria.productos.filter(p => p.activo).length;
+            const destacados = datosEnMemoria.productos.filter(p => p.destacado).length;
+            const ofertas = datosEnMemoria.productos.filter(p => p.precioTemporadaActivo).length;
             
-            document.getElementById('countProductos').textContent = datos.productos.length;
-            document.getElementById('countCategorias').textContent = datos.categorias.length;
+            document.getElementById('countProductos').textContent = datosEnMemoria.productos.length;
+            document.getElementById('countCategorias').textContent = datosEnMemoria.categorias.length;
             document.getElementById('statActivos').textContent = activos;
             document.getElementById('statDestacados').textContent = destacados;
             document.getElementById('statOfertas').textContent = ofertas;
         }
 
-        // Verificar pedidos nuevos y mostrar notificación
-        function verificarPedidosNuevos() {
-            const pedidosNuevos = datos.pedidos.filter(p => p.estado === 'nuevo' && !p.visto).length;
-            const badge = document.getElementById('badgePedidosNuevos');
-            
-            if (pedidosNuevos > 0) {
-                badge.textContent = pedidosNuevos;
-                badge.classList.remove('hidden');
-                
-                // Mostrar notificación flotante solo si hay nuevos
-                if (pedidosNuevos > 0 && !window.ultimaNotificacion) {
-                    mostrarNotificacion(`¡${pedidosNuevos} pedido${pedidosNuevos > 1 ? 's' : ''} nuevo${pedidosNuevos > 1 ? 's' : ''}!`, 'success');
-                    reproducirSonidoNotificacion();
-                    window.ultimaNotificacion = Date.now();
-                }
-            } else {
-                badge.classList.add('hidden');
-            }
-            
-            if (document.getElementById('tab-pedidos').classList.contains('hidden') === false) {
-                renderizarPedidos();
-            }
-        }
-
         function mostrarNotificacion(mensaje, tipo = 'info') {
             const container = document.getElementById('notificacionesContainer');
             const notif = document.createElement('div');
-            notif.className = `notificacion bg-white border-l-4 ${tipo === 'success' ? 'border-green-500' : 'border-blue-500'} p-4 rounded-lg shadow-lg flex items-center gap-3 min-w-[300px]`;
+            notif.className = `notificacion bg-white border-l-4 ${tipo === 'success' ? 'border-green-500' : tipo === 'error' ? 'border-red-500' : 'border-blue-500'} p-4 rounded-lg shadow-lg flex items-center gap-3 min-w-[300px]`;
             notif.innerHTML = `
-                <i class="fas ${tipo === 'success' ? 'fa-check-circle text-green-500' : 'fa-info-circle text-blue-500'} text-xl"></i>
+                <i class="fas ${tipo === 'success' ? 'fa-check-circle text-green-500' : tipo === 'error' ? 'fa-exclamation-circle text-red-500' : 'fa-info-circle text-blue-500'} text-xl"></i>
                 <div class="flex-1">
                     <p class="font-medium text-gray-800">${mensaje}</p>
                 </div>
@@ -710,45 +1063,28 @@
             }, 5000);
         }
 
-        function reproducirSonidoNotificacion() {
-            try {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                
-                // Crear tono de notificación (dos beeps)
-                const oscillator1 = audioContext.createOscillator();
-                const gainNode1 = audioContext.createGain();
-                
-                oscillator1.connect(gainNode1);
-                gainNode1.connect(audioContext.destination);
-                
-                oscillator1.frequency.value = 800;
-                oscillator1.type = 'sine';
-                gainNode1.gain.setValueAtTime(0.3, audioContext.currentTime);
-                gainNode1.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
-                
-                oscillator1.start(audioContext.currentTime);
-                oscillator1.stop(audioContext.currentTime + 0.2);
-                
-                // Segundo beep
-                setTimeout(() => {
-                    const oscillator2 = audioContext.createOscillator();
-                    const gainNode2 = audioContext.createGain();
-                    oscillator2.connect(gainNode2);
-                    gainNode2.connect(audioContext.destination);
-                    oscillator2.frequency.value = 1000;
-                    oscillator2.type = 'sine';
-                    gainNode2.gain.setValueAtTime(0.3, audioContext.currentTime);
-                    gainNode2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-                    oscillator2.start(audioContext.currentTime);
-                    oscillator2.stop(audioContext.currentTime + 0.3);
-                }, 150);
-                
-            } catch (e) {
-                console.log('Audio no soportado');
-            }
+        function mostrarAlerta(mensaje, tipo = 'success') {
+            const container = document.getElementById('alertContainer');
+            const color = tipo === 'success' ? 'bg-green-100 text-green-800 border-green-200' : 
+                         tipo === 'error' ? 'bg-red-100 text-red-800 border-red-200' : 
+                         'bg-blue-100 text-blue-800 border-blue-200';
+            const icono = tipo === 'success' ? 'check-circle' : tipo === 'error' ? 'exclamation-circle' : 'info-circle';
+            
+            container.innerHTML = `
+                <div class="${color} border px-4 py-3 rounded-xl flex items-center gap-2 animate-fade-in">
+                    <i class="fas fa-${icono}"></i>
+                    <span class="font-medium">${mensaje}</span>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
         }
 
-        // Navegación de tabs
+        // ============================================
+        // NAVEGACIÓN DE TABS
+        // ============================================
         function showTab(tab) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
             document.querySelectorAll('[id^="tab-btn-"]').forEach(b => {
@@ -765,12 +1101,14 @@
             if (tab === 'pedidos') renderizarPedidos();
         }
 
-        // PEDIDOS CRUD
+        // ============================================
+        // PEDIDOS
+        // ============================================
         function renderizarPedidos() {
             const container = document.getElementById('listaPedidos');
             const empty = document.getElementById('emptyPedidos');
             
-            let pedidosMostrar = datos.pedidos || [];
+            let pedidosMostrar = datosEnMemoria.pedidos || [];
             
             if (filtroPedidosActual !== 'todos') {
                 pedidosMostrar = pedidosMostrar.filter(p => p.estado === filtroPedidosActual);
@@ -838,12 +1176,12 @@
         }
 
         function verDetallePedido(id) {
-            const pedido = datos.pedidos.find(p => p.id === id);
+            const pedido = datosEnMemoria.pedidos.find(p => p.id === id);
             if (!pedido) return;
             
             // Marcar como visto
             pedido.visto = true;
-            guardarDatos();
+            guardarPedidoEnDB(pedido);
             verificarPedidosNuevos();
             
             const modal = document.getElementById('modalPedido');
@@ -884,7 +1222,7 @@
                             ${pedido.productos.map(prod => `
                                 <div class="flex justify-between items-center py-2 border-b border-gray-100">
                                     <div class="flex items-center gap-3">
-                                        <img src="${prod.imagen}" class="w-12 h-12 object-cover rounded-lg" onerror="this.style.display='none'">
+                                        <img src="${prod.imagen || 'https://via.placeholder.com/80?text=Flor'}" class="w-12 h-12 object-cover rounded-lg" onerror="this.src='https://via.placeholder.com/80?text=Flor'">
                                         <div>
                                             <p class="font-medium">${prod.nombre}</p>
                                             <p class="text-sm text-gray-500">${prod.cantidad} x ₡${prod.precioUnitario.toLocaleString()}</p>
@@ -942,25 +1280,47 @@
         }
 
         function cambiarEstadoPedido(id, nuevoEstado) {
-            const pedido = datos.pedidos.find(p => p.id === id);
+            const pedido = datosEnMemoria.pedidos.find(p => p.id === id);
             if (pedido) {
                 pedido.estado = nuevoEstado;
-                guardarDatos();
+                guardarPedidoEnDB(pedido);
                 renderizarPedidos();
                 mostrarAlerta(`Pedido marcado como ${nuevoEstado.replace('_', ' ')}`, 'success');
             }
         }
 
+        function verificarPedidosNuevos() {
+            const pedidosNuevos = datosEnMemoria.pedidos.filter(p => p.estado === 'nuevo' && !p.visto).length;
+            const badge = document.getElementById('badgePedidosNuevos');
+            
+            if (pedidosNuevos > 0) {
+                badge.textContent = pedidosNuevos;
+                badge.classList.remove('hidden');
+                
+                // Mostrar notificación flotante solo si hay nuevos
+                if (pedidosNuevos > 0 && (!window.ultimaNotificacion || Date.now() - window.ultimaNotificacion > 10000)) {
+                    mostrarNotificacion(`¡${pedidosNuevos} pedido${pedidosNuevos > 1 ? 's' : ''} nuevo${pedidosNuevos > 1 ? 's' : ''}!`, 'success');
+                    window.ultimaNotificacion = Date.now();
+                }
+            } else {
+                badge.classList.add('hidden');
+            }
+            
+            if (document.getElementById('tab-pedidos').classList.contains('hidden') === false) {
+                renderizarPedidos();
+            }
+        }
+
         function marcarTodosVistos() {
-            datos.pedidos.forEach(p => p.visto = true);
-            guardarDatos();
+            datosEnMemoria.pedidos.forEach(p => p.visto = true);
+            datosEnMemoria.pedidos.forEach(p => guardarPedidoEnDB(p));
             verificarPedidosNuevos();
             renderizarPedidos();
             mostrarAlerta('Todos los pedidos marcados como vistos', 'success');
         }
 
         function exportarPedidos() {
-            const csv = convertirPedidosACSV(datos.pedidos);
+            const csv = convertirPedidosACSV(datosEnMemoria.pedidos);
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -989,19 +1349,21 @@
             return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
         }
 
-        // Productos CRUD (igual que antes)
+        // ============================================
+        // PRODUCTOS
+        // ============================================
         function renderizarProductos() {
             const tbody = document.getElementById('listaProductos');
             const empty = document.getElementById('emptyProductos');
             
-            if (datos.productos.length === 0) {
+            if (datosEnMemoria.productos.length === 0) {
                 tbody.innerHTML = '';
                 empty.classList.remove('hidden');
                 return;
             }
             
             empty.classList.add('hidden');
-            tbody.innerHTML = datos.productos.map((p, index) => {
+            tbody.innerHTML = datosEnMemoria.productos.map((p, index) => {
                 const precio = p.precioTemporadaActivo && p.precioTemporada ? p.precioTemporada : p.precioRegular;
                 const img = p.imagenes?.[0] || 'https://via.placeholder.com/80?text=Sin+foto';
                 
@@ -1040,19 +1402,19 @@
             }).join('');
         }
 
-        function abrirModalProducto(id = null) {
+        async function abrirModalProducto(id = null) {
             document.getElementById('modalProducto').classList.remove('hidden');
             document.getElementById('tituloModal').textContent = id ? 'Editar Producto' : 'Nuevo Producto';
             
             const select = document.getElementById('prodCategoria');
-            select.innerHTML = datos.categorias.map(c => 
+            select.innerHTML = datosEnMemoria.categorias.map(c => 
                 `<option value="${c.id}">${c.icono} ${c.nombre}</option>`
             ).join('');
             
             fotosTemp = [];
             
             if (id) {
-                const p = datos.productos.find(x => x.id === id);
+                const p = datosEnMemoria.productos.find(x => x.id === id);
                 document.getElementById('prodId').value = p.id;
                 document.getElementById('prodCodigo').value = p.codigo;
                 document.getElementById('prodNombre').value = p.nombre;
@@ -1064,7 +1426,12 @@
                 document.getElementById('prodTemporadaActivo').checked = p.precioTemporadaActivo || false;
                 document.getElementById('prodActivo').checked = p.activo !== false;
                 document.getElementById('prodDestacado').checked = p.destacado || false;
-                fotosTemp = p.imagenes || [];
+                
+                // Cargar imágenes existentes
+                if (p.imagenes && p.imagenes.length > 0) {
+                    fotosTemp = [...p.imagenes];
+                    console.log('📸 Cargando imágenes existentes:', fotosTemp.length);
+                }
             } else {
                 document.getElementById('prodId').value = '';
                 document.getElementById('prodCodigo').value = '';
@@ -1081,185 +1448,7 @@
             renderizarPreviews();
         }
 
-        function guardarProducto() {
-            const id = document.getElementById('prodId').value;
-            const codigo = document.getElementById('prodCodigo').value.trim();
-            const nombre = document.getElementById('prodNombre').value.trim();
-            
-            if (!codigo || !nombre) {
-                mostrarAlerta('Código y nombre son obligatorios', 'error');
-                return;
-            }
-            
-            const producto = {
-                id: id || 'prod-' + Date.now(),
-                codigo: codigo,
-                nombre: nombre,
-                categoria: document.getElementById('prodCategoria').value,
-                descripcion: document.getElementById('prodDescripcion').value.trim(),
-                stock: parseInt(document.getElementById('prodStock').value) || 0,
-                precioRegular: parseInt(document.getElementById('prodPrecioRegular').value) || 0,
-                precioTemporada: parseInt(document.getElementById('prodPrecioTemporada').value) || null,
-                precioTemporadaActivo: document.getElementById('prodTemporadaActivo').checked,
-                imagenes: fotosTemp,
-                activo: document.getElementById('prodActivo').checked,
-                destacado: document.getElementById('prodDestacado').checked
-            };
-            
-            if (id) {
-                const index = datos.productos.findIndex(p => p.id === id);
-                datos.productos[index] = producto;
-            } else {
-                datos.productos.push(producto);
-            }
-            
-            guardarDatos();
-            cerrarModal('modalProducto');
-            renderizarProductos();
-            mostrarAlerta('Producto guardado correctamente', 'success');
-        }
-
-        function eliminarProducto(id) {
-            if (confirm('¿Eliminar este producto permanentemente?')) {
-                datos.productos = datos.productos.filter(p => p.id !== id);
-                guardarDatos();
-                renderizarProductos();
-                mostrarAlerta('Producto eliminado', 'success');
-            }
-        }
-
-        // Categorías CRUD (igual que antes)
-        function renderizarCategorias() {
-            const container = document.getElementById('listaCategorias');
-            const empty = document.getElementById('emptyCategorias');
-            
-            if (datos.categorias.length === 0) {
-                container.innerHTML = '';
-                empty.classList.remove('hidden');
-                return;
-            }
-            
-            empty.classList.add('hidden');
-            container.innerHTML = datos.categorias.map(c => `
-                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="text-4xl">${c.icono}</div>
-                        <div class="flex gap-2">
-                            <button onclick="abrirModalCategoria('${c.id}')" class="text-blue-600 hover:text-blue-800 p-2 hover:bg-blue-50 rounded-lg transition-colors">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button onclick="eliminarCategoria('${c.id}')" class="text-red-600 hover:text-red-800 p-2 hover:bg-red-50 rounded-lg transition-colors">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <h3 class="font-bold text-lg text-gray-800 mb-1">${c.nombre}</h3>
-                    <p class="text-sm text-gray-500 font-mono mb-3">${c.id}</p>
-                    <span class="px-3 py-1 rounded-full text-xs font-medium ${c.activa ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}">
-                        ${c.activa ? 'Activa' : 'Inactiva'}
-                    </span>
-                </div>
-            `).join('');
-        }
-
-        function abrirModalCategoria(id = null) {
-            document.getElementById('modalCategoria').classList.remove('hidden');
-            document.getElementById('tituloModalCat').textContent = id ? 'Editar Categoría' : 'Nueva Categoría';
-            
-            if (id) {
-                const c = datos.categorias.find(x => x.id === id);
-                document.getElementById('catId').value = c.id;
-                document.getElementById('catIdInput').value = c.id;
-                document.getElementById('catIdInput').disabled = true;
-                document.getElementById('catNombre').value = c.nombre;
-                document.getElementById('catIcono').value = c.icono;
-                document.getElementById('catActiva').checked = c.activa;
-            } else {
-                document.getElementById('catId').value = '';
-                document.getElementById('catIdInput').value = '';
-                document.getElementById('catIdInput').disabled = false;
-                document.getElementById('catNombre').value = '';
-                document.getElementById('catIcono').value = '🌸';
-                document.getElementById('catActiva').checked = true;
-            }
-        }
-
-        function guardarCategoria() {
-            const idOriginal = document.getElementById('catId').value;
-            const id = document.getElementById('catIdInput').value.trim().toLowerCase().replace(/\s+/g, '-');
-            const nombre = document.getElementById('catNombre').value.trim();
-            
-            if (!id || !nombre) {
-                mostrarAlerta('ID y nombre son obligatorios', 'error');
-                return;
-            }
-            
-            if (!idOriginal && datos.categorias.some(c => c.id === id)) {
-                mostrarAlerta('Ya existe una categoría con ese ID', 'error');
-                return;
-            }
-            
-            const categoria = {
-                id: idOriginal || id,
-                nombre: nombre,
-                icono: document.getElementById('catIcono').value || '🌸',
-                orden: datos.categorias.length + 1,
-                activa: document.getElementById('catActiva').checked
-            };
-            
-            if (idOriginal) {
-                const index = datos.categorias.findIndex(c => c.id === idOriginal);
-                datos.categorias[index] = categoria;
-            } else {
-                datos.categorias.push(categoria);
-            }
-            
-            guardarDatos();
-            cerrarModal('modalCategoria');
-            renderizarCategorias();
-            mostrarAlerta('Categoría guardada correctamente', 'success');
-        }
-
-        function eliminarCategoria(id) {
-            const productosEnCategoria = datos.productos.filter(p => p.categoria === id).length;
-            let mensaje = '¿Eliminar esta categoría?';
-            if (productosEnCategoria > 0) {
-                mensaje += `\n\n⚠️ Hay ${productosEnCategoria} productos en esta categoría. Se quedarán sin categoría asignada.`;
-            }
-            
-            if (confirm(mensaje)) {
-                datos.categorias = datos.categorias.filter(c => c.id !== id);
-                guardarDatos();
-                renderizarCategorias();
-                mostrarAlerta('Categoría eliminada', 'success');
-            }
-        }
-
-        // Configuración
-        function cargarConfig() {
-            document.getElementById('configNombre').value = datos.config.nombre;
-            document.getElementById('configWhatsapp').value = datos.config.whatsapp;
-            document.getElementById('configEmail').value = datos.config.email || '';
-            document.getElementById('configTarifa').value = datos.config.tarifaExpress;
-            // NUEVO: Cargar coordenadas
-            document.getElementById('configLat').value = datos.config.lat || 10.0369;
-            document.getElementById('configLng').value = datos.config.lng || -84.1594;
-        }
-
-        function guardarConfig() {
-            datos.config.nombre = document.getElementById('configNombre').value.trim();
-            datos.config.whatsapp = document.getElementById('configWhatsapp').value.trim();
-            datos.config.email = document.getElementById('configEmail').value.trim();
-            datos.config.tarifaExpress = parseInt(document.getElementById('configTarifa').value) || 650;
-            // NUEVO: Guardar coordenadas
-            datos.config.lat = parseFloat(document.getElementById('configLat').value) || 10.0369;
-            datos.config.lng = parseFloat(document.getElementById('configLng').value) || -84.1594;
-            
-            guardarDatos();
-            mostrarAlerta('Configuración guardada', 'success');
-        }
-
-        // Manejo de imágenes
+        // Procesar fotos - MEJORADO para múltiples archivos
         function procesarFotos(input) {
             const archivos = Array.from(input.files);
             
@@ -1268,7 +1457,14 @@
                 return;
             }
             
-            archivos.forEach(archivo => {
+            // Mostrar barra de progreso
+            document.getElementById('uploadProgress').classList.remove('hidden');
+            document.getElementById('uploadProgressBar').style.width = '0%';
+            document.getElementById('uploadProgressText').textContent = '0%';
+            
+            let procesadas = 0;
+            
+            archivos.forEach((archivo, index) => {
                 if (!archivo.type.startsWith('image/')) return;
                 
                 const reader = new FileReader();
@@ -1278,7 +1474,8 @@
                         const canvas = document.createElement('canvas');
                         const ctx = canvas.getContext('2d');
                         
-                        const maxSize = 800;
+                        // Redimensionar para optimizar (600px máximo)
+                        const maxSize = 600;
                         let width = img.width;
                         let height = img.height;
                         
@@ -1294,8 +1491,22 @@
                         canvas.height = height;
                         ctx.drawImage(img, 0, 0, width, height);
                         
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                        // Calidad 0.7 para buen balance
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
                         fotosTemp.push(dataUrl);
+                        
+                        procesadas++;
+                        const porcentaje = Math.round((procesadas / archivos.length) * 100);
+                        document.getElementById('uploadProgressBar').style.width = porcentaje + '%';
+                        document.getElementById('uploadProgressText').textContent = porcentaje + '%';
+                        
+                        if (procesadas === archivos.length) {
+                            setTimeout(() => {
+                                document.getElementById('uploadProgress').classList.add('hidden');
+                                mostrarNotificacion(`✅ ${archivos.length} foto${archivos.length > 1 ? 's' : ''} procesada${archivos.length > 1 ? 's' : ''}`, 'success');
+                            }, 500);
+                        }
+                        
                         renderizarPreviews();
                     };
                     img.src = e.target.result;
@@ -1330,30 +1541,286 @@
             }
         }
 
-        // Backup y Restore
-        function exportarDatos() {
-            const dataStr = JSON.stringify(datos, null, 2);
-            const blob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
+        async function guardarProducto() {
+            if (operacionEnProgreso) return;
             
-            const fecha = new Date().toISOString().split('T')[0];
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `respaldo-floristeria-${fecha}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            const id = document.getElementById('prodId').value;
+            const codigo = document.getElementById('prodCodigo').value.trim();
+            const nombre = document.getElementById('prodNombre').value.trim();
             
-            mostrarAlerta('Copia de seguridad descargada', 'success');
+            if (!codigo || !nombre) {
+                mostrarAlerta('Código y nombre son obligatorios', 'error');
+                return;
+            }
+            
+            operacionEnProgreso = true;
+            mostrarLoading(true);
+            
+            const producto = {
+                id: id || 'prod-' + Date.now(),
+                codigo: codigo,
+                nombre: nombre,
+                categoria: document.getElementById('prodCategoria').value,
+                descripcion: document.getElementById('prodDescripcion').value.trim(),
+                stock: parseInt(document.getElementById('prodStock').value) || 0,
+                precioRegular: parseInt(document.getElementById('prodPrecioRegular').value) || 0,
+                precioTemporada: parseInt(document.getElementById('prodPrecioTemporada').value) || null,
+                precioTemporadaActivo: document.getElementById('prodTemporadaActivo').checked,
+                activo: document.getElementById('prodActivo').checked,
+                destacado: document.getElementById('prodDestacado').checked
+            };
+            
+            try {
+                const guardado = await guardarProductoEnDB(producto, fotosTemp);
+                
+                if (guardado) {
+                    // Actualizar memoria
+                    if (id) {
+                        const index = datosEnMemoria.productos.findIndex(p => p.id === id);
+                        datosEnMemoria.productos[index] = { ...producto, imagenes: fotosTemp };
+                    } else {
+                        datosEnMemoria.productos.push({ ...producto, imagenes: fotosTemp });
+                    }
+                    
+                    cerrarModal('modalProducto');
+                    renderizarProductos();
+                    actualizarStats();
+                    mostrarAlerta('✅ Producto guardado correctamente', 'success');
+                } else {
+                    throw new Error('Error al guardar en DB');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarAlerta('Error al guardar el producto', 'error');
+            }
+            
+            mostrarLoading(false);
+            operacionEnProgreso = false;
         }
 
-        function importarDatos(input) {
+        async function eliminarProducto(id) {
+            if (confirm('¿Eliminar este producto permanentemente?')) {
+                mostrarLoading(true);
+                
+                try {
+                    const eliminado = await eliminarProductoDeDB(id);
+                    
+                    if (eliminado) {
+                        datosEnMemoria.productos = datosEnMemoria.productos.filter(p => p.id !== id);
+                        renderizarProductos();
+                        actualizarStats();
+                        mostrarAlerta('Producto eliminado', 'success');
+                    } else {
+                        throw new Error('Error al eliminar');
+                    }
+                } catch (error) {
+                    mostrarAlerta('Error al eliminar', 'error');
+                }
+                
+                mostrarLoading(false);
+            }
+        }
+
+        // ============================================
+        // CATEGORÍAS
+        // ============================================
+        function renderizarCategorias() {
+            const container = document.getElementById('listaCategorias');
+            const empty = document.getElementById('emptyCategorias');
+            
+            if (datosEnMemoria.categorias.length === 0) {
+                container.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+            
+            empty.classList.add('hidden');
+            container.innerHTML = datosEnMemoria.categorias.map(c => `
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="text-4xl">${c.icono}</div>
+                        <div class="flex gap-2">
+                            <button onclick="abrirModalCategoria('${c.id}')" class="text-blue-600 hover:text-blue-800 p-2 hover:bg-blue-50 rounded-lg transition-colors">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="eliminarCategoria('${c.id}')" class="text-red-600 hover:text-red-800 p-2 hover:bg-red-50 rounded-lg transition-colors">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <h3 class="font-bold text-lg text-gray-800 mb-1">${c.nombre}</h3>
+                    <p class="text-sm text-gray-500 font-mono mb-3">${c.id}</p>
+                    <span class="px-3 py-1 rounded-full text-xs font-medium ${c.activa ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}">
+                        ${c.activa ? 'Activa' : 'Inactiva'}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        function abrirModalCategoria(id = null) {
+            document.getElementById('modalCategoria').classList.remove('hidden');
+            document.getElementById('tituloModalCat').textContent = id ? 'Editar Categoría' : 'Nueva Categoría';
+            
+            if (id) {
+                const c = datosEnMemoria.categorias.find(x => x.id === id);
+                document.getElementById('catId').value = c.id;
+                document.getElementById('catIdInput').value = c.id;
+                document.getElementById('catIdInput').disabled = true;
+                document.getElementById('catNombre').value = c.nombre;
+                document.getElementById('catIcono').value = c.icono;
+                document.getElementById('catActiva').checked = c.activa;
+            } else {
+                document.getElementById('catId').value = '';
+                document.getElementById('catIdInput').value = '';
+                document.getElementById('catIdInput').disabled = false;
+                document.getElementById('catNombre').value = '';
+                document.getElementById('catIcono').value = '🌸';
+                document.getElementById('catActiva').checked = true;
+            }
+        }
+
+        async function guardarCategoria() {
+            const idOriginal = document.getElementById('catId').value;
+            const id = document.getElementById('catIdInput').value.trim().toLowerCase().replace(/\s+/g, '-');
+            const nombre = document.getElementById('catNombre').value.trim();
+            
+            if (!id || !nombre) {
+                mostrarAlerta('ID y nombre son obligatorios', 'error');
+                return;
+            }
+            
+            if (!idOriginal && datosEnMemoria.categorias.some(c => c.id === id)) {
+                mostrarAlerta('Ya existe una categoría con ese ID', 'error');
+                return;
+            }
+            
+            const categoria = {
+                id: idOriginal || id,
+                nombre: nombre,
+                icono: document.getElementById('catIcono').value || '🌸',
+                orden: datosEnMemoria.categorias.length + 1,
+                activa: document.getElementById('catActiva').checked
+            };
+            
+            try {
+                const guardado = await guardarCategoriaEnDB(categoria);
+                
+                if (guardado) {
+                    if (idOriginal) {
+                        const index = datosEnMemoria.categorias.findIndex(c => c.id === idOriginal);
+                        datosEnMemoria.categorias[index] = categoria;
+                    } else {
+                        datosEnMemoria.categorias.push(categoria);
+                    }
+                    
+                    cerrarModal('modalCategoria');
+                    renderizarCategorias();
+                    actualizarStats();
+                    mostrarAlerta('Categoría guardada correctamente', 'success');
+                } else {
+                    throw new Error('Error al guardar');
+                }
+            } catch (error) {
+                mostrarAlerta('Error al guardar la categoría', 'error');
+            }
+        }
+
+        function eliminarCategoria(id) {
+            const productosEnCategoria = datosEnMemoria.productos.filter(p => p.categoria === id).length;
+            let mensaje = '¿Eliminar esta categoría?';
+            if (productosEnCategoria > 0) {
+                mensaje += `\n\n⚠️ Hay ${productosEnCategoria} productos en esta categoría. Se quedarán sin categoría asignada.`;
+            }
+            
+            if (confirm(mensaje)) {
+                datosEnMemoria.categorias = datosEnMemoria.categorias.filter(c => c.id !== id);
+                guardarCategoriaEnDB({ id, _delete: true }); // Marcar para eliminar
+                renderizarCategorias();
+                actualizarStats();
+                mostrarAlerta('Categoría eliminada', 'success');
+            }
+        }
+
+        // ============================================
+        // CONFIGURACIÓN
+        // ============================================
+        function cargarConfig() {
+            document.getElementById('configNombre').value = datosEnMemoria.config.nombre;
+            document.getElementById('configWhatsapp').value = datosEnMemoria.config.whatsapp;
+            document.getElementById('configEmail').value = datosEnMemoria.config.email || '';
+            document.getElementById('configTarifa').value = datosEnMemoria.config.tarifaExpress;
+            document.getElementById('configLat').value = datosEnMemoria.config.lat || 10.034784;
+            document.getElementById('configLng').value = datosEnMemoria.config.lng || -84.158785;
+        }
+
+        async function guardarConfig() {
+            datosEnMemoria.config.nombre = document.getElementById('configNombre').value.trim();
+            datosEnMemoria.config.whatsapp = document.getElementById('configWhatsapp').value.trim();
+            datosEnMemoria.config.email = document.getElementById('configEmail').value.trim();
+            datosEnMemoria.config.tarifaExpress = parseInt(document.getElementById('configTarifa').value) || 650;
+            datosEnMemoria.config.lat = parseFloat(document.getElementById('configLat').value) || 10.034784;
+            datosEnMemoria.config.lng = parseFloat(document.getElementById('configLng').value) || -84.158785;
+            
+            try {
+                const guardado = await guardarConfigEnDB(datosEnMemoria.config);
+                
+                if (guardado) {
+                    mostrarAlerta('✅ Configuración guardada', 'success');
+                } else {
+                    throw new Error('Error al guardar');
+                }
+            } catch (error) {
+                mostrarAlerta('Error al guardar configuración', 'error');
+            }
+        }
+
+        // ============================================
+        // BACKUP Y RESTORE
+        // ============================================
+        async function exportarDatos() {
+            mostrarLoading(true);
+            
+            try {
+                // Recolectar todos los datos para backup
+                const backup = {
+                    version: 2,
+                    fecha: new Date().toISOString(),
+                    productos: datosEnMemoria.productos,
+                    categorias: datosEnMemoria.categorias,
+                    pedidos: datosEnMemoria.pedidos,
+                    config: datosEnMemoria.config
+                };
+                
+                const dataStr = JSON.stringify(backup, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                const fecha = new Date().toISOString().split('T')[0];
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `respaldo-floristeria-${fecha}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                mostrarAlerta('✅ Copia de seguridad descargada', 'success');
+            } catch (error) {
+                console.error('Error exportando:', error);
+                mostrarAlerta('Error al crear backup', 'error');
+            }
+            
+            mostrarLoading(false);
+        }
+
+        async function importarDatos(input) {
             const archivo = input.files[0];
             if (!archivo) return;
             
+            mostrarLoading(true);
+            
             const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onload = async (e) => {
                 try {
                     const datosImportados = JSON.parse(e.target.result);
                     
@@ -1362,44 +1829,70 @@
                     }
                     
                     if (confirm(`¿Restaurar copia de seguridad?\n\nProductos: ${datosImportados.productos.length}\nCategorías: ${datosImportados.categorias.length}\nPedidos: ${datosImportados.pedidos?.length || 0}\n\n⚠️ Se reemplazarán todos los datos actuales.`)) {
-                        datos = datosImportados;
-                        if (!datos.pedidos) datos.pedidos = [];
-                        // Asegurar coordenadas
-                        if (!datos.config.lat) datos.config.lat = 10.0369;
-                        if (!datos.config.lng) datos.config.lng = -84.1594;
-                        guardarDatos();
+                        
+                        // Limpiar datos actuales
+                        for (const producto of datosEnMemoria.productos) {
+                            await eliminarProductoDeDB(producto.id);
+                        }
+                        
+                        // Importar nuevos datos
+                        datosEnMemoria.productos = [];
+                        datosEnMemoria.categorias = [];
+                        datosEnMemoria.pedidos = datosImportados.pedidos || [];
+                        datosEnMemoria.config = datosImportados.config || datosEnMemoria.config;
+                        
+                        // Guardar categorías
+                        for (const cat of datosImportados.categorias) {
+                            await guardarCategoriaEnDB(cat);
+                            datosEnMemoria.categorias.push(cat);
+                        }
+                        
+                        // Guardar productos con imágenes
+                        for (const prod of datosImportados.productos) {
+                            const imagenes = prod.imagenes || [];
+                            const productoSinImgs = { ...prod };
+                            delete productoSinImgs.imagenes;
+                            
+                            await guardarProductoEnDB(productoSinImgs, imagenes);
+                            datosEnMemoria.productos.push({ ...productoSinImgs, imagenes });
+                        }
+                        
+                        // Guardar pedidos
+                        for (const ped of datosEnMemoria.pedidos) {
+                            await guardarPedidoEnDB(ped);
+                        }
+                        
+                        // Guardar config
+                        await guardarConfigEnDB(datosEnMemoria.config);
+                        
                         renderizarProductos();
-                        mostrarAlerta('Datos restaurados correctamente', 'success');
+                        renderizarCategorias();
+                        actualizarStats();
+                        
+                        mostrarAlerta('✅ Datos restaurados correctamente', 'success');
                     }
                 } catch (err) {
+                    console.error('Error importando:', err);
                     mostrarAlerta('Error al leer el archivo. Asegúrate de que sea un respaldo válido.', 'error');
                 }
+                
+                mostrarLoading(false);
             };
             reader.readAsText(archivo);
             input.value = '';
         }
 
-        // Utilidades
+        // ============================================
+        // UTILIDADES
+        // ============================================
         function cerrarModal(id) {
             document.getElementById(id).classList.add('hidden');
         }
 
-        function mostrarAlerta(mensaje, tipo = 'success') {
-            const container = document.getElementById('alertContainer');
-            const color = tipo === 'success' ? 'bg-green-100 text-green-800 border-green-200' : 'bg-red-100 text-red-800 border-red-200';
-            const icono = tipo === 'success' ? 'check-circle' : 'exclamation-circle';
-            
-            container.innerHTML = `
-                <div class="${color} border px-4 py-3 rounded-xl flex items-center gap-2 animate-fade-in">
-                    <i class="fas fa-${icono}"></i>
-                    <span class="font-medium">${mensaje}</span>
-                </div>
-            `;
-            
-            setTimeout(() => {
-                container.innerHTML = '';
-            }, 5000);
-        }
+        // Inicialización
+        window.onload = async function() {
+            await inicializarDB();
+        };
 
         window.onclick = function(event) {
             if (event.target.id === 'modalProducto') cerrarModal('modalProducto');
