@@ -95,7 +95,7 @@
         </div>
         <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white text-center">
             <div class="max-w-3xl mx-auto animate-fade-in">
-                <span class="inline-block px-6 py-2 bg-sb-rose/20 text-sb-rose-soft rounded-full text-sm font-medium mb-6 backdrop-blur-sm">💐 Desde 2010 en Costa Rica</span>
+                <span class="inline-block px-6 py-2 bg-sb-rose/20 text-sb-rose-soft rounded-full text-sm font-medium mb-6 backdrop-blur-sm">💐 Desde 1998 en Costa Rica</span>
                 <h2 class="font-serif text-4xl md:text-6xl lg:text-7xl leading-tight mb-6">Flores que cuentan<br><span class="italic text-sb-rose-soft">tu historia</span></h2>
                 <p class="text-lg md:text-xl text-gray-200 mb-10 max-w-xl mx-auto">Arreglos frescos, entrega el mismo día en Santa Bárbara, Heredia. Cada flor seleccionada a mano para tus momentos especiales.</p>
                 <div class="flex flex-wrap justify-center gap-4">
@@ -393,6 +393,13 @@
                 cargarDatos();
             }
         }, 1000);
+
+        // Forzar actualización de caché
+        const version = '1.0.3'; // Cambia este número cada vez que actualices
+        if (!localStorage.getItem('sb_version') || localStorage.getItem('sb_version') !== version) {
+            localStorage.setItem('sb_version', version);
+            console.log('🔄 Nueva versión detectada, recargando...');
+        }
     </script>
 </body>
 </html>
