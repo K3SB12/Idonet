@@ -35,6 +35,7 @@
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #2D5A3D; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
@@ -241,7 +242,7 @@
 
     <script>
         // ============================================
-        // VARIABLES GLOBALES Y CONFIGURACIÓN
+        // VARIABLES GLOBALES
         // ============================================
         const DB_NAME = 'FloristeriaSB';
         const DB_VERSION = 2;
@@ -267,7 +268,7 @@
         let operacionEnProgreso = false;
 
         // ============================================
-        // INICIALIZACIÓN - IndexedDB
+        // INICIALIZACIÓN DE INDEXEDDB
         // ============================================
         async function inicializarDB() {
             return new Promise((resolve, reject) => {
@@ -317,6 +318,9 @@
             });
         }
 
+        // ============================================
+        // FUNCIONES DE BASE DE DATOS (CORREGIDAS)
+        // ============================================
         async function cargarDatosDesdeDB() {
             if (!db) return;
             
@@ -401,6 +405,7 @@
             });
         }
 
+        // ✅ FUNCIÓN CORREGIDA - AHORA USA await tx.done
         async function guardarProductoEnDB(producto, imagenes) {
             if (!db) return false;
             
@@ -410,43 +415,54 @@
                 const productoSinImgs = { ...producto };
                 delete productoSinImgs.imagenes;
                 
-                await new Promise((res, rej) => {
-                    const r = tx.objectStore('productos').put(productoSinImgs);
-                    r.onsuccess = () => res(); r.onerror = () => rej(r.error);
+                // Guardar producto
+                const storeProductos = tx.objectStore('productos');
+                await new Promise((resolve, reject) => {
+                    const request = storeProductos.put(productoSinImgs);
+                    request.onsuccess = () => resolve();
+                    request.onerror = () => reject(request.error);
                 });
                 
+                // Eliminar imágenes antiguas
                 const imgStore = tx.objectStore('imagenes');
                 const index = imgStore.index('productoId');
                 
-                const oldImgs = await new Promise((res) => {
-                    const r = index.getAll(producto.id);
-                    r.onsuccess = () => res(r.result || []);
+                const oldImgs = await new Promise((resolve, reject) => {
+                    const request = index.getAll(producto.id);
+                    request.onsuccess = () => resolve(request.result || []);
+                    request.onerror = () => reject(request.error);
                 });
                 
                 for (const img of oldImgs) {
-                    await new Promise((res, rej) => {
-                        const r = imgStore.delete(img.id);
-                        r.onsuccess = () => res(); r.onerror = () => rej(r.error);
+                    await new Promise((resolve, reject) => {
+                        const request = imgStore.delete(img.id);
+                        request.onsuccess = () => resolve();
+                        request.onerror = () => reject(request.error);
                     });
                 }
                 
+                // Guardar nuevas imágenes
                 for (let i = 0; i < imagenes.length; i++) {
-                    await new Promise((res, rej) => {
-                        const r = imgStore.put({
+                    await new Promise((resolve, reject) => {
+                        const request = imgStore.put({
                             id: `${producto.id}_img_${i}`,
                             productoId: producto.id,
                             indice: i,
                             data: imagenes[i]
                         });
-                        r.onsuccess = () => res(); r.onerror = () => rej(r.error);
+                        request.onsuccess = () => resolve();
+                        request.onerror = () => reject(request.error);
                     });
                 }
                 
-                await new Promise((res, rej) => {
-                    tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error);
+                // ✅ ESPERAR QUE LA TRANSACCIÓN SE COMPLETE
+                await new Promise((resolve, reject) => {
+                    tx.oncomplete = () => resolve();
+                    tx.onerror = () => reject(tx.error);
                 });
                 
                 return true;
+                
             } catch (error) {
                 console.error('Error guardando producto:', error);
                 tx.abort();
@@ -454,41 +470,90 @@
             }
         }
 
+        // ✅ FUNCIÓN CORREGIDA - AHORA USA await tx.done
         async function guardarCategoriaEnDB(categoria) {
             if (!db) return false;
+            
+            const tx = db.transaction('categorias', 'readwrite');
+            
             try {
-                const tx = db.transaction('categorias', 'readwrite');
-                await new Promise((res, rej) => {
-                    const r = tx.objectStore('categorias').put(categoria);
-                    r.onsuccess = () => res(); r.onerror = () => rej(r.error);
+                const store = tx.objectStore('categorias');
+                
+                await new Promise((resolve, reject) => {
+                    const request = store.put(categoria);
+                    request.onsuccess = () => resolve();
+                    request.onerror = () => reject(request.error);
                 });
-                await new Promise((res, rej) => {
-                    tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error);
+                
+                // ✅ ESPERAR QUE LA TRANSACCIÓN SE COMPLETE
+                await new Promise((resolve, reject) => {
+                    tx.oncomplete = () => resolve();
+                    tx.onerror = () => reject(tx.error);
                 });
+                
                 return true;
+                
             } catch (error) {
                 console.error('Error guardando categoría:', error);
+                tx.abort();
                 return false;
             }
         }
 
         async function guardarConfigEnDB(config) {
             if (!db) return false;
+            
+            const tx = db.transaction('config', 'readwrite');
+            
             try {
-                const tx = db.transaction('config', 'readwrite');
                 const store = tx.objectStore('config');
+                
                 for (const [clave, valor] of Object.entries(config)) {
-                    await new Promise((res, rej) => {
-                        const r = store.put({ clave, valor });
-                        r.onsuccess = () => res(); r.onerror = () => rej(r.error);
+                    await new Promise((resolve, reject) => {
+                        const request = store.put({ clave, valor });
+                        request.onsuccess = () => resolve();
+                        request.onerror = () => reject(request.error);
                     });
                 }
-                await new Promise((res, rej) => {
-                    tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error);
+                
+                await new Promise((resolve, reject) => {
+                    tx.oncomplete = () => resolve();
+                    tx.onerror = () => reject(tx.error);
                 });
+                
                 return true;
+                
             } catch (error) {
                 console.error('Error guardando config:', error);
+                tx.abort();
+                return false;
+            }
+        }
+
+        async function guardarPedidoEnDB(pedido) {
+            if (!db) return false;
+            
+            const tx = db.transaction('pedidos', 'readwrite');
+            
+            try {
+                const store = tx.objectStore('pedidos');
+                
+                await new Promise((resolve, reject) => {
+                    const request = store.put(pedido);
+                    request.onsuccess = () => resolve();
+                    request.onerror = () => reject(request.error);
+                });
+                
+                await new Promise((resolve, reject) => {
+                    tx.oncomplete = () => resolve();
+                    tx.onerror = () => reject(tx.error);
+                });
+                
+                return true;
+                
+            } catch (error) {
+                console.error('Error guardando pedido:', error);
+                tx.abort();
                 return false;
             }
         }
@@ -606,7 +671,7 @@
         }
 
         // ============================================
-        // PEDIDOS (resumen)
+        // PEDIDOS
         // ============================================
         function renderizarPedidos() {
             const container = document.getElementById('listaPedidos');
@@ -643,18 +708,6 @@
             const modal = document.getElementById('modalPedido');
             document.getElementById('contenidoModalPedido').innerHTML = `<pre>${JSON.stringify(pedido, null, 2)}</pre>`;
             modal.classList.remove('hidden');
-        }
-
-        async function guardarPedidoEnDB(pedido) {
-            if (!db) return;
-            try {
-                const tx = db.transaction('pedidos', 'readwrite');
-                await new Promise((res,rej) => {
-                    const r = tx.objectStore('pedidos').put(pedido);
-                    r.onsuccess = () => res(); r.onerror = () => rej(r.error);
-                });
-                await new Promise((res,rej) => { tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); });
-            } catch (e) {}
         }
 
         function cambiarEstadoPedido(id, nuevoEstado) {
@@ -855,17 +908,42 @@
             try {
                 if (db) {
                     const tx = db.transaction(['productos', 'imagenes'], 'readwrite');
-                    await new Promise((res,rej) => { const r = tx.objectStore('productos').delete(id); r.onsuccess = () => res(); r.onerror = () => rej(r.error); });
+                    
+                    await new Promise((resolve, reject) => {
+                        const request = tx.objectStore('productos').delete(id);
+                        request.onsuccess = () => resolve();
+                        request.onerror = () => reject(request.error);
+                    });
+                    
                     const imgStore = tx.objectStore('imagenes');
                     const index = imgStore.index('productoId');
-                    const oldImgs = await new Promise((res) => { const r = index.getAll(id); r.onsuccess = () => res(r.result || []); });
-                    for (const img of oldImgs) await new Promise((res,rej) => { const r = imgStore.delete(img.id); r.onsuccess = () => res(); r.onerror = () => rej(r.error); });
+                    
+                    const oldImgs = await new Promise((resolve, reject) => {
+                        const request = index.getAll(id);
+                        request.onsuccess = () => resolve(request.result || []);
+                        request.onerror = () => reject(request.error);
+                    });
+                    
+                    for (const img of oldImgs) {
+                        await new Promise((resolve, reject) => {
+                            const request = imgStore.delete(img.id);
+                            request.onsuccess = () => resolve();
+                            request.onerror = () => reject(request.error);
+                        });
+                    }
+                    
+                    await new Promise((resolve, reject) => {
+                        tx.oncomplete = () => resolve();
+                        tx.onerror = () => reject(tx.error);
+                    });
                 }
+                
                 datosEnMemoria.productos = datosEnMemoria.productos.filter(p => p.id !== id);
                 renderizarProductos();
                 actualizarStats();
                 mostrarAlerta('Producto eliminado', 'success');
             } catch (error) {
+                console.error(error);
                 mostrarAlerta('Error al eliminar', 'error');
             }
             mostrarLoading(false);
@@ -950,6 +1028,7 @@
                 actualizarStats();
                 mostrarAlerta('✅ Categoría guardada', 'success');
             } catch (error) {
+                console.error(error);
                 mostrarAlerta('Error al guardar', 'error');
             }
         }
@@ -963,6 +1042,7 @@
                 if (db) {
                     const tx = db.transaction('categorias', 'readwrite');
                     tx.objectStore('categorias').delete(id);
+                    tx.oncomplete = () => {};
                 }
                 renderizarCategorias();
                 actualizarStats();
@@ -1016,6 +1096,7 @@
                 URL.revokeObjectURL(url);
                 mostrarAlerta('✅ Backup descargado', 'success');
             } catch (error) {
+                console.error(error);
                 mostrarAlerta('Error al crear backup', 'error');
             }
             mostrarLoading(false);
@@ -1039,7 +1120,10 @@
                         tx.objectStore('categorias').clear();
                         tx.objectStore('pedidos').clear();
                         tx.objectStore('config').clear();
-                        await new Promise((res,rej) => { tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); });
+                        await new Promise((resolve, reject) => {
+                            tx.oncomplete = () => resolve();
+                            tx.onerror = () => reject(tx.error);
+                        });
                         
                         // Guardar nuevos
                         for (const cat of datosImportados.categorias || []) await guardarCategoriaEnDB(cat);
@@ -1053,6 +1137,7 @@
                     await cargarDatosDesdeDB();
                     mostrarAlerta('✅ Datos restaurados', 'success');
                 } catch (err) {
+                    console.error(err);
                     mostrarAlerta('Error al restaurar', 'error');
                 }
                 mostrarLoading(false);
