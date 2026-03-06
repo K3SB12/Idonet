@@ -6,191 +6,197 @@
     <title>Admin | Floristería Santa Bárbara</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Estilos críticos para que se vea en celular -->
     <style>
-        .drop-zone { border: 3px dashed #ccc; transition: all 0.3s; }
-        .drop-zone:hover { border-color: #2D5A3D; background: #f0fdf4; }
-        .preview-img { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; }
-        .tab-active { background-color: rgba(255,255,255,0.1); border-left: 4px solid #4A7C59; }
-        .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #2D5A3D; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 0; }
+        input, select, textarea { 
+            background-color: #ffffff !important; 
+            color: #000000 !important; 
+            border: 2px solid #cccccc !important;
+            padding: 12px !important;
+            font-size: 16px !important;
+            width: 100% !important;
+            border-radius: 8px !important;
+        }
+        button { 
+            min-height: 48px !important; 
+            font-size: 16px !important;
+            background-color: #2D5A3D !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 8px !important;
+            padding: 12px 24px !important;
+            font-weight: bold !important;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            max-width: 500px;
+            margin: 20px;
+        }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
-    <!-- Pantalla de carga -->
-    <div id="loadingScreen" class="fixed inset-0 bg-white/80 z-[200] hidden flex items-center justify-center">
-        <div class="text-center"><div class="spinner mx-auto mb-4"></div><p class="text-gray-600">Procesando...</p></div>
-    </div>
-
+<body class="bg-gray-100">
     <!-- Login -->
     <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-white p-8 rounded-2xl shadow-lg max-w-md w-full">
-            <div class="text-center mb-8">
-                <span class="text-5xl">🌸</span>
-                <h1 class="text-2xl font-bold text-sb-green mt-4">Santa Bárbara</h1>
-                <p class="text-gray-500 mt-2">Panel de Administración</p>
-            </div>
-            <div id="loginForm">
-                <input type="email" id="email" placeholder="Correo electrónico" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 mb-4 focus:border-sb-green focus:outline-none">
-                <input type="password" id="clave" placeholder="Contraseña" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 mb-6 focus:border-sb-green focus:outline-none">
-                <button onclick="login()" class="w-full bg-sb-green text-white py-3 rounded-xl font-semibold hover:bg-sb-green-light">Entrar al Sistema</button>
-            </div>
-            <div id="firstTimeMsg" class="hidden mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
-                <p class="text-sm text-blue-800 text-center"><i class="fas fa-info-circle mr-2"></i><strong>Primera vez:</strong> Crea tu cuenta</p>
-            </div>
-            <div class="mt-6 text-center"><a href="index.html" class="text-gray-500 hover:text-sb-green">← Volver a la tienda</a></div>
+            <h1 class="text-2xl font-bold text-center mb-6">🌸 Santa Bárbara</h1>
+            <input type="email" id="email" placeholder="Correo electrónico" class="w-full mb-4">
+            <input type="password" id="clave" placeholder="Contraseña" class="w-full mb-4">
+            <button onclick="login()" class="w-full bg-green-700 text-white py-3 rounded-lg font-bold">Entrar</button>
+            <p class="text-sm text-center mt-4 text-gray-600">Primera vez: crea tu cuenta</p>
         </div>
     </div>
 
     <!-- Dashboard -->
-    <div id="dashboard" class="hidden min-h-screen flex flex-col md:flex-row">
-        <!-- Sidebar -->
-        <aside class="w-full md:w-64 bg-sb-dark text-white">
-            <div class="p-6 border-b border-gray-700"><span class="text-3xl">🌸</span><h2 class="text-lg font-bold">Santa Bárbara</h2><p class="text-xs text-gray-400">Panel Admin</p></div>
-            <nav class="p-4">
-                <button onclick="showTab('pedidos')" id="tab-btn-pedidos" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/10 flex items-center gap-3"><i class="fas fa-shopping-bag w-5"></i><span>Pedidos</span><span id="badgePedidosNuevos" class="ml-auto bg-red-500 text-xs px-2 py-1 rounded-full hidden">0</span></button>
-                <button onclick="showTab('productos')" id="tab-btn-productos" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/10 flex items-center gap-3 tab-active"><i class="fas fa-box w-5"></i><span>Productos</span><span id="countProductos" class="ml-auto bg-sb-green text-xs px-2 py-1 rounded-full">0</span></button>
-                <button onclick="showTab('categorias')" id="tab-btn-categorias" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/10 flex items-center gap-3"><i class="fas fa-tags w-5"></i><span>Categorías</span><span id="countCategorias" class="ml-auto bg-gray-600 text-xs px-2 py-1 rounded-full">0</span></button>
-                <button onclick="showTab('config')" id="tab-btn-config" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/10 flex items-center gap-3"><i class="fas fa-cog w-5"></i><span>Configuración</span></button>
-                <button onclick="showTab('backup')" id="tab-btn-backup" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/10 flex items-center gap-3"><i class="fas fa-database w-5"></i><span>Copia Seguridad</span></button>
-            </nav>
-            <div class="p-4 mt-auto border-t border-gray-700"><button onclick="logout()" class="w-full text-left px-4 py-3 rounded-lg hover:bg-white/10 text-red-400"><i class="fas fa-sign-out-alt w-5"></i><span>Cerrar Sesión</span></button></div>
-        </aside>
+    <div id="dashboard" class="hidden p-4">
+        <div class="flex gap-2 mb-4 overflow-x-auto">
+            <button onclick="showTab('productos')" class="px-4 py-2 bg-green-700 text-white rounded-lg">Productos</button>
+            <button onclick="showTab('categorias')" class="px-4 py-2 bg-gray-500 text-white rounded-lg">Categorías</button>
+            <button onclick="showTab('backup')" class="px-4 py-2 bg-gray-500 text-white rounded-lg">Backup</button>
+            <button onclick="logout()" class="px-4 py-2 bg-red-500 text-white rounded-lg">Salir</button>
+        </div>
 
-        <!-- Main Content -->
-        <main class="flex-1 p-4 md:p-8 overflow-y-auto">
-            <div id="alertContainer" class="mb-6"></div>
-
-            <!-- PEDIDOS -->
-            <div id="tab-pedidos" class="tab-content hidden">
-                <div class="flex justify-between mb-6"><h2 class="text-2xl font-bold">Pedidos Recibidos</h2></div>
-                <div id="listaPedidos" class="space-y-4"></div>
-                <div id="emptyPedidos" class="hidden text-center py-12">No hay pedidos</div>
+        <!-- Productos -->
+        <div id="tab-productos" class="tab-content">
+            <div class="flex justify-between mb-4">
+                <h2 class="text-2xl font-bold">Productos</h2>
+                <button onclick="abrirModalProducto()" class="bg-green-700 text-white px-4 py-2 rounded-lg">+ Nuevo</button>
             </div>
+            <div id="listaProductos" class="bg-white p-4 rounded-lg"></div>
+        </div>
 
-            <!-- PRODUCTOS -->
-            <div id="tab-productos" class="tab-content">
-                <div class="flex justify-between mb-6">
-                    <h2 class="text-2xl font-bold">Productos</h2>
-                    <button onclick="abrirModalProducto()" class="bg-sb-green text-white px-4 py-2 rounded-lg">+ Nuevo Producto</button>
-                </div>
-                <div id="listaProductos" class="bg-white rounded-lg p-4"></div>
-                <div id="emptyProductos" class="hidden text-center py-12">No hay productos</div>
+        <!-- Categorías -->
+        <div id="tab-categorias" class="tab-content hidden">
+            <div class="flex justify-between mb-4">
+                <h2 class="text-2xl font-bold">Categorías</h2>
+                <button onclick="abrirModalCategoria()" class="bg-green-700 text-white px-4 py-2 rounded-lg">+ Nueva</button>
             </div>
+            <div id="listaCategorias" class="grid grid-cols-2 gap-4"></div>
+        </div>
 
-            <!-- CATEGORÍAS -->
-            <div id="tab-categorias" class="tab-content hidden">
-                <div class="flex justify-between mb-6">
-                    <h2 class="text-2xl font-bold">Categorías</h2>
-                    <button onclick="abrirModalCategoria()" class="bg-sb-green text-white px-4 py-2 rounded-lg">+ Nueva Categoría</button>
-                </div>
-                <div id="listaCategorias" class="grid grid-cols-2 md:grid-cols-3 gap-4"></div>
-                <div id="emptyCategorias" class="hidden text-center py-12">No hay categorías</div>
+        <!-- Backup -->
+        <div id="tab-backup" class="tab-content hidden">
+            <h2 class="text-2xl font-bold mb-4">Copia de Seguridad</h2>
+            <div class="bg-white p-4 rounded-lg mb-4">
+                <button onclick="exportarDatos()" class="w-full bg-green-600 text-white py-3 rounded-lg mb-2">📥 Descargar Backup</button>
+                <p class="text-sm text-gray-600">Guarda este archivo para cambiar de celular</p>
             </div>
-
-            <!-- CONFIGURACIÓN -->
-            <div id="tab-config" class="tab-content hidden">
-                <h2 class="text-2xl font-bold mb-6">Configuración</h2>
-                <div class="bg-white p-6 rounded-lg max-w-md">
-                    <div class="mb-4"><label>WhatsApp</label><input type="text" id="configWhatsapp" class="w-full p-2 border rounded"></div>
-                    <div class="mb-4"><label>Tarifa por km</label><input type="number" id="configTarifa" class="w-full p-2 border rounded"></div>
-                    <button onclick="guardarConfig()" class="bg-sb-green text-white px-4 py-2 rounded">Guardar</button>
-                </div>
-            </div>
-
-            <!-- BACKUP -->
-            <div id="tab-backup" class="tab-content hidden">
-                <h2 class="text-2xl font-bold mb-6">Copia de Seguridad</h2>
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-lg">
-                        <h3 class="font-bold mb-4">📥 Descargar Backup</h3>
-                        <button onclick="exportarDatos()" class="w-full bg-green-600 text-white py-2 rounded">Descargar</button>
-                    </div>
-                    <div class="bg-white p-6 rounded-lg">
-                        <h3 class="font-bold mb-4">📤 Restaurar Backup</h3>
-                        <input type="file" id="inputBackup" accept=".json" class="hidden" onchange="importarDatos(this)">
-                        <button onclick="document.getElementById('inputBackup').click()" class="w-full bg-blue-600 text-white py-2 rounded">Seleccionar Archivo</button>
-                    </div>
-                </div>
-                <div class="mt-6 p-4 bg-yellow-50 rounded-lg text-sm">
-                    <p class="font-bold">📱 Para cambiar de dispositivo:</p>
-                    <p>1. Descarga el backup en este dispositivo</p>
-                    <p>2. Envíate el archivo</p>
-                    <p>3. Restaura en el otro dispositivo</p>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Modal Categoría (simplificado) -->
-    <div id="modalCategoria" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-lg max-w-md w-full p-6">
-            <h3 class="text-xl font-bold mb-4" id="tituloModalCat">Nueva Categoría</h3>
-            <input type="hidden" id="catId">
-            <div class="mb-4"><label class="block mb-1">ID único</label><input type="text" id="catIdInput" class="w-full p-2 border rounded"></div>
-            <div class="mb-4"><label class="block mb-1">Nombre</label><input type="text" id="catNombre" class="w-full p-2 border rounded"></div>
-            <div class="mb-4"><label class="block mb-1">Icono</label><input type="text" id="catIcono" class="w-full p-2 border rounded" value="🌸"></div>
-            <div class="mb-4"><label><input type="checkbox" id="catActiva" checked> Activa</label></div>
-            <div class="flex gap-2 justify-end">
-                <button onclick="cerrarModal('modalCategoria')" class="px-4 py-2 border rounded">Cancelar</button>
-                <button onclick="guardarCategoria()" class="px-4 py-2 bg-sb-green text-white rounded">Guardar</button>
+            <div class="bg-white p-4 rounded-lg">
+                <input type="file" id="inputBackup" accept=".json" class="hidden" onchange="importarDatos(this)">
+                <button onclick="document.getElementById('inputBackup').click()" class="w-full bg-blue-600 text-white py-3 rounded-lg">📤 Restaurar Backup</button>
+                <p class="text-sm text-gray-600 mt-2">Selecciona el archivo que guardaste</p>
             </div>
         </div>
     </div>
 
-    <!-- Modal Producto (simplificado) -->
+    <!-- Modal Categoría -->
+    <div id="modalCategoria" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-md w-full p-6">
+            <h3 class="text-xl font-bold mb-4">Nueva Categoría</h3>
+            <input type="hidden" id="catId">
+            <div class="mb-4">
+                <label class="block mb-2 font-bold">ID único</label>
+                <input type="text" id="catIdInput" class="w-full p-3 border-2 border-gray-300 rounded-lg" placeholder="rosas-rojas">
+            </div>
+            <div class="mb-4">
+                <label class="block mb-2 font-bold">Nombre</label>
+                <input type="text" id="catNombre" class="w-full p-3 border-2 border-gray-300 rounded-lg" placeholder="Ramos de Rosas">
+            </div>
+            <div class="mb-4">
+                <label class="block mb-2 font-bold">Icono</label>
+                <input type="text" id="catIcono" class="w-full p-3 border-2 border-gray-300 rounded-lg" value="🌸">
+            </div>
+            <div class="mb-4">
+                <label class="flex items-center">
+                    <input type="checkbox" id="catActiva" checked class="mr-2 w-5 h-5"> Activa
+                </label>
+            </div>
+            <div class="flex gap-2 justify-end">
+                <button onclick="cerrarModal('modalCategoria')" class="px-6 py-3 bg-gray-500 text-white rounded-lg">Cancelar</button>
+                <button onclick="guardarCategoria()" class="px-6 py-3 bg-green-700 text-white rounded-lg">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Producto -->
     <div id="modalProducto" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-lg max-w-2xl w-full p-6">
-            <h3 class="text-xl font-bold mb-4" id="tituloModal">Nuevo Producto</h3>
+            <h3 class="text-xl font-bold mb-4">Nuevo Producto</h3>
             <input type="hidden" id="prodId">
             
-            <div class="grid md:grid-cols-2 gap-4 mb-4">
-                <div><label class="block mb-1">Código</label><input type="text" id="prodCodigo" class="w-full p-2 border rounded"></div>
-                <div><label class="block mb-1">Nombre</label><input type="text" id="prodNombre" class="w-full p-2 border rounded"></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block mb-2 font-bold">Código</label>
+                    <input type="text" id="prodCodigo" class="w-full p-3 border-2 border-gray-300 rounded-lg">
+                </div>
+                <div>
+                    <label class="block mb-2 font-bold">Nombre</label>
+                    <input type="text" id="prodNombre" class="w-full p-3 border-2 border-gray-300 rounded-lg">
+                </div>
             </div>
             
-            <div class="grid md:grid-cols-2 gap-4 mb-4">
-                <div><label class="block mb-1">Categoría</label><select id="prodCategoria" class="w-full p-2 border rounded"></select></div>
-                <div><label class="block mb-1">Stock</label><input type="number" id="prodStock" value="10" class="w-full p-2 border rounded"></div>
-            </div>
-            
-            <div class="mb-4"><label class="block mb-1">Descripción</label><textarea id="prodDescripcion" rows="2" class="w-full p-2 border rounded"></textarea></div>
-            
-            <div class="grid md:grid-cols-3 gap-4 mb-4">
-                <div><label class="block mb-1">Precio regular</label><input type="number" id="prodPrecioRegular" class="w-full p-2 border rounded"></div>
-                <div><label class="block mb-1">Precio oferta</label><input type="number" id="prodPrecioTemporada" class="w-full p-2 border rounded"></div>
-                <div class="flex items-end pb-2"><label><input type="checkbox" id="prodTemporadaActivo"> Activar oferta</label></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block mb-2 font-bold">Categoría</label>
+                    <select id="prodCategoria" class="w-full p-3 border-2 border-gray-300 rounded-lg"></select>
+                </div>
+                <div>
+                    <label class="block mb-2 font-bold">Stock</label>
+                    <input type="number" id="prodStock" value="10" class="w-full p-3 border-2 border-gray-300 rounded-lg">
+                </div>
             </div>
             
             <div class="mb-4">
-                <label class="block mb-2">Fotos (máx 15)</label>
-                <div class="border-2 border-dashed p-6 text-center cursor-pointer" onclick="document.getElementById('inputFotos').click()">
-                    <i class="fas fa-cloud-upload-alt text-3xl mb-2"></i>
-                    <p>Haz clic para subir fotos</p>
+                <label class="block mb-2 font-bold">Descripción</label>
+                <textarea id="prodDescripcion" rows="2" class="w-full p-3 border-2 border-gray-300 rounded-lg"></textarea>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                    <label class="block mb-2 font-bold">Precio regular</label>
+                    <input type="number" id="prodPrecioRegular" class="w-full p-3 border-2 border-gray-300 rounded-lg">
+                </div>
+                <div>
+                    <label class="block mb-2 font-bold">Precio oferta</label>
+                    <input type="number" id="prodPrecioTemporada" class="w-full p-3 border-2 border-gray-300 rounded-lg">
+                </div>
+                <div class="flex items-end pb-3">
+                    <label class="flex items-center">
+                        <input type="checkbox" id="prodTemporadaActivo" class="mr-2 w-5 h-5"> Activar oferta
+                    </label>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block mb-2 font-bold">Fotos</label>
+                <div class="border-2 border-dashed p-6 text-center cursor-pointer bg-gray-50 rounded-lg" onclick="document.getElementById('inputFotos').click()">
+                    <p class="text-lg">📸 Haz clic para subir fotos</p>
+                    <p class="text-sm text-gray-600">Máximo 15 fotos</p>
                     <input type="file" id="inputFotos" multiple accept="image/*" class="hidden" onchange="procesarFotos(this)">
                 </div>
-                <div class="flex justify-between mt-2">
-                    <span id="contadorFotos">0</span>/15
-                    <button onclick="limpiarFotos()" class="text-red-600 text-sm">Limpiar todas</button>
-                </div>
-                <div id="previewFotos" class="mt-4 grid grid-cols-4 gap-2"></div>
+                <div id="previewFotos" class="grid grid-cols-4 gap-2 mt-4"></div>
             </div>
             
             <div class="flex gap-4 mb-4">
-                <label><input type="checkbox" id="prodActivo" checked> Activo</label>
-                <label><input type="checkbox" id="prodDestacado"> Destacado</label>
+                <label class="flex items-center">
+                    <input type="checkbox" id="prodActivo" checked class="mr-2 w-5 h-5"> Activo
+                </label>
+                <label class="flex items-center">
+                    <input type="checkbox" id="prodDestacado" class="mr-2 w-5 h-5"> Destacado
+                </label>
             </div>
             
             <div class="flex gap-2 justify-end">
-                <button onclick="cerrarModal('modalProducto')" class="px-4 py-2 border rounded">Cancelar</button>
-                <button onclick="guardarProducto()" class="px-4 py-2 bg-sb-green text-white rounded">Guardar</button>
+                <button onclick="cerrarModal('modalProducto')" class="px-6 py-3 bg-gray-500 text-white rounded-lg">Cancelar</button>
+                <button onclick="guardarProducto()" class="px-6 py-3 bg-green-700 text-white rounded-lg">Guardar</button>
             </div>
         </div>
     </div>
 
     <script>
-        // ============================================
-        // VARIABLES GLOBALES
-        // ============================================
         const STORAGE_KEY = 'floristeria_completa';
         const AUTH_KEY = 'admin_auth';
         
@@ -198,60 +204,39 @@
             productos: [],
             categorias: [],
             pedidos: [],
-            config: {
-                whatsapp: '50686053613',
-                tarifaExpress: 650
-            }
+            config: { whatsapp: '50686053613', tarifaExpress: 650 }
         };
-        
         let fotosTemp = [];
-
-        // ============================================
-        // FUNCIONES PRINCIPALES
-        // ============================================
-        function cargarDatos() {
-            try {
-                const guardado = localStorage.getItem(STORAGE_KEY);
-                if (guardado) {
-                    datos = JSON.parse(guardado);
-                } else {
-                    // Datos iniciales de ejemplo
-                    datos.categorias = [
-                        { id: 'rosas', nombre: 'Ramos de Rosas', icono: '🌹', activa: true },
-                        { id: 'girasoles', nombre: 'Ramos de Girasoles', icono: '🌻', activa: true }
-                    ];
-                    guardarDatos();
-                }
-                actualizarContadores();
-            } catch(e) {
-                console.error('Error:', e);
-            }
-        }
 
         function guardarDatos() {
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(datos));
                 return true;
             } catch(e) {
-                alert('Error: Espacio lleno. Intenta con fotos más pequeñas.');
+                alert('Error al guardar');
                 return false;
             }
         }
 
-        // ============================================
-        // AUTENTICACIÓN
-        // ============================================
+        function cargarDatos() {
+            const guardado = localStorage.getItem(STORAGE_KEY);
+            if (guardado) datos = JSON.parse(guardado);
+            actualizarContadores();
+            renderizarCategorias();
+            renderizarProductos();
+        }
+
+        function actualizarContadores() {
+            document.getElementById('countProductos').textContent = datos.productos.length;
+            document.getElementById('countCategorias').textContent = datos.categorias.length;
+        }
+
+        // Autenticación
         function verificarSesion() {
             if (localStorage.getItem(AUTH_KEY) === 'ok') {
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('dashboard').classList.remove('hidden');
                 cargarDatos();
-                showTab('productos');
-            } else {
-                document.getElementById('loginScreen').classList.remove('hidden');
-                if (!localStorage.getItem(STORAGE_KEY)) {
-                    document.getElementById('firstTimeMsg').classList.remove('hidden');
-                }
             }
         }
 
@@ -287,39 +272,24 @@
             }
         }
 
-        // ============================================
-        // UI
-        // ============================================
         function showTab(tab) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
             document.getElementById(`tab-${tab}`).classList.remove('hidden');
-            
             if (tab === 'productos') renderizarProductos();
             if (tab === 'categorias') renderizarCategorias();
-            if (tab === 'config') cargarConfig();
         }
 
-        function actualizarContadores() {
-            document.getElementById('countProductos').textContent = datos.productos.length;
-            document.getElementById('countCategorias').textContent = datos.categorias.length;
-        }
-
-        // ============================================
-        // CATEGORÍAS
-        // ============================================
+        // Categorías
         function renderizarCategorias() {
             const container = document.getElementById('listaCategorias');
             if (datos.categorias.length === 0) {
-                container.innerHTML = '';
-                document.getElementById('emptyCategorias').classList.remove('hidden');
+                container.innerHTML = '<p class="text-center text-gray-500">No hay categorías</p>';
                 return;
             }
-            document.getElementById('emptyCategorias').classList.add('hidden');
             container.innerHTML = datos.categorias.map(c => `
                 <div class="bg-white p-4 rounded-lg shadow">
-                    <div class="text-2xl mb-2">${c.icono}</div>
+                    <div class="text-3xl mb-2">${c.icono}</div>
                     <h3 class="font-bold">${c.nombre}</h3>
-                    <p class="text-xs text-gray-500">${c.id}</p>
                     <div class="flex gap-2 mt-2">
                         <button onclick="abrirModalCategoria('${c.id}')" class="text-blue-600">✏️</button>
                         <button onclick="eliminarCategoria('${c.id}')" class="text-red-600">🗑️</button>
@@ -330,8 +300,6 @@
 
         function abrirModalCategoria(id = null) {
             document.getElementById('modalCategoria').classList.remove('hidden');
-            document.getElementById('tituloModalCat').textContent = id ? 'Editar' : 'Nueva Categoría';
-            
             if (id) {
                 const c = datos.categorias.find(x => x.id === id);
                 document.getElementById('catId').value = c.id;
@@ -353,7 +321,6 @@
         function guardarCategoria() {
             const id = document.getElementById('catIdInput').value.trim().toLowerCase().replace(/\s+/g, '-');
             const nombre = document.getElementById('catNombre').value.trim();
-            
             if (!id || !nombre) return alert('ID y nombre obligatorios');
             
             const categoria = {
@@ -375,7 +342,6 @@
             cerrarModal('modalCategoria');
             renderizarCategorias();
             actualizarContadores();
-            alert('✅ Categoría guardada');
         }
 
         function eliminarCategoria(id) {
@@ -387,23 +353,19 @@
             }
         }
 
-        // ============================================
-        // PRODUCTOS
-        // ============================================
+        // Productos
         function renderizarProductos() {
             const container = document.getElementById('listaProductos');
             if (datos.productos.length === 0) {
-                container.innerHTML = '';
-                document.getElementById('emptyProductos').classList.remove('hidden');
+                container.innerHTML = '<p class="text-center text-gray-500">No hay productos</p>';
                 return;
             }
-            document.getElementById('emptyProductos').classList.add('hidden');
             container.innerHTML = datos.productos.map(p => `
                 <div class="border-b p-4 flex items-center gap-4">
                     <img src="${p.imagenes?.[0] || 'https://via.placeholder.com/50'}" class="w-12 h-12 object-cover rounded">
                     <div class="flex-1">
                         <h3 class="font-bold">${p.nombre}</h3>
-                        <p class="text-sm">${p.codigo} - ₡${(p.precioTemporadaActivo ? p.precioTemporada : p.precioRegular).toLocaleString()}</p>
+                        <p class="text-sm">${p.codigo}</p>
                     </div>
                     <div class="flex gap-2">
                         <button onclick="abrirModalProducto('${p.id}')" class="text-blue-600">✏️</button>
@@ -415,7 +377,6 @@
 
         function abrirModalProducto(id = null) {
             document.getElementById('modalProducto').classList.remove('hidden');
-            document.getElementById('tituloModal').textContent = id ? 'Editar' : 'Nuevo Producto';
             
             const select = document.getElementById('prodCategoria');
             select.innerHTML = datos.categorias.map(c => `<option value="${c.id}">${c.nombre}</option>`);
@@ -463,7 +424,7 @@
                         const canvas = document.createElement('canvas');
                         const ctx = canvas.getContext('2d');
                         let width = img.width, height = img.height;
-                        const maxSize = 400; // Reducido para ahorrar espacio
+                        const maxSize = 400;
                         if (width > height && width > maxSize) { height *= maxSize / width; width = maxSize; }
                         else if (height > maxSize) { width *= maxSize / height; height = maxSize; }
                         canvas.width = width; canvas.height = height;
@@ -479,7 +440,6 @@
         }
 
         function renderizarPreviews() {
-            document.getElementById('contadorFotos').textContent = fotosTemp.length;
             document.getElementById('previewFotos').innerHTML = fotosTemp.map((f, i) => `
                 <div class="relative">
                     <img src="${f}" class="w-full h-16 object-cover rounded">
@@ -487,8 +447,6 @@
                 </div>
             `).join('');
         }
-
-        function limpiarFotos() { fotosTemp = []; renderizarPreviews(); }
 
         function guardarProducto() {
             const producto = {
@@ -532,35 +490,14 @@
             }
         }
 
-        // ============================================
-        // CONFIGURACIÓN
-        // ============================================
-        function cargarConfig() {
-            document.getElementById('configWhatsapp').value = datos.config.whatsapp || '';
-            document.getElementById('configTarifa').value = datos.config.tarifaExpress || 650;
-        }
-
-        function guardarConfig() {
-            datos.config = {
-                whatsapp: document.getElementById('configWhatsapp').value.trim(),
-                tarifaExpress: parseInt(document.getElementById('configTarifa').value) || 650
-            };
-            guardarDatos();
-            alert('✅ Configuración guardada');
-        }
-
-        // ============================================
-        // BACKUP
-        // ============================================
+        // Backup
         function exportarDatos() {
             const backup = {
                 productos: datos.productos,
                 categorias: datos.categorias,
                 pedidos: datos.pedidos || [],
-                config: datos.config,
-                fecha: new Date().toLocaleString()
+                config: datos.config
             };
-            
             const blob = new Blob([JSON.stringify(backup)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -589,14 +526,10 @@
             reader.readAsText(file);
         }
 
-        // ============================================
-        // UTILIDADES
-        // ============================================
         function cerrarModal(id) {
             document.getElementById(id).classList.add('hidden');
         }
 
-        // Inicialización
         window.onload = verificarSesion;
     </script>
 </body>
