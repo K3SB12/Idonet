@@ -29,13 +29,8 @@
         .drop-zone:hover, .drop-zone.dragover { border-color: #2D5A3D; background: #f0fdf4; }
         .preview-img { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; }
         .tab-active { background-color: rgba(255,255,255,0.1); border-left: 4px solid #4A7C59; }
-        .pedido-nuevo { animation: pulse-border 2s infinite; }
-        @keyframes pulse-border { 0%,100% { border-left-color: #C41E3A; } 50% { border-left-color: transparent; } }
-        .notificacion { animation: slideIn 0.3s ease-out; }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #2D5A3D; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
@@ -87,7 +82,6 @@
         <!-- Main Content -->
         <main class="flex-1 p-4 md:p-8 overflow-y-auto relative">
             <div id="notificacionesContainer" class="fixed top-4 right-4 z-50 space-y-2 max-w-sm"></div>
-            <div id="progressBar" class="hidden fixed top-0 left-0 w-full h-1 bg-green-200 z-[100]"><div class="h-full bg-sb-green transition-all duration-300" style="width:0%"></div></div>
             <div id="alertContainer" class="mb-6"></div>
 
             <!-- PEDIDOS -->
@@ -166,7 +160,7 @@
                     <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-200"><div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center text-green-600 mb-4"><i class="fas fa-download text-2xl"></i></div><h3 class="text-xl font-bold mb-2">Guardar Copia</h3><p class="text-gray-600 mb-6 text-sm">Descarga todos tus productos (con fotos), categorías, pedidos y configuración.</p><button onclick="exportarDatos()" class="w-full bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 font-medium"><i class="fas fa-download mr-2"></i>Descargar Respaldo</button></div>
                     <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-200"><div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mb-4"><i class="fas fa-upload text-2xl"></i></div><h3 class="text-xl font-bold mb-2">Restaurar Copia</h3><p class="text-gray-600 mb-6 text-sm">Selecciona tu archivo de respaldo para recuperar todo (incluyendo fotos).</p><label class="block w-full"><input type="file" id="inputBackup" accept=".json" class="hidden" onchange="importarDatos(this)"><div class="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 font-medium text-center cursor-pointer"><i class="fas fa-upload mr-2"></i>Seleccionar Archivo</div></label></div>
                 </div>
-                <div class="mt-8 bg-yellow-50 border border-yellow-200 rounded-xl p-6"><h4 class="font-bold text-yellow-800 mb-2"><i class="fas fa-exclamation-triangle mr-2"></i>Importante</h4><ul class="text-sm text-yellow-700 space-y-1 list-disc list-inside"><li>Tus fotos se guardan en IndexedDB. ¡No hay límite de espacio!</li><li>Haz copias de seguridad regularmente.</li></ul></div>
+                <div class="mt-8 bg-yellow-50 border border-yellow-200 rounded-xl p-6"><h4 class="font-bold text-yellow-800 mb-2"><i class="fas fa-exclamation-triangle mr-2"></i>Importante</h4><ul class="text-sm text-yellow-700 space-y-1 list-disc list-inside"><li>Tus fotos se guardan en IndexedDB. ¡No hay límite de espacio!</li><li>Haz copias de seguridad regularmente.</li><li>Para cambiar de dispositivo: Descarga el backup, envíatelo, y restáuralo en el nuevo dispositivo.</li></ul></div>
             </div>
         </main>
     </div>
@@ -244,12 +238,11 @@
         // ============================================
         // VARIABLES GLOBALES
         // ============================================
-        const DB_NAME = 'FloristeriaSB';
-        const DB_VERSION = 2;
+        const CART_KEY = 'sb_carrito';
         const AUTH_KEY = 'admin_auth';
         
-        let db = null;
-        let datosEnMemoria = {
+        // Usar localStorage como almacenamiento principal (funciona en todos los dispositivos)
+        let datos = {
             productos: [],
             categorias: [],
             pedidos: [],
@@ -268,307 +261,43 @@
         let operacionEnProgreso = false;
 
         // ============================================
-        // INICIALIZACIÓN DE INDEXEDDB
+        // INICIALIZACIÓN
         // ============================================
-        async function inicializarDB() {
-            return new Promise((resolve, reject) => {
-                mostrarLoading(true);
-                
-                const request = indexedDB.open(DB_NAME, DB_VERSION);
-                
-                request.onupgradeneeded = (event) => {
-                    const db = event.target.result;
-                    
-                    if (!db.objectStoreNames.contains('productos')) {
-                        const store = db.createObjectStore('productos', { keyPath: 'id' });
-                        store.createIndex('categoria', 'categoria', { unique: false });
-                    }
-                    if (!db.objectStoreNames.contains('imagenes')) {
-                        const imgStore = db.createObjectStore('imagenes', { keyPath: 'id' });
-                        imgStore.createIndex('productoId', 'productoId', { unique: false });
-                    }
-                    if (!db.objectStoreNames.contains('categorias')) {
-                        db.createObjectStore('categorias', { keyPath: 'id' });
-                    }
-                    if (!db.objectStoreNames.contains('pedidos')) {
-                        const pedStore = db.createObjectStore('pedidos', { keyPath: 'id' });
-                        pedStore.createIndex('fecha', 'fecha', { unique: false });
-                    }
-                    if (!db.objectStoreNames.contains('config')) {
-                        db.createObjectStore('config', { keyPath: 'clave' });
-                    }
-                };
-                
-                request.onsuccess = async (event) => {
-                    db = event.target.result;
-                    console.log('✅ IndexedDB conectada');
-                    await cargarDatosDesdeDB();
-                    mostrarLoading(false);
-                    verificarSesion();
-                    resolve();
-                };
-                
-                request.onerror = (event) => {
-                    console.error('❌ Error abriendo DB:', event.target.error);
-                    mostrarAlerta('Error al conectar con la base de datos', 'error');
-                    mostrarLoading(false);
-                    cargarDatosFallback();
-                    reject(event.target.error);
-                };
-            });
-        }
-
-        // ============================================
-        // FUNCIONES DE BASE DE DATOS (CORREGIDAS)
-        // ============================================
-        async function cargarDatosDesdeDB() {
-            if (!db) return;
-            
-            try {
-                // Categorías
-                const categorias = await new Promise((resolve) => {
-                    const tx = db.transaction('categorias', 'readonly');
-                    const store = tx.objectStore('categorias');
-                    const request = store.getAll();
-                    request.onsuccess = () => resolve(request.result || []);
-                });
-                datosEnMemoria.categorias = categorias;
-
-                // Productos (sin imágenes)
-                const productos = await new Promise((resolve) => {
-                    const tx = db.transaction('productos', 'readonly');
-                    const store = tx.objectStore('productos');
-                    const request = store.getAll();
-                    request.onsuccess = () => resolve(request.result || []);
-                });
-
-                // Cargar imágenes para cada producto
-                for (const producto of productos) {
-                    const imagenes = await cargarImagenesDeProducto(producto.id);
-                    producto.imagenes = imagenes;
-                }
-                datosEnMemoria.productos = productos;
-
-                // Pedidos
-                const pedidos = await new Promise((resolve) => {
-                    const tx = db.transaction('pedidos', 'readonly');
-                    const store = tx.objectStore('pedidos');
-                    const request = store.getAll();
-                    request.onsuccess = () => resolve(request.result || []);
-                });
-                datosEnMemoria.pedidos = pedidos;
-
-                // Configuración
-                const configItems = await new Promise((resolve) => {
-                    const tx = db.transaction('config', 'readonly');
-                    const store = tx.objectStore('config');
-                    const request = store.getAll();
-                    request.onsuccess = () => resolve(request.result || []);
-                });
-                
-                const configObj = {};
-                configItems.forEach(item => configObj[item.clave] = item.valor);
-                datosEnMemoria.config = {
-                    nombre: configObj.nombre || 'Floristería Santa Bárbara',
-                    whatsapp: configObj.whatsapp || '50686053613',
-                    email: configObj.email || '',
-                    tarifaExpress: configObj.tarifaExpress || 650,
-                    lat: configObj.lat || 10.034784,
-                    lng: configObj.lng || -84.158785
-                };
-
-                console.log('✅ Datos cargados:', {
-                    productos: datosEnMemoria.productos.length,
-                    categorias: datosEnMemoria.categorias.length,
-                    pedidos: datosEnMemoria.pedidos.length
-                });
-                
-                actualizarStats();
-                
-            } catch (error) {
-                console.error('❌ Error cargando datos:', error);
-            }
-        }
-
-        async function cargarImagenesDeProducto(productoId) {
-            return new Promise((resolve) => {
-                if (!db) return resolve([]);
-                const tx = db.transaction('imagenes', 'readonly');
-                const store = tx.objectStore('imagenes');
-                const index = store.index('productoId');
-                const request = index.getAll(productoId);
-                request.onsuccess = () => {
-                    const imagenes = (request.result || []).sort((a,b) => a.indice - b.indice).map(img => img.data);
-                    resolve(imagenes);
-                };
-                request.onerror = () => resolve([]);
-            });
-        }
-
-        // ✅ FUNCIÓN CORREGIDA - AHORA USA await tx.done
-        async function guardarProductoEnDB(producto, imagenes) {
-            if (!db) return false;
-            
-            const tx = db.transaction(['productos', 'imagenes'], 'readwrite');
-            
-            try {
-                const productoSinImgs = { ...producto };
-                delete productoSinImgs.imagenes;
-                
-                // Guardar producto
-                const storeProductos = tx.objectStore('productos');
-                await new Promise((resolve, reject) => {
-                    const request = storeProductos.put(productoSinImgs);
-                    request.onsuccess = () => resolve();
-                    request.onerror = () => reject(request.error);
-                });
-                
-                // Eliminar imágenes antiguas
-                const imgStore = tx.objectStore('imagenes');
-                const index = imgStore.index('productoId');
-                
-                const oldImgs = await new Promise((resolve, reject) => {
-                    const request = index.getAll(producto.id);
-                    request.onsuccess = () => resolve(request.result || []);
-                    request.onerror = () => reject(request.error);
-                });
-                
-                for (const img of oldImgs) {
-                    await new Promise((resolve, reject) => {
-                        const request = imgStore.delete(img.id);
-                        request.onsuccess = () => resolve();
-                        request.onerror = () => reject(request.error);
-                    });
-                }
-                
-                // Guardar nuevas imágenes
-                for (let i = 0; i < imagenes.length; i++) {
-                    await new Promise((resolve, reject) => {
-                        const request = imgStore.put({
-                            id: `${producto.id}_img_${i}`,
-                            productoId: producto.id,
-                            indice: i,
-                            data: imagenes[i]
-                        });
-                        request.onsuccess = () => resolve();
-                        request.onerror = () => reject(request.error);
-                    });
-                }
-                
-                // ✅ ESPERAR QUE LA TRANSACCIÓN SE COMPLETE
-                await new Promise((resolve, reject) => {
-                    tx.oncomplete = () => resolve();
-                    tx.onerror = () => reject(tx.error);
-                });
-                
-                return true;
-                
-            } catch (error) {
-                console.error('Error guardando producto:', error);
-                tx.abort();
-                return false;
-            }
-        }
-
-        // ✅ FUNCIÓN CORREGIDA - AHORA USA await tx.done
-        async function guardarCategoriaEnDB(categoria) {
-            if (!db) return false;
-            
-            const tx = db.transaction('categorias', 'readwrite');
-            
-            try {
-                const store = tx.objectStore('categorias');
-                
-                await new Promise((resolve, reject) => {
-                    const request = store.put(categoria);
-                    request.onsuccess = () => resolve();
-                    request.onerror = () => reject(request.error);
-                });
-                
-                // ✅ ESPERAR QUE LA TRANSACCIÓN SE COMPLETE
-                await new Promise((resolve, reject) => {
-                    tx.oncomplete = () => resolve();
-                    tx.onerror = () => reject(tx.error);
-                });
-                
-                return true;
-                
-            } catch (error) {
-                console.error('Error guardando categoría:', error);
-                tx.abort();
-                return false;
-            }
-        }
-
-        async function guardarConfigEnDB(config) {
-            if (!db) return false;
-            
-            const tx = db.transaction('config', 'readwrite');
-            
-            try {
-                const store = tx.objectStore('config');
-                
-                for (const [clave, valor] of Object.entries(config)) {
-                    await new Promise((resolve, reject) => {
-                        const request = store.put({ clave, valor });
-                        request.onsuccess = () => resolve();
-                        request.onerror = () => reject(request.error);
-                    });
-                }
-                
-                await new Promise((resolve, reject) => {
-                    tx.oncomplete = () => resolve();
-                    tx.onerror = () => reject(tx.error);
-                });
-                
-                return true;
-                
-            } catch (error) {
-                console.error('Error guardando config:', error);
-                tx.abort();
-                return false;
-            }
-        }
-
-        async function guardarPedidoEnDB(pedido) {
-            if (!db) return false;
-            
-            const tx = db.transaction('pedidos', 'readwrite');
-            
-            try {
-                const store = tx.objectStore('pedidos');
-                
-                await new Promise((resolve, reject) => {
-                    const request = store.put(pedido);
-                    request.onsuccess = () => resolve();
-                    request.onerror = () => reject(request.error);
-                });
-                
-                await new Promise((resolve, reject) => {
-                    tx.oncomplete = () => resolve();
-                    tx.onerror = () => reject(tx.error);
-                });
-                
-                return true;
-                
-            } catch (error) {
-                console.error('Error guardando pedido:', error);
-                tx.abort();
-                return false;
-            }
-        }
-
-        function cargarDatosFallback() {
+        function cargarDatos() {
             try {
                 const guardado = localStorage.getItem('floristeria_datos');
                 if (guardado) {
-                    const parsed = JSON.parse(guardado);
-                    datosEnMemoria.productos = parsed.productos || [];
-                    datosEnMemoria.categorias = parsed.categorias || [];
-                    datosEnMemoria.pedidos = parsed.pedidos || [];
-                    datosEnMemoria.config = parsed.config || datosEnMemoria.config;
+                    datos = JSON.parse(guardado);
+                    if (!datos.pedidos) datos.pedidos = [];
+                    if (!datos.config) datos.config = datos.config || {};
+                    if (!datos.config.lat) datos.config.lat = 10.034784;
+                    if (!datos.config.lng) datos.config.lng = -84.158785;
+                } else {
+                    // Datos de ejemplo
+                    datos.categorias = [
+                        { id: 'ramos-de-rosas', nombre: 'Ramos de Rosas', icono: '🌹', orden: 1, activa: true },
+                        { id: 'ramos-de-girasoles', nombre: 'Ramos de Girasoles', icono: '🌻', orden: 2, activa: true }
+                    ];
+                    guardarDatos();
                 }
-            } catch (e) {}
+                console.log('✅ Datos cargados:', datos.productos.length, 'productos,', datos.categorias.length, 'categorías');
+            } catch (e) {
+                console.error('Error cargando datos:', e);
+            }
+            
+            actualizarStats();
+        }
+
+        function guardarDatos() {
+            try {
+                localStorage.setItem('floristeria_datos', JSON.stringify(datos));
+                console.log('✅ Datos guardados en localStorage');
+                return true;
+            } catch (e) {
+                console.error('Error guardando datos:', e);
+                mostrarAlerta('Error al guardar. ¿Espacio lleno?', 'error');
+                return false;
+            }
         }
 
         // ============================================
@@ -581,7 +310,8 @@
             } else {
                 document.getElementById('loginScreen').classList.remove('hidden');
                 document.getElementById('dashboard').classList.add('hidden');
-                if (!localStorage.getItem('floristeria_datos') && datosEnMemoria.categorias.length === 0) {
+                const datosExistentes = localStorage.getItem('floristeria_datos');
+                if (!datosExistentes) {
                     document.getElementById('firstTimeMsg').classList.remove('hidden');
                 }
             }
@@ -618,6 +348,7 @@
         function entrarDashboard() {
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('dashboard').classList.remove('hidden');
+            cargarDatos();
             actualizarStats();
             showTab('productos');
             verificarPedidosNuevos();
@@ -649,11 +380,11 @@
         }
 
         function actualizarStats() {
-            const activos = datosEnMemoria.productos.filter(p => p.activo).length;
-            const destacados = datosEnMemoria.productos.filter(p => p.destacado).length;
-            const ofertas = datosEnMemoria.productos.filter(p => p.precioTemporadaActivo).length;
-            document.getElementById('countProductos').textContent = datosEnMemoria.productos.length;
-            document.getElementById('countCategorias').textContent = datosEnMemoria.categorias.length;
+            const activos = datos.productos.filter(p => p.activo).length;
+            const destacados = datos.productos.filter(p => p.destacado).length;
+            const ofertas = datos.productos.filter(p => p.precioTemporadaActivo).length;
+            document.getElementById('countProductos').textContent = datos.productos.length;
+            document.getElementById('countCategorias').textContent = datos.categorias.length;
             document.getElementById('statActivos').textContent = activos;
             document.getElementById('statDestacados').textContent = destacados;
             document.getElementById('statOfertas').textContent = ofertas;
@@ -676,7 +407,7 @@
         function renderizarPedidos() {
             const container = document.getElementById('listaPedidos');
             const empty = document.getElementById('emptyPedidos');
-            let pedidosMostrar = datosEnMemoria.pedidos || [];
+            let pedidosMostrar = datos.pedidos || [];
             if (filtroPedidosActual !== 'todos') pedidosMostrar = pedidosMostrar.filter(p => p.estado === filtroPedidosActual);
             pedidosMostrar.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
             
@@ -689,7 +420,7 @@
             container.innerHTML = pedidosMostrar.map(p => {
                 const fecha = new Date(p.fecha).toLocaleString('es-CR');
                 const esNuevo = p.estado === 'nuevo' && !p.visto;
-                return `<div class="bg-white rounded-xl p-5 shadow-sm border-l-4 ${esNuevo ? 'border-red-500 pedido-nuevo' : p.estado === 'entregado' ? 'border-green-500' : p.estado === 'confirmado' ? 'border-blue-500' : 'border-gray-300'} cursor-pointer" onclick="verDetallePedido('${p.id}')">
+                return `<div class="bg-white rounded-xl p-5 shadow-sm border-l-4 ${esNuevo ? 'border-red-500' : p.estado === 'entregado' ? 'border-green-500' : p.estado === 'confirmado' ? 'border-blue-500' : 'border-gray-300'} cursor-pointer" onclick="verDetallePedido('${p.id}')">
                     <div class="flex flex-col md:flex-row justify-between gap-4"><div class="flex-1"><div class="flex items-center gap-3 mb-2"><span class="font-bold">${p.id}</span>${esNuevo ? '<span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">NUEVO</span>' : ''}<span class="text-xs text-gray-500">${fecha}</span></div><p class="text-sm"><strong>De:</strong> ${p.cliente}</p><p class="text-sm"><strong>Para:</strong> ${p.receptor}</p></div><div class="text-right"><p class="text-xl font-bold text-sb-green">₡${p.total.toLocaleString()}</p><p class="text-xs capitalize">${p.tipoEntrega}</p><select onchange="cambiarEstadoPedido('${p.id}', this.value); event.stopPropagation();" class="mt-2 text-xs border rounded-lg px-2 py-1" onclick="event.stopPropagation()"><option value="nuevo" ${p.estado==='nuevo'?'selected':''}>Nuevo</option><option value="confirmado" ${p.estado==='confirmado'?'selected':''}>Confirmado</option><option value="entregado" ${p.estado==='entregado'?'selected':''}>Entregado</option><option value="cancelado" ${p.estado==='cancelado'?'selected':''}>Cancelado</option></select></div></div></div>`;
             }).join('');
         }
@@ -700,10 +431,10 @@
         }
 
         function verDetallePedido(id) {
-            const pedido = datosEnMemoria.pedidos.find(p => p.id === id);
+            const pedido = datos.pedidos.find(p => p.id === id);
             if (!pedido) return;
             pedido.visto = true;
-            guardarPedidoEnDB(pedido);
+            guardarDatos();
             verificarPedidosNuevos();
             const modal = document.getElementById('modalPedido');
             document.getElementById('contenidoModalPedido').innerHTML = `<pre>${JSON.stringify(pedido, null, 2)}</pre>`;
@@ -711,17 +442,17 @@
         }
 
         function cambiarEstadoPedido(id, nuevoEstado) {
-            const pedido = datosEnMemoria.pedidos.find(p => p.id === id);
+            const pedido = datos.pedidos.find(p => p.id === id);
             if (pedido) {
                 pedido.estado = nuevoEstado;
-                guardarPedidoEnDB(pedido);
+                guardarDatos();
                 renderizarPedidos();
                 mostrarAlerta(`Pedido marcado como ${nuevoEstado.replace('_',' ')}`, 'success');
             }
         }
 
         function verificarPedidosNuevos() {
-            const pedidosNuevos = datosEnMemoria.pedidos.filter(p => p.estado === 'nuevo' && !p.visto).length;
+            const pedidosNuevos = datos.pedidos.filter(p => p.estado === 'nuevo' && !p.visto).length;
             const badge = document.getElementById('badgePedidosNuevos');
             if (pedidosNuevos > 0) {
                 badge.textContent = pedidosNuevos;
@@ -733,14 +464,15 @@
         }
 
         function marcarTodosVistos() {
-            datosEnMemoria.pedidos.forEach(p => { p.visto = true; guardarPedidoEnDB(p); });
+            datos.pedidos.forEach(p => { p.visto = true; });
+            guardarDatos();
             verificarPedidosNuevos();
             renderizarPedidos();
             mostrarAlerta('Todos los pedidos marcados como vistos', 'success');
         }
 
         function exportarPedidos() {
-            const csv = 'ID,Fecha,Cliente,Total\n' + datosEnMemoria.pedidos.map(p => `${p.id},${p.fecha},${p.cliente},${p.total}`).join('\n');
+            const csv = 'ID,Fecha,Cliente,Total\n' + datos.pedidos.map(p => `${p.id},${p.fecha},${p.cliente},${p.total}`).join('\n');
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -756,29 +488,30 @@
         function renderizarProductos() {
             const tbody = document.getElementById('listaProductos');
             const empty = document.getElementById('emptyProductos');
-            if (datosEnMemoria.productos.length === 0) {
+            if (datos.productos.length === 0) {
                 tbody.innerHTML = '';
                 empty.classList.remove('hidden');
                 return;
             }
             empty.classList.add('hidden');
-            tbody.innerHTML = datosEnMemoria.productos.map(p => {
+            tbody.innerHTML = datos.productos.map((p, index) => {
                 const precio = p.precioTemporadaActivo && p.precioTemporada ? p.precioTemporada : p.precioRegular;
-                return `<tr class="hover:bg-gray-50"><td class="px-6 py-4"><div class="flex items-center gap-3"><img src="${p.imagenes?.[0] || 'https://via.placeholder.com/80'}" class="w-12 h-12 object-cover rounded-lg"><div><div class="font-medium">${p.nombre}</div>${p.destacado ? '<span class="text-xs text-sb-gold">⭐ Destacado</span>' : ''}</div></div></td><td class="px-6 py-4 text-sm">${p.codigo}</td><td class="px-6 py-4"><div class="font-bold text-sb-green">₡${precio.toLocaleString()}</div>${p.precioTemporadaActivo ? `<div class="text-xs line-through">₡${p.precioRegular.toLocaleString()}</div>` : ''}</td><td class="px-6 py-4">${p.stock}</td><td class="px-6 py-4"><span class="px-3 py-1 rounded-full text-xs font-medium ${p.activo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}">${p.activo ? 'Activo' : 'Inactivo'}</span></td><td class="px-6 py-4"><button onclick="abrirModalProducto('${p.id}')" class="text-blue-600 hover:text-blue-800 mr-3"><i class="fas fa-edit"></i></button><button onclick="eliminarProducto('${p.id}')" class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button></td></tr>`;
+                const img = p.imagenes?.[0] || 'https://via.placeholder.com/80?text=Flor';
+                return `<tr class="hover:bg-gray-50"><td class="px-6 py-4"><div class="flex items-center gap-3"><img src="${img}" class="w-12 h-12 object-cover rounded-lg" onerror="this.src='https://via.placeholder.com/80?text=Flor'"><div><div class="font-medium">${p.nombre}</div>${p.destacado ? '<span class="text-xs text-sb-gold">⭐ Destacado</span>' : ''}</div></div></td><td class="px-6 py-4 text-sm">${p.codigo}</td><td class="px-6 py-4"><div class="font-bold text-sb-green">₡${precio.toLocaleString()}</div>${p.precioTemporadaActivo ? `<div class="text-xs line-through">₡${p.precioRegular.toLocaleString()}</div>` : ''}</td><td class="px-6 py-4">${p.stock || 0}</td><td class="px-6 py-4"><span class="px-3 py-1 rounded-full text-xs font-medium ${p.activo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}">${p.activo ? 'Activo' : 'Inactivo'}</span></td><td class="px-6 py-4"><button onclick="abrirModalProducto('${p.id}')" class="text-blue-600 hover:text-blue-800 mr-3"><i class="fas fa-edit"></i></button><button onclick="eliminarProducto('${p.id}')" class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button></td></tr>`;
             }).join('');
         }
 
-        async function abrirModalProducto(id = null) {
+        function abrirModalProducto(id = null) {
             document.getElementById('modalProducto').classList.remove('hidden');
             document.getElementById('tituloModal').textContent = id ? 'Editar Producto' : 'Nuevo Producto';
             
             const select = document.getElementById('prodCategoria');
-            select.innerHTML = datosEnMemoria.categorias.map(c => `<option value="${c.id}">${c.icono} ${c.nombre}</option>`).join('');
+            select.innerHTML = datos.categorias.filter(c => c.activa).map(c => `<option value="${c.id}">${c.icono} ${c.nombre}</option>`).join('');
             
             fotosTemp = [];
             
             if (id) {
-                const p = datosEnMemoria.productos.find(x => x.id === id);
+                const p = datos.productos.find(x => x.id === id);
                 document.getElementById('prodId').value = p.id;
                 document.getElementById('prodCodigo').value = p.codigo;
                 document.getElementById('prodNombre').value = p.nombre;
@@ -853,7 +586,7 @@
         function eliminarFoto(index) { fotosTemp.splice(index, 1); renderizarPreviews(); }
         function limpiarFotos() { if (fotosTemp.length && confirm('¿Eliminar todas?')) { fotosTemp = []; renderizarPreviews(); } }
 
-        async function guardarProducto() {
+        function guardarProducto() {
             if (operacionEnProgreso) return;
             const id = document.getElementById('prodId').value;
             const codigo = document.getElementById('prodCodigo').value.trim();
@@ -867,28 +600,30 @@
             mostrarLoading(true);
             
             const producto = {
-                id: id || 'prod-' + Date.now(),
-                codigo, nombre, categoria,
+                id: id || 'prod-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5),
+                codigo: codigo,
+                nombre: nombre,
+                categoria: categoria,
                 descripcion: document.getElementById('prodDescripcion').value.trim() || '',
                 stock: parseInt(document.getElementById('prodStock').value) || 0,
                 precioRegular: parseInt(document.getElementById('prodPrecioRegular').value) || 0,
                 precioTemporada: parseInt(document.getElementById('prodPrecioTemporada').value) || null,
                 precioTemporadaActivo: document.getElementById('prodTemporadaActivo').checked,
+                imagenes: [...fotosTemp],
                 activo: document.getElementById('prodActivo').checked,
                 destacado: document.getElementById('prodDestacado').checked
             };
             
             try {
-                const guardado = await guardarProductoEnDB(producto, fotosTemp);
-                if (!guardado) throw new Error('Error al guardar en DB');
-                
                 if (id) {
-                    const index = datosEnMemoria.productos.findIndex(p => p.id === id);
-                    if (index !== -1) datosEnMemoria.productos[index] = { ...producto, imagenes: [...fotosTemp] };
-                    else datosEnMemoria.productos.push({ ...producto, imagenes: [...fotosTemp] });
+                    const index = datos.productos.findIndex(p => p.id === id);
+                    if (index !== -1) datos.productos[index] = producto;
+                    else datos.productos.push(producto);
                 } else {
-                    datosEnMemoria.productos.push({ ...producto, imagenes: [...fotosTemp] });
+                    datos.productos.push(producto);
                 }
+                
+                if (!guardarDatos()) throw new Error('Error al guardar');
                 
                 fotosTemp = [];
                 cerrarModal('modalProducto');
@@ -896,57 +631,20 @@
                 actualizarStats();
                 mostrarAlerta('✅ Producto guardado', 'success');
             } catch (error) {
+                console.error(error);
                 mostrarAlerta('Error al guardar', 'error');
             }
             mostrarLoading(false);
             operacionEnProgreso = false;
         }
 
-        async function eliminarProducto(id) {
+        function eliminarProducto(id) {
             if (!confirm('¿Eliminar permanentemente?')) return;
-            mostrarLoading(true);
-            try {
-                if (db) {
-                    const tx = db.transaction(['productos', 'imagenes'], 'readwrite');
-                    
-                    await new Promise((resolve, reject) => {
-                        const request = tx.objectStore('productos').delete(id);
-                        request.onsuccess = () => resolve();
-                        request.onerror = () => reject(request.error);
-                    });
-                    
-                    const imgStore = tx.objectStore('imagenes');
-                    const index = imgStore.index('productoId');
-                    
-                    const oldImgs = await new Promise((resolve, reject) => {
-                        const request = index.getAll(id);
-                        request.onsuccess = () => resolve(request.result || []);
-                        request.onerror = () => reject(request.error);
-                    });
-                    
-                    for (const img of oldImgs) {
-                        await new Promise((resolve, reject) => {
-                            const request = imgStore.delete(img.id);
-                            request.onsuccess = () => resolve();
-                            request.onerror = () => reject(request.error);
-                        });
-                    }
-                    
-                    await new Promise((resolve, reject) => {
-                        tx.oncomplete = () => resolve();
-                        tx.onerror = () => reject(tx.error);
-                    });
-                }
-                
-                datosEnMemoria.productos = datosEnMemoria.productos.filter(p => p.id !== id);
-                renderizarProductos();
-                actualizarStats();
-                mostrarAlerta('Producto eliminado', 'success');
-            } catch (error) {
-                console.error(error);
-                mostrarAlerta('Error al eliminar', 'error');
-            }
-            mostrarLoading(false);
+            datos.productos = datos.productos.filter(p => p.id !== id);
+            guardarDatos();
+            renderizarProductos();
+            actualizarStats();
+            mostrarAlerta('Producto eliminado', 'success');
         }
 
         // ============================================
@@ -955,13 +653,13 @@
         function renderizarCategorias() {
             const container = document.getElementById('listaCategorias');
             const empty = document.getElementById('emptyCategorias');
-            if (datosEnMemoria.categorias.length === 0) {
+            if (datos.categorias.length === 0) {
                 container.innerHTML = '';
                 empty.classList.remove('hidden');
                 return;
             }
             empty.classList.add('hidden');
-            container.innerHTML = datosEnMemoria.categorias.map(c => `
+            container.innerHTML = datos.categorias.map(c => `
                 <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
                     <div class="flex items-start justify-between mb-4">
                         <div class="text-4xl">${c.icono}</div>
@@ -982,7 +680,7 @@
             document.getElementById('tituloModalCat').textContent = id ? 'Editar Categoría' : 'Nueva Categoría';
             
             if (id) {
-                const c = datosEnMemoria.categorias.find(x => x.id === id);
+                const c = datos.categorias.find(x => x.id === id);
                 document.getElementById('catId').value = c.id;
                 document.getElementById('catIdInput').value = c.id;
                 document.getElementById('catIdInput').disabled = true;
@@ -999,7 +697,7 @@
             }
         }
 
-        async function guardarCategoria() {
+        function guardarCategoria() {
             const idOriginal = document.getElementById('catId').value;
             const id = document.getElementById('catIdInput').value.trim().toLowerCase().replace(/\s+/g, '-');
             const nombre = document.getElementById('catNombre').value.trim();
@@ -1007,43 +705,32 @@
             const activa = document.getElementById('catActiva').checked;
             
             if (!id || !nombre) return mostrarAlerta('ID y nombre obligatorios', 'error');
-            if (!idOriginal && datosEnMemoria.categorias.some(c => c.id === id)) return mostrarAlerta('ID ya existe', 'error');
+            if (!idOriginal && datos.categorias.some(c => c.id === id)) return mostrarAlerta('ID ya existe', 'error');
             
-            const categoria = { id: idOriginal || id, nombre, icono, orden: datosEnMemoria.categorias.length + 1, activa };
+            const categoria = { id: idOriginal || id, nombre, icono, orden: datos.categorias.length + 1, activa };
             
-            try {
-                const guardado = await guardarCategoriaEnDB(categoria);
-                if (!guardado) throw new Error('Error DB');
-                
-                if (idOriginal) {
-                    const index = datosEnMemoria.categorias.findIndex(c => c.id === idOriginal);
-                    if (index !== -1) datosEnMemoria.categorias[index] = categoria;
-                    else datosEnMemoria.categorias.push(categoria);
-                } else {
-                    datosEnMemoria.categorias.push(categoria);
-                }
-                
-                cerrarModal('modalCategoria');
-                renderizarCategorias();
-                actualizarStats();
-                mostrarAlerta('✅ Categoría guardada', 'success');
-            } catch (error) {
-                console.error(error);
-                mostrarAlerta('Error al guardar', 'error');
+            if (idOriginal) {
+                const index = datos.categorias.findIndex(c => c.id === idOriginal);
+                if (index !== -1) datos.categorias[index] = categoria;
+                else datos.categorias.push(categoria);
+            } else {
+                datos.categorias.push(categoria);
             }
+            
+            guardarDatos();
+            cerrarModal('modalCategoria');
+            renderizarCategorias();
+            actualizarStats();
+            mostrarAlerta('✅ Categoría guardada', 'success');
         }
 
         function eliminarCategoria(id) {
-            const productosEnCategoria = datosEnMemoria.productos.filter(p => p.categoria === id).length;
+            const productosEnCategoria = datos.productos.filter(p => p.categoria === id).length;
             let mensaje = '¿Eliminar esta categoría?';
-            if (productosEnCategoria > 0) mensaje += `\n⚠️ Hay ${productosEnCategoria} productos en esta categoría.`;
+            if (productosEnCategoria > 0) mensaje += `\n⚠️ Hay ${productosEnCategoria} productos en esta categoría. Se quedarán sin categoría.`;
             if (confirm(mensaje)) {
-                datosEnMemoria.categorias = datosEnMemoria.categorias.filter(c => c.id !== id);
-                if (db) {
-                    const tx = db.transaction('categorias', 'readwrite');
-                    tx.objectStore('categorias').delete(id);
-                    tx.oncomplete = () => {};
-                }
+                datos.categorias = datos.categorias.filter(c => c.id !== id);
+                guardarDatos();
                 renderizarCategorias();
                 actualizarStats();
                 mostrarAlerta('Categoría eliminada', 'success');
@@ -1054,16 +741,16 @@
         // CONFIGURACIÓN
         // ============================================
         function cargarConfig() {
-            document.getElementById('configNombre').value = datosEnMemoria.config.nombre;
-            document.getElementById('configWhatsapp').value = datosEnMemoria.config.whatsapp;
-            document.getElementById('configEmail').value = datosEnMemoria.config.email || '';
-            document.getElementById('configTarifa').value = datosEnMemoria.config.tarifaExpress;
-            document.getElementById('configLat').value = datosEnMemoria.config.lat;
-            document.getElementById('configLng').value = datosEnMemoria.config.lng;
+            document.getElementById('configNombre').value = datos.config.nombre;
+            document.getElementById('configWhatsapp').value = datos.config.whatsapp;
+            document.getElementById('configEmail').value = datos.config.email || '';
+            document.getElementById('configTarifa').value = datos.config.tarifaExpress;
+            document.getElementById('configLat').value = datos.config.lat;
+            document.getElementById('configLng').value = datos.config.lng;
         }
 
-        async function guardarConfig() {
-            datosEnMemoria.config = {
+        function guardarConfig() {
+            datos.config = {
                 nombre: document.getElementById('configNombre').value.trim(),
                 whatsapp: document.getElementById('configWhatsapp').value.trim(),
                 email: document.getElementById('configEmail').value.trim(),
@@ -1071,30 +758,39 @@
                 lat: parseFloat(document.getElementById('configLat').value) || 10.034784,
                 lng: parseFloat(document.getElementById('configLng').value) || -84.158785
             };
-            try {
-                const guardado = await guardarConfigEnDB(datosEnMemoria.config);
-                mostrarAlerta(guardado ? '✅ Configuración guardada' : 'Error al guardar', guardado ? 'success' : 'error');
-            } catch {
-                mostrarAlerta('Error al guardar', 'error');
-            }
+            guardarDatos();
+            mostrarAlerta('✅ Configuración guardada', 'success');
         }
 
         // ============================================
         // BACKUP
         // ============================================
-        async function exportarDatos() {
+        function exportarDatos() {
             mostrarLoading(true);
             try {
-                const backup = { productos: datosEnMemoria.productos, categorias: datosEnMemoria.categorias, pedidos: datosEnMemoria.pedidos, config: datosEnMemoria.config };
+                const backup = {
+                    productos: datos.productos,
+                    categorias: datos.categorias,
+                    pedidos: datos.pedidos,
+                    config: datos.config,
+                    fecha: new Date().toLocaleString('es-CR'),
+                    version: '1.0'
+                };
+                
                 const dataStr = JSON.stringify(backup, null, 2);
                 const blob = new Blob([dataStr], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
+                
+                const fecha = new Date().toISOString().split('T')[0];
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `respaldo-${new Date().toISOString().split('T')[0]}.json`;
+                a.download = `RESPALDO_FLORISTERIA_${fecha}.json`;
+                document.body.appendChild(a);
                 a.click();
+                document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                mostrarAlerta('✅ Backup descargado', 'success');
+                
+                mostrarAlerta('✅ Backup guardado. ¡Guarda este archivo!', 'success');
             } catch (error) {
                 console.error(error);
                 mostrarAlerta('Error al crear backup', 'error');
@@ -1102,43 +798,30 @@
             mostrarLoading(false);
         }
 
-        async function importarDatos(input) {
+        function importarDatos(input) {
             const archivo = input.files[0];
             if (!archivo) return;
             mostrarLoading(true);
             const reader = new FileReader();
-            reader.onload = async (e) => {
+            reader.onload = (e) => {
                 try {
                     const datosImportados = JSON.parse(e.target.result);
-                    if (!confirm('¿Restaurar copia? Se reemplazarán todos los datos.')) return;
                     
-                    if (db) {
-                        // Limpiar todo
-                        const tx = db.transaction(['productos','imagenes','categorias','pedidos','config'], 'readwrite');
-                        tx.objectStore('productos').clear();
-                        tx.objectStore('imagenes').clear();
-                        tx.objectStore('categorias').clear();
-                        tx.objectStore('pedidos').clear();
-                        tx.objectStore('config').clear();
-                        await new Promise((resolve, reject) => {
-                            tx.oncomplete = () => resolve();
-                            tx.onerror = () => reject(tx.error);
-                        });
-                        
-                        // Guardar nuevos
-                        for (const cat of datosImportados.categorias || []) await guardarCategoriaEnDB(cat);
-                        for (const prod of datosImportados.productos || []) {
-                            await guardarProductoEnDB(prod, prod.imagenes || []);
-                        }
-                        for (const ped of datosImportados.pedidos || []) await guardarPedidoEnDB(ped);
-                        await guardarConfigEnDB(datosImportados.config || datosEnMemoria.config);
-                    }
+                    if (!confirm('¿Restaurar copia? Se reemplazarán TODOS los datos actuales.')) return;
                     
-                    await cargarDatosDesdeDB();
-                    mostrarAlerta('✅ Datos restaurados', 'success');
+                    if (datosImportados.productos) datos.productos = datosImportados.productos;
+                    if (datosImportados.categorias) datos.categorias = datosImportados.categorias;
+                    if (datosImportados.pedidos) datos.pedidos = datosImportados.pedidos;
+                    if (datosImportados.config) datos.config = datosImportados.config;
+                    
+                    guardarDatos();
+                    renderizarProductos();
+                    renderizarCategorias();
+                    actualizarStats();
+                    mostrarAlerta('✅ Datos restaurados correctamente', 'success');
                 } catch (err) {
                     console.error(err);
-                    mostrarAlerta('Error al restaurar', 'error');
+                    mostrarAlerta('Error al restaurar. Archivo inválido.', 'error');
                 }
                 mostrarLoading(false);
                 input.value = '';
@@ -1153,8 +836,8 @@
             document.getElementById(id).classList.add('hidden');
         }
 
-        window.onload = async function() {
-            await inicializarDB();
+        window.onload = function() {
+            verificarSesion();
         };
 
         window.onclick = function(event) {
